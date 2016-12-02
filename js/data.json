@@ -1,0 +1,49 @@
+[
+  {
+    "name": "Domestic",
+    "path": "domestic",
+    "photos": []
+  },
+  {
+    "name": "Friends",
+    "path": "friends",
+    "photos": [{
+      "name": "Desmond",
+      "path": "desmond",
+      "type": "object"
+    }, {
+      "name": "Dylan On The Couch",
+      "path": "dylan-on-the-couch",
+      "type": "object"
+    }, {
+      "name": "Half Dylan",
+      "path": "half-dylan",
+      "type": "object"
+    }, {
+      "name": "Jaq Montauk",
+      "path": "jaq-montauk",
+      "type": "object"
+    }, {
+      "name": "Nigel",
+      "path": "nigel",
+      "type": "object"
+    }, {
+      "name": "Riddhi Montauk",
+      "path": "riddhi-montauk",
+      "type": "object"
+    }, {
+      "name": "Sam",
+      "path": "sam",
+      "type": "object"
+    }, {
+      "name": "Seb Montauk",
+      "path": "seb-montauk",
+      "type": "object"
+    }]
+  },
+  {
+    "name": "Natural History",
+    "path": "natural-history",
+    "photos": []
+  }
+]
