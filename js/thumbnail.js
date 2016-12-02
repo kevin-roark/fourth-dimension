@@ -1,5 +1,5 @@
 
-import THREE from 'three';
+let THREE = require('three');
 
 let textureLoader = new THREE.TextureLoader();
 
@@ -13,7 +13,7 @@ export default class Thumbnail {
   load (callback) {
     let { seriesPath, modelPath, scale } = this;
 
-    let texturePath = `models/${seriesPath}/${modelPath}/Texture.jpg`;
+    let texturePath = `models/${seriesPath}/${modelPath}/Thumbnail.jpg`;
     textureLoader.load(texturePath, texture => {
       let length = 1 * scale;
       let geometry = new THREE.BoxBufferGeometry(length, length, 0.2);

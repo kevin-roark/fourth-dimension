@@ -1,7 +1,8 @@
 
-import THREE from 'three';
-import TWEEN from 'tween';
-import isMobile from 'ismobilejs';
+let THREE = require('three');
+let TWEEN = require('tween.js');
+let isMobile = require('ismobilejs');
+
 import seriesData from './data';
 import ThumbnailPile from './thumbnail-pile';
 
@@ -26,7 +27,7 @@ function go () {
   window.scene = scene;
 
   let camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 10000);
-  camera.position.z = 80;
+  camera.position.z = 20;
   scene.add(camera);
 
   let container = document.body;

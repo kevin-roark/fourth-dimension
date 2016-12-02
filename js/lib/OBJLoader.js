@@ -1,5 +1,5 @@
 
-import THREE from 'three';
+let THREE = require('three');
 
 /**
  * @author mrdoob / http://mrdoob.com/
