@@ -5,6 +5,7 @@ let isMobile = require('ismobilejs');
 
 import seriesData from './data';
 import ThumbnailPile from './thumbnail-pile';
+import MouseIntersector from './mouse-intersector';
 
 if (isMobile.any) {
   let mobileWarning = document.createElement('div');
@@ -27,18 +28,31 @@ function go () {
   window.scene = scene;
 
   let camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 10000);
-  camera.position.z = 20;
+  camera.position.z = 30;
   scene.add(camera);
 
   let container = document.body;
   container.appendChild(renderer.domElement);
 
+  let dom = {
+    seriesTitle: document.querySelector('.series-title')
+  };
+
+  let thumbnailMeshes = [];
   let startTime;
 
   window.addEventListener('resize', resize);
   resize();
 
-  createScene();
+  createScene(() => {
+    let thumbnailIntersector = new MouseIntersector({ camera, renderer, meshes: thumbnailMeshes });
+    thumbnailIntersector.addHoverListener(mesh => {
+      setHoverThumnbail(mesh ? mesh._thumbnail : null);
+    });
+    thumbnailIntersector.addClickListener(mesh => {
+      console.log(mesh._thumbnail);
+    });
+  });
   renderer.render(scene, camera);
   start();
 
@@ -65,24 +79,46 @@ function go () {
     window.requestAnimationFrame(update);
   }
 
-  function createScene () {
+  function setHoverThumnbail (thumbnail) {
+    let title = thumbnail ? `${thumbnail._pile.series.name} — ${thumbnail.photo.name}` : '';
+    dom.seriesTitle.textContent = title;
+  }
+
+  function createScene (callback) {
+    let remaining = 1;
+
     makeLights();
-    makePiles();
+    makePiles(loaded);
+
+    function loaded () {
+      remaining -= 1;
+      if (remaining === 0) callback();
+    }
   }
 
   function makeLights () {
-    let ambient = new THREE.AmbientLight(0x888888, 1);
+    let ambient = new THREE.AmbientLight(0xffffff, 1);
     scene.add(ambient);
   }
 
-  function makePiles () {
+  function makePiles (callback) {
+    let remaining = seriesData.length;
+    let half = Math.floor(seriesData.length / 2);
+
     seriesData.forEach((series, idx) => {
       let thumbnailPile = new ThumbnailPile({ series });
       thumbnailPile.load(() => {
-        let x = -80 + 160 * (idx / (seriesData.length - 1));
-        thumbnailPile.mesh.position.set(x, 0, 0);
+        let x = -21 + 60 * ((idx % half) / half);
+        let y = idx % 2 === 0 ? 10 : -10;
+        thumbnailPile.mesh.position.set(x, y, 0);
 
         scene.add(thumbnailPile.mesh);
+        thumbnailMeshes = thumbnailMeshes.concat(thumbnailPile.thumbnails.map(t => t.mesh));
+
+        remaining -= 1;
+        if (remaining === 0 && callback) {
+          callback();
+        }
       });
     });
   }

@@ -1,54 +1,5 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-module.exports=[
-  {
-    "name": "Domestic",
-    "path": "domestic",
-    "photos": []
-  },
-  {
-    "name": "Friends",
-    "path": "friends",
-    "photos": [{
-      "name": "Desmond",
-      "path": "desmond",
-      "type": "object"
-    }, {
-      "name": "Dylan On The Couch",
-      "path": "dylan-on-the-couch",
-      "type": "object"
-    }, {
-      "name": "Half Dylan",
-      "path": "half-dylan",
-      "type": "object"
-    }, {
-      "name": "Jaq Montauk",
-      "path": "jaq-montauk",
-      "type": "object"
-    }, {
-      "name": "Nigel",
-      "path": "nigel",
-      "type": "object"
-    }, {
-      "name": "Riddhi Montauk",
-      "path": "riddhi-montauk",
-      "type": "object"
-    }, {
-      "name": "Sam",
-      "path": "sam",
-      "type": "object"
-    }, {
-      "name": "Seb Montauk",
-      "path": "seb-montauk",
-      "type": "object"
-    }]
-  },
-  {
-    "name": "Natural History",
-    "path": "natural-history",
-    "photos": []
-  }
-]
-
+module.exports=[{"name":"Domestic","path":"domestic","photos":[{"name":"Bedroom","path":"bedroom","type":"object"},{"name":"Den","path":"den","type":"object"},{"name":"Elegant Living Room","path":"elegant-living-room","type":"object"},{"name":"Kitchen","path":"kitchen","type":"object"},{"name":"Living Room","path":"living-room","type":"object"}]},{"name":"Friends","path":"friends","photos":[{"name":"Desmond","path":"desmond","type":"object"},{"name":"Dylan On The Couch","path":"dylan-on-the-couch","type":"object"},{"name":"Half Dylan","path":"half-dylan","type":"object"},{"name":"Jaq Montauk","path":"jaq-montauk","type":"object"},{"name":"Nigel","path":"nigel","type":"object"},{"name":"Riddhi Montauk","path":"riddhi-montauk","type":"object"},{"name":"Sam","path":"sam","type":"object"},{"name":"Seb Montauk","path":"seb-montauk","type":"object"}]},{"name":"Natural History","path":"natural-history","photos":[{"name":"Alien Rocks","path":"alien-rocks","type":"object"},{"name":"Big Fly","path":"big-fly","type":"object"},{"name":"Evolution","path":"evolution","type":"object"},{"name":"Farm Scene","path":"farm-scene","type":"object"},{"name":"Frog Shadow","path":"frog-shadow","type":"object"},{"name":"Lot Of Skulls","path":"lot-of-skulls","type":"object"},{"name":"Three Skulls","path":"three-skulls","type":"object"},{"name":"True Monkey","path":"true-monkey","type":"object"}]},{"name":"Objects 1","path":"objects-1","photos":[{"name":"Angel","path":"angel","type":"object"},{"name":"Bad Father","path":"bad-father","type":"object"},{"name":"Basketball","path":"basketball","type":"object"},{"name":"Ben Franklin Bust","path":"ben-franklin-bust","type":"object"},{"name":"Broken Eagle","path":"broken-eagle","type":"object"},{"name":"Father","path":"father","type":"object"},{"name":"Freedom","path":"freedom","type":"object"},{"name":"Gator","path":"gator","type":"object"},{"name":"Grotto","path":"grotto","type":"object"},{"name":"Laptop","path":"laptop","type":"object"},{"name":"Last Supper","path":"last-supper","type":"object"},{"name":"Marble Bust","path":"marble-bust","type":"object"},{"name":"Mary","path":"mary","type":"object"},{"name":"Minion","path":"minion","type":"object"},{"name":"Rock","path":"rock","type":"object"},{"name":"Rocky","path":"rocky","type":"object"},{"name":"Video Camera","path":"video-camera","type":"object"}]},{"name":"Roark","path":"roark","photos":[{"name":"Isabella","path":"isabella","type":"object"},{"name":"Kevin Sr","path":"kevin-sr","type":"object"},{"name":"Laurie","path":"laurie","type":"object"},{"name":"Laurie And Mom","path":"laurie-and-mom","type":"object"},{"name":"Melanie","path":"melanie","type":"object"},{"name":"Moses","path":"moses","type":"object"}]},{"name":"Still Life","path":"still-life","photos":[{"name":"Bella With Dog","path":"bella-with-dog","type":"object"},{"name":"Dylan On Github","path":"dylan-on-github","type":"object"},{"name":"Laurie In The Mirror","path":"laurie-in-the-mirror","type":"object"},{"name":"Meme Nancy Reading","path":"meme-nancy-reading","type":"object"},{"name":"Myself In The Mirror","path":"myself-in-the-mirror","type":"object"},{"name":"Photo Of Rocks","path":"photo-of-rocks","type":"object"}]}]
 },{}],2:[function(require,module,exports){
 "use strict";
 
@@ -61,6 +12,8 @@ var isMobile = require("ismobilejs");
 var seriesData = _interopRequire(require("./data"));
 
 var ThumbnailPile = _interopRequire(require("./thumbnail-pile"));
+
+var MouseIntersector = _interopRequire(require("./mouse-intersector"));
 
 if (isMobile.any) {
   var mobileWarning = document.createElement("div");
@@ -83,18 +36,31 @@ function go() {
   window.scene = scene;
 
   var camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 10000);
-  camera.position.z = 20;
+  camera.position.z = 30;
   scene.add(camera);
 
   var container = document.body;
   container.appendChild(renderer.domElement);
 
+  var dom = {
+    seriesTitle: document.querySelector(".series-title")
+  };
+
+  var thumbnailMeshes = [];
   var startTime = undefined;
 
   window.addEventListener("resize", resize);
   resize();
 
-  createScene();
+  createScene(function () {
+    var thumbnailIntersector = new MouseIntersector({ camera: camera, renderer: renderer, meshes: thumbnailMeshes });
+    thumbnailIntersector.addHoverListener(function (mesh) {
+      setHoverThumnbail(mesh ? mesh._thumbnail : null);
+    });
+    thumbnailIntersector.addClickListener(function (mesh) {
+      console.log(mesh._thumbnail);
+    });
+  });
   renderer.render(scene, camera);
   start();
 
@@ -121,30 +87,133 @@ function go() {
     window.requestAnimationFrame(update);
   }
 
-  function createScene() {
+  function setHoverThumnbail(thumbnail) {
+    var title = thumbnail ? "" + thumbnail._pile.series.name + " — " + thumbnail.photo.name : "";
+    dom.seriesTitle.textContent = title;
+  }
+
+  function createScene(callback) {
+    var remaining = 1;
+
     makeLights();
-    makePiles();
+    makePiles(loaded);
+
+    function loaded() {
+      remaining -= 1;
+      if (remaining === 0) callback();
+    }
   }
 
   function makeLights() {
-    var ambient = new THREE.AmbientLight(8947848, 1);
+    var ambient = new THREE.AmbientLight(16777215, 1);
     scene.add(ambient);
   }
 
-  function makePiles() {
+  function makePiles(callback) {
+    var remaining = seriesData.length;
+    var half = Math.floor(seriesData.length / 2);
+
     seriesData.forEach(function (series, idx) {
       var thumbnailPile = new ThumbnailPile({ series: series });
       thumbnailPile.load(function () {
-        var x = -80 + 160 * (idx / (seriesData.length - 1));
-        thumbnailPile.mesh.position.set(x, 0, 0);
+        var x = -21 + 60 * (idx % half / half);
+        var y = idx % 2 === 0 ? 10 : -10;
+        thumbnailPile.mesh.position.set(x, y, 0);
 
         scene.add(thumbnailPile.mesh);
+        thumbnailMeshes = thumbnailMeshes.concat(thumbnailPile.thumbnails.map(function (t) {
+          return t.mesh;
+        }));
+
+        remaining -= 1;
+        if (remaining === 0 && callback) {
+          callback();
+        }
       });
     });
   }
 }
 
-},{"./data":1,"./thumbnail-pile":3,"ismobilejs":5,"three":6,"tween.js":7}],3:[function(require,module,exports){
+},{"./data":1,"./mouse-intersector":3,"./thumbnail-pile":4,"ismobilejs":6,"three":7,"tween.js":8}],3:[function(require,module,exports){
+"use strict";
+
+var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
+var THREE = require("three");
+
+var MouseIntersector = (function () {
+  function MouseIntersector(_ref) {
+    var camera = _ref.camera;
+    var renderer = _ref.renderer;
+    var meshes = _ref.meshes;
+
+    _classCallCheck(this, MouseIntersector);
+
+    this.camera = camera;
+    this.meshes = meshes;
+    this.renderer = renderer;
+
+    this.raycaster = new THREE.Raycaster();
+    this.mouse = new THREE.Vector2();
+    this.hoverListeners = [];
+    this.clickListeners = [];
+
+    document.addEventListener("mousemove", this.move.bind(this));
+    document.addEventListener("click", this.click.bind(this));
+  }
+
+  _createClass(MouseIntersector, {
+    addHoverListener: {
+      value: function addHoverListener(fn) {
+        this.hoverListeners.push(fn);
+      }
+    },
+    addClickListener: {
+      value: function addClickListener(fn) {
+        this.clickListeners.push(fn);
+      }
+    },
+    move: {
+      value: function move(ev) {
+        var intersects = this.getIntersections(ev);
+        this.notifyListeners(intersects, this.hoverListeners);
+      }
+    },
+    click: {
+      value: function click(ev) {
+        var intersects = this.getIntersections(ev);
+        this.notifyListeners(intersects, this.clickListeners);
+      }
+    },
+    notifyListeners: {
+      value: function notifyListeners(intersects, listeners) {
+        var firstObject = intersects.length > 0 ? intersects[0].object : null;
+        listeners.forEach(function (listener) {
+          listener(firstObject, intersects);
+        });
+      }
+    },
+    getIntersections: {
+      value: function getIntersections(ev) {
+        this.mouse.x = ev.clientX / this.renderer.domElement.clientWidth * 2 - 1;
+        this.mouse.y = -(ev.clientY / this.renderer.domElement.clientHeight) * 2 + 1;
+
+        this.raycaster.setFromCamera(this.mouse, this.camera);
+
+        var intersects = this.raycaster.intersectObjects(this.meshes);
+        return intersects;
+      }
+    }
+  });
+
+  return MouseIntersector;
+})();
+
+module.exports = MouseIntersector;
+
+},{"three":7}],4:[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -168,6 +237,7 @@ var ThumbnailPile = (function () {
     this.series = series;
     this.spread = spread;
     this.mesh = new THREE.Object3D();
+    this.mesh._pile = this;
   }
 
   _createClass(ThumbnailPile, {
@@ -184,7 +254,8 @@ var ThumbnailPile = (function () {
         var thumbnails = this.thumbnails = [];
 
         series.photos.forEach(function (photo) {
-          var thumbnail = new Thumbnail({ seriesPath: series.path, modelPath: photo.path, scale: 2 });
+          var thumbnail = new Thumbnail({ photo: photo, seriesPath: series.path, scale: 2 });
+          thumbnail._pile = _this;
           thumbnails.push(thumbnail);
 
           thumbnail.load(function () {
@@ -212,7 +283,7 @@ var ThumbnailPile = (function () {
 
 module.exports = ThumbnailPile;
 
-},{"./Thumbnail":4,"three":6}],4:[function(require,module,exports){
+},{"./Thumbnail":5,"three":7}],5:[function(require,module,exports){
 "use strict";
 
 var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
@@ -226,14 +297,14 @@ var textureLoader = new THREE.TextureLoader();
 var Thumbnail = (function () {
   function Thumbnail(_ref) {
     var seriesPath = _ref.seriesPath;
-    var modelPath = _ref.modelPath;
+    var photo = _ref.photo;
     var _ref$scale = _ref.scale;
     var scale = _ref$scale === undefined ? 1 : _ref$scale;
 
     _classCallCheck(this, Thumbnail);
 
     this.seriesPath = seriesPath;
-    this.modelPath = modelPath;
+    this.photo = photo;
     this.scale = scale;
   }
 
@@ -245,10 +316,10 @@ var Thumbnail = (function () {
         var _ref = this;
 
         var seriesPath = _ref.seriesPath;
-        var modelPath = _ref.modelPath;
+        var photo = _ref.photo;
         var scale = _ref.scale;
 
-        var texturePath = "models/" + seriesPath + "/" + modelPath + "/Thumbnail.jpg";
+        var texturePath = "models/" + seriesPath + "/" + photo.path + "/Thumbnail.jpg";
         textureLoader.load(texturePath, function (texture) {
           var length = 1 * scale;
           var geometry = new THREE.BoxBufferGeometry(length, length, 0.2);
@@ -262,6 +333,7 @@ var Thumbnail = (function () {
           material.side = THREE.DoubleSide;
 
           var mesh = _this.mesh = new THREE.Mesh(geometry, material);
+          mesh._thumbnail = _this;
           if (callback) callback(mesh);
         });
       }
@@ -273,7 +345,7 @@ var Thumbnail = (function () {
 
 module.exports = Thumbnail;
 
-},{"three":6}],5:[function(require,module,exports){
+},{"three":7}],6:[function(require,module,exports){
 /**
  * isMobile.js v0.4.0
  *
@@ -412,7 +484,7 @@ module.exports = Thumbnail;
 
 })(this);
 
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
     typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -42205,7 +42277,7 @@ module.exports = Thumbnail;
     Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 (function (process){
 /**
  * Tween.js - Licensed under the MIT license
@@ -43079,7 +43151,7 @@ TWEEN.Interpolation = {
 })(this);
 
 }).call(this,require('_process'))
-},{"_process":8}],8:[function(require,module,exports){
+},{"_process":9}],9:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};

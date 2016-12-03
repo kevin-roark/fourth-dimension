@@ -7,7 +7,7 @@ const typeMap = {
   friends: 'body',
   domestic: 'room',
 };
-const makeThumbnails = false;
+const makeThumbnails = true;
 
 let seriesPaths = fs.readdirSync('models').filter(dirFilter);
 let data = seriesPaths.map(seriesPath => {

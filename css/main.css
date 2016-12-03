@@ -23,6 +23,7 @@ canvas {
 }
 
 .info {
+  z-index: 1;
   position: fixed;
   top: 10px;
   right: 10px;
@@ -51,6 +52,7 @@ canvas {
   }
 
 .series-title {
+  z-index: 1;
   position: fixed;
   bottom: 40px;
   right: 40px;

@@ -7,6 +7,7 @@ export default class ThumbnailPile {
     this.series = series;
     this.spread = spread;
     this.mesh = new THREE.Object3D();
+    this.mesh._pile = this;
   }
 
   load (callback) {
@@ -15,7 +16,8 @@ export default class ThumbnailPile {
     let thumbnails = this.thumbnails = [];
 
     series.photos.forEach(photo => {
-      let thumbnail = new Thumbnail({ seriesPath: series.path, modelPath: photo.path, scale: 2 });
+      let thumbnail = new Thumbnail({ photo, seriesPath: series.path, scale: 2 });
+      thumbnail._pile = this;
       thumbnails.push(thumbnail);
 
       thumbnail.load(() => {
