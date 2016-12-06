@@ -8,6 +8,8 @@ import ThumbnailPile from './thumbnail-pile';
 import PhotoView from './photo-view';
 import MouseIntersector from './mouse-intersector';
 
+let CAMERA_POSITION = { home: 30, view: 20 };
+
 if (isMobile.any) {
   let mobileWarning = document.createElement('div');
   mobileWarning.className = 'mobile-warning';
@@ -29,7 +31,7 @@ function go () {
   window.scene = scene;
 
   let camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 10000);
-  camera.position.z = 30;
+  camera.position.z = CAMERA_POSITION.home;
   scene.add(camera);
 
   let container = new THREE.Object3D();
@@ -55,10 +57,22 @@ function go () {
   createScene(() => {
     let thumbnailIntersector = new MouseIntersector({ camera, renderer, meshes: thumbnailMeshes });
     thumbnailIntersector.addHoverListener(mesh => {
+      if (state.photoInView || state.loadingPhotoView) return;
       setHoverThumnbail(mesh ? mesh._thumbnail : null);
     });
     thumbnailIntersector.addClickListener(mesh => {
+      if (state.photoInView || state.loadingPhotoView) return;
       viewPhoto(mesh ? mesh._thumbnail.photo : null);
+    });
+
+    document.addEventListener('keydown', ev => {
+      switch (ev.keyCode) {
+        case 27: // escape
+          if (state.photoInView) {
+            viewPhoto(null);
+          }
+          break;
+      }
     });
   });
   renderer.render(scene, camera);
@@ -107,14 +121,17 @@ function go () {
       state.loadingPhotoView = true;
       let photoView = new PhotoView({ photo, scene });
       photoView.load(() => {
+        state.loadingPhotoView = false;
         scene.remove(container);
         photoView.activate();
         state.photoInView = photoView;
+        camera.position.z = CAMERA_POSITION.view;
       });
     } else {
       state.photoInView.deactivate();
       state.photoInView = null;
       scene.add(container);
+      camera.position.z = CAMERA_POSITION.home;
     }
   }
 

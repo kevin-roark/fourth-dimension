@@ -31,12 +31,12 @@ export default function load (photo, callback) {
     loaded();
   });
 
-  let objPath = `models/${photo.seriesPath}/${photo.path}/Thumbnail.jpg`;
-  objLoader.load(objPath, geometry => {
-    model.geometry = geometry;
+  let objPath = `models/${photo.seriesPath}/${photo.path}/Model.obj`;
+  objLoader.load(objPath, group => {
+    model.geometry = group.children[0].geometry;
     loaded();
   },
-  null, err => {
+  _ => _, err => {
     console.err(err);
   });
 }
