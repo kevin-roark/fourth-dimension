@@ -10,17 +10,17 @@ body {
 canvas {
   position: fixed;
   top: 0; left: 0; width: 100%; height: 100%;
-  cursor: url('images/myhand.png'), auto;
+  cursor: url('../images/myhand.png'), auto;
 }
 
 ::-moz-selection {
-  background: #fff;
-  color: #ffff00;
+  background: #00f;
+  color: #fff;
 }
 
 ::selection {
-  background: #fff;
-  color: #ffff00;
+  background: #00f;
+  color: #fff;
 }
 
 .info {

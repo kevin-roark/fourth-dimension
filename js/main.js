@@ -5,6 +5,7 @@ let isMobile = require('ismobilejs');
 
 import seriesData from './data';
 import ThumbnailPile from './thumbnail-pile';
+import PhotoView from './photo-view';
 import MouseIntersector from './mouse-intersector';
 
 if (isMobile.any) {
@@ -31,11 +32,18 @@ function go () {
   camera.position.z = 30;
   scene.add(camera);
 
-  let container = document.body;
-  container.appendChild(renderer.domElement);
+  let container = new THREE.Object3D();
+  scene.add(container);
+
+  document.body.appendChild(renderer.domElement);
 
   let dom = {
     seriesTitle: document.querySelector('.series-title')
+  };
+
+  let state = {
+    loadingPhotoView: false,
+    photoInView: null
   };
 
   let thumbnailMeshes = [];
@@ -50,7 +58,7 @@ function go () {
       setHoverThumnbail(mesh ? mesh._thumbnail : null);
     });
     thumbnailIntersector.addClickListener(mesh => {
-      console.log(mesh._thumbnail);
+      viewPhoto(mesh ? mesh._thumbnail.photo : null);
     });
   });
   renderer.render(scene, camera);
@@ -87,6 +95,29 @@ function go () {
     renderer.domElement.style.cursor = cursor;
   }
 
+  function viewPhoto (photo) {
+    if (!!photo === !!state.photoInView) {
+      return;
+    }
+    if (state.loadingPhotoView) {
+      return;
+    }
+
+    if (photo) {
+      state.loadingPhotoView = true;
+      let photoView = new PhotoView({ photo, scene });
+      photoView.load(() => {
+        scene.remove(container);
+        photoView.activate();
+        state.photoInView = photoView;
+      });
+    } else {
+      state.photoInView.deactivate();
+      state.photoInView = null;
+      scene.add(container);
+    }
+  }
+
   function createScene (callback) {
     let remaining = 1;
 
@@ -115,7 +146,7 @@ function go () {
         let y = idx % 2 === 0 ? 10 : -10;
         thumbnailPile.mesh.position.set(x, y, 0);
 
-        scene.add(thumbnailPile.mesh);
+        container.add(thumbnailPile.mesh);
         thumbnailMeshes = thumbnailMeshes.concat(thumbnailPile.thumbnails.map(t => t.mesh));
 
         remaining -= 1;
