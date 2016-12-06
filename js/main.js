@@ -82,6 +82,9 @@ function go () {
   function setHoverThumnbail (thumbnail) {
     let title = thumbnail ? `${thumbnail._pile.series.name} — ${thumbnail.photo.name}` : '';
     dom.seriesTitle.textContent = title;
+
+    let cursor = thumbnail ? "url('images/basketball.png'), crosshair" : "url('images/myhand.png'), auto";
+    renderer.domElement.style.cursor = cursor;
   }
 
   function createScene (callback) {
