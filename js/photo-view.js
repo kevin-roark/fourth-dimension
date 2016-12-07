@@ -43,4 +43,20 @@ export default class PhotoView {
     this.scene.background = null;
     this.scene.remove(this.container);
   }
+
+  keydown (ev) {
+
+  }
+
+  mousedown (ev) {
+
+  }
+
+  mouseup (ev) {
+
+  }
+
+  mousemove (ev) {
+
+  }
 }

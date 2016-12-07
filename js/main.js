@@ -40,7 +40,10 @@ function go () {
   document.body.appendChild(renderer.domElement);
 
   let dom = {
-    seriesTitle: document.querySelector('.series-title')
+    info: document.querySelector('.info'),
+    seriesTitle: document.querySelector('.series-title'),
+    photoViewInterface: document.querySelector('.photo-view-interface'),
+    photoViewCloseButton: document.querySelector('.photo-view-close-button')
   };
 
   let state = {
@@ -68,12 +71,27 @@ function go () {
     document.addEventListener('keydown', ev => {
       switch (ev.keyCode) {
         case 27: // escape
-          if (state.photoInView) {
-            viewPhoto(null);
-          }
+          exitCurrentPhotoView();
+          break;
+        default:
+          if (state.photoInView) state.photoInView.keydown(ev);
           break;
       }
     });
+
+    document.addEventListener('mousedown', ev => {
+      if (state.photoInView) state.photoInView.mousedown(ev);
+    });
+
+    document.addEventListener('mouseup', ev => {
+      if (state.photoInView) state.photoInView.mouseup(ev);
+    });
+
+    document.addEventListener('mousemove', ev => {
+      if (state.photoInView) state.photoInView.mousemove(ev);
+    });
+
+    dom.photoViewCloseButton.addEventListener('click', exitCurrentPhotoView);
   });
   renderer.render(scene, camera);
   start();
@@ -122,17 +140,35 @@ function go () {
       let photoView = new PhotoView({ photo, scene });
       photoView.load(() => {
         state.loadingPhotoView = false;
-        scene.remove(container);
-        photoView.activate();
-        state.photoInView = photoView;
-        camera.position.z = CAMERA_POSITION.view;
+        setPhotoView(photoView);
       });
     } else {
-      state.photoInView.deactivate();
-      state.photoInView = null;
-      scene.add(container);
-      camera.position.z = CAMERA_POSITION.home;
+      setPhotoView(null);
     }
+  }
+
+  function exitCurrentPhotoView () {
+    if (state.photoInView) {
+      viewPhoto(null);
+    }
+  }
+
+  function setPhotoView (photoView) {
+    if (photoView) {
+      scene.remove(container);
+      photoView.activate();
+    } else {
+      state.photoInView.deactivate();
+      scene.add(container);
+    }
+
+    [dom.info, dom.photoViewInterface, dom.seriesTitle].forEach(el => {
+      if (photoView) el.classList.add('photo-view');
+      else el.classList.remove('photo-view');
+    });
+
+    state.photoInView = photoView;
+    camera.position.z = photoView ? CAMERA_POSITION.view : CAMERA_POSITION.home;
   }
 
   function createScene (callback) {
