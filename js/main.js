@@ -8,7 +8,7 @@ import ThumbnailPile from './thumbnail-pile';
 import PhotoView from './photo-view';
 import MouseIntersector from './mouse-intersector';
 
-let CAMERA_POSITION = { home: 30, view: 20 };
+let CAMERA_POSITION = { home: 30, view: 10 };
 
 if (isMobile.any) {
   let mobileWarning = document.createElement('div');
@@ -20,6 +20,8 @@ if (isMobile.any) {
 }
 
 function go () {
+  window.THREE = THREE;
+
   let renderer = new THREE.WebGLRenderer({
     antialias: true
   });
@@ -43,16 +45,23 @@ function go () {
     info: document.querySelector('.info'),
     seriesTitle: document.querySelector('.series-title'),
     photoViewInterface: document.querySelector('.photo-view-interface'),
-    photoViewCloseButton: document.querySelector('.photo-view-close-button')
+    photoViewCloseButton: document.querySelector('.photo-view-close-button'),
+    photoViewControlButtons: {
+      wireframe: document.querySelector('#wireframe-button'),
+      texture: document.querySelector('#texture-button'),
+      lighting: document.querySelector('#lighting-button'),
+      background: document.querySelector('#background-button')
+    }
   };
 
   let state = {
     loadingPhotoView: false,
-    photoInView: null
+    photoInView: null,
+    startTime: null,
+    lastTime: null
   };
 
   let thumbnailMeshes = [];
-  let startTime;
 
   window.addEventListener('resize', resize);
   resize();
@@ -92,6 +101,19 @@ function go () {
     });
 
     dom.photoViewCloseButton.addEventListener('click', exitCurrentPhotoView);
+
+    dom.photoViewControlButtons.wireframe.addEventListener('click', () => {
+      if (state.photoInView) state.photoInView.wireframeButtonPressed();
+    });
+    dom.photoViewControlButtons.texture.addEventListener('click', () => {
+      if (state.photoInView) state.photoInView.textureButtonPressed();
+    });
+    dom.photoViewControlButtons.lighting.addEventListener('click', () => {
+      if (state.photoInView) state.photoInView.lightingButtonPressed();
+    });
+    dom.photoViewControlButtons.background.addEventListener('click', () => {
+      if (state.photoInView) state.photoInView.backgroundButtonPressed();
+    });
   });
   renderer.render(scene, camera);
   start();
@@ -111,10 +133,15 @@ function go () {
   }
 
   function update (time) {
-    if (null == startTime) startTime = time;
+    if (!state.startTime) state.startTime = time;
+    let delta = time - (state.lastTime || time);
 
     TWEEN.update(time);
+
+    if (state.photoInView) state.photoInView.update(delta);
+
     renderer.render(scene, camera);
+    state.lastTime = time;
 
     window.requestAnimationFrame(update);
   }

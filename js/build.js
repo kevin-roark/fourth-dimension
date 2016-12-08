@@ -57,9 +57,64 @@ var Thumbnail = (function () {
 
 module.exports = Thumbnail;
 
-},{"three":10}],2:[function(require,module,exports){
+},{"three":11}],2:[function(require,module,exports){
 module.exports=[{"name":"Domestic","path":"domestic","photos":[{"name":"Bedroom","path":"bedroom","seriesPath":"domestic","type":"object"},{"name":"Den","path":"den","seriesPath":"domestic","type":"object"},{"name":"Elegant Living Room","path":"elegant-living-room","seriesPath":"domestic","type":"object"},{"name":"Kitchen","path":"kitchen","seriesPath":"domestic","type":"object"},{"name":"Living Room","path":"living-room","seriesPath":"domestic","type":"object"}]},{"name":"Friends","path":"friends","photos":[{"name":"Desmond","path":"desmond","seriesPath":"friends","type":"object"},{"name":"Dylan On The Couch","path":"dylan-on-the-couch","seriesPath":"friends","type":"object"},{"name":"Half Dylan","path":"half-dylan","seriesPath":"friends","type":"object"},{"name":"Jaq Montauk","path":"jaq-montauk","seriesPath":"friends","type":"object"},{"name":"Nigel","path":"nigel","seriesPath":"friends","type":"object"},{"name":"Riddhi Montauk","path":"riddhi-montauk","seriesPath":"friends","type":"object"},{"name":"Sam","path":"sam","seriesPath":"friends","type":"object"},{"name":"Seb Montauk","path":"seb-montauk","seriesPath":"friends","type":"object"}]},{"name":"Natural History","path":"natural-history","photos":[{"name":"Alien Rocks","path":"alien-rocks","seriesPath":"natural-history","type":"object"},{"name":"Big Fly","path":"big-fly","seriesPath":"natural-history","type":"object"},{"name":"Evolution","path":"evolution","seriesPath":"natural-history","type":"object"},{"name":"Farm Scene","path":"farm-scene","seriesPath":"natural-history","type":"object"},{"name":"Frog Shadow","path":"frog-shadow","seriesPath":"natural-history","type":"object"},{"name":"Lot Of Skulls","path":"lot-of-skulls","seriesPath":"natural-history","type":"object"},{"name":"Three Skulls","path":"three-skulls","seriesPath":"natural-history","type":"object"},{"name":"True Monkey","path":"true-monkey","seriesPath":"natural-history","type":"object"}]},{"name":"Objects 1","path":"objects-1","photos":[{"name":"Angel","path":"angel","seriesPath":"objects-1","type":"object"},{"name":"Bad Father","path":"bad-father","seriesPath":"objects-1","type":"object"},{"name":"Basketball","path":"basketball","seriesPath":"objects-1","type":"object"},{"name":"Ben Franklin Bust","path":"ben-franklin-bust","seriesPath":"objects-1","type":"object"},{"name":"Broken Eagle","path":"broken-eagle","seriesPath":"objects-1","type":"object"},{"name":"Father","path":"father","seriesPath":"objects-1","type":"object"},{"name":"Freedom","path":"freedom","seriesPath":"objects-1","type":"object"},{"name":"Gator","path":"gator","seriesPath":"objects-1","type":"object"},{"name":"Grotto","path":"grotto","seriesPath":"objects-1","type":"object"},{"name":"Laptop","path":"laptop","seriesPath":"objects-1","type":"object"},{"name":"Last Supper","path":"last-supper","seriesPath":"objects-1","type":"object"},{"name":"Marble Bust","path":"marble-bust","seriesPath":"objects-1","type":"object"},{"name":"Mary","path":"mary","seriesPath":"objects-1","type":"object"},{"name":"Minion","path":"minion","seriesPath":"objects-1","type":"object"},{"name":"Rock","path":"rock","seriesPath":"objects-1","type":"object"},{"name":"Rocky","path":"rocky","seriesPath":"objects-1","type":"object"},{"name":"Video Camera","path":"video-camera","seriesPath":"objects-1","type":"object"}]},{"name":"Roark","path":"roark","photos":[{"name":"Isabella","path":"isabella","seriesPath":"roark","type":"object"},{"name":"Kevin Sr","path":"kevin-sr","seriesPath":"roark","type":"object"},{"name":"Laurie","path":"laurie","seriesPath":"roark","type":"object"},{"name":"Laurie And Mom","path":"laurie-and-mom","seriesPath":"roark","type":"object"},{"name":"Melanie","path":"melanie","seriesPath":"roark","type":"object"},{"name":"Moses","path":"moses","seriesPath":"roark","type":"object"}]},{"name":"Still Life","path":"still-life","photos":[{"name":"Bella With Dog","path":"bella-with-dog","seriesPath":"still-life","type":"object"},{"name":"Dylan On Github","path":"dylan-on-github","seriesPath":"still-life","type":"object"},{"name":"Laurie In The Mirror","path":"laurie-in-the-mirror","seriesPath":"still-life","type":"object"},{"name":"Meme Nancy Reading","path":"meme-nancy-reading","seriesPath":"still-life","type":"object"},{"name":"Myself In The Mirror","path":"myself-in-the-mirror","seriesPath":"still-life","type":"object"},{"name":"Photo Of Rocks","path":"photo-of-rocks","seriesPath":"still-life","type":"object"}]}]
 },{}],3:[function(require,module,exports){
+"use strict";
+
+module.exports = createGrid;
+
+var THREE = require("three");
+
+function createGrid() {
+  var _ref = arguments[0] === undefined ? {} : arguments[0];
+
+  var _ref$length = _ref.length;
+  var length = _ref$length === undefined ? 1000 : _ref$length;
+  var _ref$gridLength = _ref.gridLength;
+  var gridLength = _ref$gridLength === undefined ? 50 : _ref$gridLength;
+  var _ref$ceiling = _ref.ceiling;
+  var ceiling = _ref$ceiling === undefined ? true : _ref$ceiling;
+  var _ref$color = _ref.color;
+  var color = _ref$color === undefined ? 8947848 : _ref$color;
+
+  var container = new THREE.Object3D();
+  var wallY = ceiling ? 0 : length;
+
+  var floorGrid = new THREE.GridHelper(length, gridLength, color, color);
+  floorGrid.position.y = ceiling ? -length : 0;
+  container.add(floorGrid);
+
+  if (ceiling) {
+    var ceilingGrid = new THREE.GridHelper(length, gridLength, color, color);
+    ceilingGrid.position.y = length;
+    container.add(ceilingGrid);
+  }
+
+  var wallGrid1 = new THREE.GridHelper(length, gridLength, color, color);
+  wallGrid1.rotation.x = Math.PI / 2;
+  wallGrid1.position.set(0, wallY, length);
+  container.add(wallGrid1);
+
+  var wallGrid2 = new THREE.GridHelper(length, gridLength, color, color);
+  wallGrid2.rotation.x = Math.PI / 2;
+  wallGrid2.position.set(0, wallY, -length);
+  container.add(wallGrid2);
+
+  var wallGrid3 = new THREE.GridHelper(length, gridLength, color, color);
+  wallGrid3.rotation.z = Math.PI / 2;
+  wallGrid3.position.set(length, wallY, 0);
+  container.add(wallGrid3);
+
+  var wallGrid4 = new THREE.GridHelper(length, gridLength, color, color);
+  wallGrid4.rotation.z = Math.PI / 2;
+  wallGrid4.position.set(-length, wallY, 0);
+  container.add(wallGrid4);
+
+  return container;
+}
+
+},{"three":11}],4:[function(require,module,exports){
 
 
 /**
@@ -716,7 +771,7 @@ OBJLoader.prototype = {
 
 };
 
-},{"three":10}],4:[function(require,module,exports){
+},{"three":11}],5:[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -733,7 +788,7 @@ var PhotoView = _interopRequire(require("./photo-view"));
 
 var MouseIntersector = _interopRequire(require("./mouse-intersector"));
 
-var CAMERA_POSITION = { home: 30, view: 20 };
+var CAMERA_POSITION = { home: 30, view: 10 };
 
 if (isMobile.any) {
   var mobileWarning = document.createElement("div");
@@ -745,6 +800,8 @@ if (isMobile.any) {
 }
 
 function go() {
+  window.THREE = THREE;
+
   var renderer = new THREE.WebGLRenderer({
     antialias: true
   });
@@ -768,16 +825,23 @@ function go() {
     info: document.querySelector(".info"),
     seriesTitle: document.querySelector(".series-title"),
     photoViewInterface: document.querySelector(".photo-view-interface"),
-    photoViewCloseButton: document.querySelector(".photo-view-close-button")
+    photoViewCloseButton: document.querySelector(".photo-view-close-button"),
+    photoViewControlButtons: {
+      wireframe: document.querySelector("#wireframe-button"),
+      texture: document.querySelector("#texture-button"),
+      lighting: document.querySelector("#lighting-button"),
+      background: document.querySelector("#background-button")
+    }
   };
 
   var state = {
     loadingPhotoView: false,
-    photoInView: null
+    photoInView: null,
+    startTime: null,
+    lastTime: null
   };
 
   var thumbnailMeshes = [];
-  var startTime = undefined;
 
   window.addEventListener("resize", resize);
   resize();
@@ -818,6 +882,19 @@ function go() {
     });
 
     dom.photoViewCloseButton.addEventListener("click", exitCurrentPhotoView);
+
+    dom.photoViewControlButtons.wireframe.addEventListener("click", function () {
+      if (state.photoInView) state.photoInView.wireframeButtonPressed();
+    });
+    dom.photoViewControlButtons.texture.addEventListener("click", function () {
+      if (state.photoInView) state.photoInView.textureButtonPressed();
+    });
+    dom.photoViewControlButtons.lighting.addEventListener("click", function () {
+      if (state.photoInView) state.photoInView.lightingButtonPressed();
+    });
+    dom.photoViewControlButtons.background.addEventListener("click", function () {
+      if (state.photoInView) state.photoInView.backgroundButtonPressed();
+    });
   });
   renderer.render(scene, camera);
   start();
@@ -837,10 +914,15 @@ function go() {
   }
 
   function update(time) {
-    if (null == startTime) startTime = time;
+    if (!state.startTime) state.startTime = time;
+    var delta = time - (state.lastTime || time);
 
     TWEEN.update(time);
+
+    if (state.photoInView) state.photoInView.update(delta);
+
     renderer.render(scene, camera);
+    state.lastTime = time;
 
     window.requestAnimationFrame(update);
   }
@@ -940,7 +1022,7 @@ function go() {
   }
 }
 
-},{"./data":2,"./mouse-intersector":6,"./photo-view":7,"./thumbnail-pile":8,"ismobilejs":9,"three":10,"tween.js":11}],5:[function(require,module,exports){
+},{"./data":2,"./mouse-intersector":7,"./photo-view":8,"./thumbnail-pile":9,"ismobilejs":10,"three":11,"tween.js":12}],6:[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -991,7 +1073,7 @@ function load(photo, callback) {
   });
 }
 
-},{"./lib/OBJLoader":3,"three":10}],6:[function(require,module,exports){
+},{"./lib/OBJLoader":4,"three":11}],7:[function(require,module,exports){
 "use strict";
 
 var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
@@ -1070,7 +1152,7 @@ var MouseIntersector = (function () {
 
 module.exports = MouseIntersector;
 
-},{"three":10}],7:[function(require,module,exports){
+},{"three":11}],8:[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -1082,6 +1164,10 @@ var _classCallCheck = function (instance, Constructor) { if (!(instance instance
 var THREE = require("three");
 
 var loadModel = _interopRequire(require("./model-cache"));
+
+var createGrid = _interopRequire(require("./grid"));
+
+var BACKGROUNDS = ["texture", "black", "grid"];
 
 var PhotoView = (function () {
   function PhotoView(_ref) {
@@ -1095,7 +1181,11 @@ var PhotoView = (function () {
 
     this.container = new THREE.Object3D();
     this.state = {
-      material: true
+      active: false,
+      showTexture: true,
+      wireframe: false,
+      background: "texture",
+      rps: 2
     };
   }
 
@@ -1116,6 +1206,8 @@ var PhotoView = (function () {
           _this.geometry = geometry;
           _this.texture = texture;
 
+          geometry.center();
+
           var material = _this.material = new THREE.MeshStandardMaterial({
             roughness: 0.8,
             metalness: 0.3,
@@ -1126,20 +1218,43 @@ var PhotoView = (function () {
           var mesh = _this.mesh = new THREE.Mesh(geometry, material);
           container.add(mesh);
 
+          _this.setWireframe(_this.state.wireframe);
+          _this.setShowTexture(_this.state.showTexture);
+
           if (callback) callback();
         });
       }
     },
     activate: {
       value: function activate() {
-        this.scene.background = this.texture;
+        this.state.active = true;
+        this.setBackground(this.state.background);
         this.scene.add(this.container);
       }
     },
     deactivate: {
       value: function deactivate() {
-        this.scene.background = null;
+        var permanent = arguments[0] === undefined ? true : arguments[0];
+
+        this.state.active = false;
+        this.scene.background = new THREE.Color(16777215);
         this.scene.remove(this.container);
+        this.grid = null;
+
+        if (permanent) {
+          this.container = null;
+          this.material = null;
+          this.mesh = null;
+        }
+      }
+    },
+    update: {
+      value: function update(delta) {
+        if (this.state.active) {
+          if (this.mesh) {
+            this.mesh.rotation.y += this.state.rps * (delta / 1000);
+          }
+        }
       }
     },
     keydown: {
@@ -1153,6 +1268,74 @@ var PhotoView = (function () {
     },
     mousemove: {
       value: function mousemove(ev) {}
+    },
+    wireframeButtonPressed: {
+      value: function wireframeButtonPressed() {
+        this.setWireframe(!this.state.wireframe);
+      }
+    },
+    textureButtonPressed: {
+      value: function textureButtonPressed() {
+        this.setShowTexture(!this.state.showTexture);
+      }
+    },
+    lightingButtonPressed: {
+      value: function lightingButtonPressed() {}
+    },
+    backgroundButtonPressed: {
+      value: function backgroundButtonPressed() {
+        var backgroundIndex = (BACKGROUNDS.indexOf(this.state.background) + 1) % BACKGROUNDS.length;
+        this.setBackground(BACKGROUNDS[backgroundIndex]);
+      }
+    },
+    setWireframe: {
+      value: function setWireframe(wireframe) {
+        this.state.wireframe = wireframe;
+
+        if (this.material) {
+          this.material.wireframe = wireframe;
+        }
+      }
+    },
+    setShowTexture: {
+      value: function setShowTexture(showTexture) {
+        this.state.showTexture = showTexture;
+
+        if (this.material) {
+          if (showTexture) {
+            this.material.color.setHex(16777215);
+            this.material.map = this.texture;
+          } else {
+            this.material.color.setHex(8947848);
+            this.material.map = null;
+          }
+        }
+      }
+    },
+    setBackground: {
+      value: function setBackground(background) {
+        this.state.background = background;
+
+        switch (background) {
+          case "texture":
+            this.scene.background = this.texture;
+            break;
+
+          case "black":
+            this.scene.background = new THREE.Color(0);
+            break;
+
+          case "grid":
+            this.scene.background = new THREE.Color(16777215);
+            if (!this.grid) this.grid = createGrid({ length: 60, gridLength: 20 });
+            this.scene.add(this.grid);
+            break;
+        }
+
+        if (background !== "grid" && this.grid) {
+          this.scene.remove(this.grid);
+        }
+      }
     }
   });
 
@@ -1161,7 +1344,7 @@ var PhotoView = (function () {
 
 module.exports = PhotoView;
 
-},{"./model-cache":5,"three":10}],8:[function(require,module,exports){
+},{"./grid":3,"./model-cache":6,"three":11}],9:[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -1231,7 +1414,7 @@ var ThumbnailPile = (function () {
 
 module.exports = ThumbnailPile;
 
-},{"./Thumbnail":1,"three":10}],9:[function(require,module,exports){
+},{"./Thumbnail":1,"three":11}],10:[function(require,module,exports){
 /**
  * isMobile.js v0.4.0
  *
@@ -1370,7 +1553,7 @@ module.exports = ThumbnailPile;
 
 })(this);
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -43669,7 +43852,7 @@ module.exports = ThumbnailPile;
 
 })));
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 (function (process){
 /**
  * Tween.js - Licensed under the MIT license
@@ -44543,7 +44726,7 @@ TWEEN.Interpolation = {
 })(this);
 
 }).call(this,require('_process'))
-},{"_process":12}],12:[function(require,module,exports){
+},{"_process":13}],13:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -44639,4 +44822,4 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}]},{},[4]);
+},{}]},{},[5]);
