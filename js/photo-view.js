@@ -4,11 +4,14 @@ import loadModel from './model-cache';
 import createGrid from './grid';
 
 let BACKGROUNDS = ['texture', 'black', 'grid'];
+let DEFAULT_CAMERA_POSITION = 10;
+let MODEL_SCALE_FACTOR = 5;
 
 export default class PhotoView {
-  constructor ({ photo, scene }) {
+  constructor ({ photo, scene, camera }) {
     this.photo = photo;
     this.scene = scene;
+    this.camera = camera;
 
     this.container = new THREE.Object3D();
     this.state = {
@@ -28,7 +31,7 @@ export default class PhotoView {
       this.texture = texture;
 
       geometry.center();
-
+      geometry.computeBoundingBox();
       let material = this.material = new THREE.MeshStandardMaterial({
         roughness: 0.8,
         metalness: 0.3,
@@ -37,6 +40,15 @@ export default class PhotoView {
       material.side = THREE.DoubleSide;
 
       let mesh = this.mesh = new THREE.Mesh(geometry, material);
+
+      let size = geometry.boundingBox.getSize();
+      let scale = MODEL_SCALE_FACTOR / size.y;
+      mesh.scale.set(scale, scale, scale);
+
+      if (photo.upsideDown) {
+        mesh.rotation.x = Math.PI;
+      }
+
       container.add(mesh);
 
       this.setWireframe(this.state.wireframe);
@@ -50,6 +62,7 @@ export default class PhotoView {
     this.state.active = true;
     this.setBackground(this.state.background);
     this.scene.add(this.container);
+    this.camera.position.z = DEFAULT_CAMERA_POSITION;
   }
 
   deactivate (permanent = true) {

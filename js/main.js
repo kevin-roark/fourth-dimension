@@ -8,7 +8,7 @@ import ThumbnailPile from './thumbnail-pile';
 import PhotoView from './photo-view';
 import MouseIntersector from './mouse-intersector';
 
-let CAMERA_POSITION = { home: 30, view: 10 };
+let HOME_CAMERA_POSITION = 30;
 
 if (isMobile.any) {
   let mobileWarning = document.createElement('div');
@@ -33,7 +33,7 @@ function go () {
   window.scene = scene;
 
   let camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 10000);
-  camera.position.z = CAMERA_POSITION.home;
+  camera.position.z = HOME_CAMERA_POSITION;
   scene.add(camera);
 
   let container = new THREE.Object3D();
@@ -164,7 +164,7 @@ function go () {
 
     if (photo) {
       state.loadingPhotoView = true;
-      let photoView = new PhotoView({ photo, scene });
+      let photoView = new PhotoView({ photo, scene, camera });
       photoView.load(() => {
         state.loadingPhotoView = false;
         setPhotoView(photoView);
@@ -187,6 +187,7 @@ function go () {
     } else {
       state.photoInView.deactivate();
       scene.add(container);
+      camera.position.z = HOME_CAMERA_POSITION;
     }
 
     [dom.info, dom.photoViewInterface, dom.seriesTitle].forEach(el => {
@@ -195,7 +196,6 @@ function go () {
     });
 
     state.photoInView = photoView;
-    camera.position.z = photoView ? CAMERA_POSITION.view : CAMERA_POSITION.home;
   }
 
   function createScene (callback) {

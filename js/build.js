@@ -58,7 +58,7 @@ var Thumbnail = (function () {
 module.exports = Thumbnail;
 
 },{"three":11}],2:[function(require,module,exports){
-module.exports=[{"name":"Domestic","path":"domestic","photos":[{"name":"Bedroom","path":"bedroom","seriesPath":"domestic","type":"object"},{"name":"Den","path":"den","seriesPath":"domestic","type":"object"},{"name":"Elegant Living Room","path":"elegant-living-room","seriesPath":"domestic","type":"object"},{"name":"Kitchen","path":"kitchen","seriesPath":"domestic","type":"object"},{"name":"Living Room","path":"living-room","seriesPath":"domestic","type":"object"}]},{"name":"Friends","path":"friends","photos":[{"name":"Desmond","path":"desmond","seriesPath":"friends","type":"object"},{"name":"Dylan On The Couch","path":"dylan-on-the-couch","seriesPath":"friends","type":"object"},{"name":"Half Dylan","path":"half-dylan","seriesPath":"friends","type":"object"},{"name":"Jaq Montauk","path":"jaq-montauk","seriesPath":"friends","type":"object"},{"name":"Nigel","path":"nigel","seriesPath":"friends","type":"object"},{"name":"Riddhi Montauk","path":"riddhi-montauk","seriesPath":"friends","type":"object"},{"name":"Sam","path":"sam","seriesPath":"friends","type":"object"},{"name":"Seb Montauk","path":"seb-montauk","seriesPath":"friends","type":"object"}]},{"name":"Natural History","path":"natural-history","photos":[{"name":"Alien Rocks","path":"alien-rocks","seriesPath":"natural-history","type":"object"},{"name":"Big Fly","path":"big-fly","seriesPath":"natural-history","type":"object"},{"name":"Evolution","path":"evolution","seriesPath":"natural-history","type":"object"},{"name":"Farm Scene","path":"farm-scene","seriesPath":"natural-history","type":"object"},{"name":"Frog Shadow","path":"frog-shadow","seriesPath":"natural-history","type":"object"},{"name":"Lot Of Skulls","path":"lot-of-skulls","seriesPath":"natural-history","type":"object"},{"name":"Three Skulls","path":"three-skulls","seriesPath":"natural-history","type":"object"},{"name":"True Monkey","path":"true-monkey","seriesPath":"natural-history","type":"object"}]},{"name":"Objects 1","path":"objects-1","photos":[{"name":"Angel","path":"angel","seriesPath":"objects-1","type":"object"},{"name":"Bad Father","path":"bad-father","seriesPath":"objects-1","type":"object"},{"name":"Basketball","path":"basketball","seriesPath":"objects-1","type":"object"},{"name":"Ben Franklin Bust","path":"ben-franklin-bust","seriesPath":"objects-1","type":"object"},{"name":"Broken Eagle","path":"broken-eagle","seriesPath":"objects-1","type":"object"},{"name":"Father","path":"father","seriesPath":"objects-1","type":"object"},{"name":"Freedom","path":"freedom","seriesPath":"objects-1","type":"object"},{"name":"Gator","path":"gator","seriesPath":"objects-1","type":"object"},{"name":"Grotto","path":"grotto","seriesPath":"objects-1","type":"object"},{"name":"Laptop","path":"laptop","seriesPath":"objects-1","type":"object"},{"name":"Last Supper","path":"last-supper","seriesPath":"objects-1","type":"object"},{"name":"Marble Bust","path":"marble-bust","seriesPath":"objects-1","type":"object"},{"name":"Mary","path":"mary","seriesPath":"objects-1","type":"object"},{"name":"Minion","path":"minion","seriesPath":"objects-1","type":"object"},{"name":"Rock","path":"rock","seriesPath":"objects-1","type":"object"},{"name":"Rocky","path":"rocky","seriesPath":"objects-1","type":"object"},{"name":"Video Camera","path":"video-camera","seriesPath":"objects-1","type":"object"}]},{"name":"Roark","path":"roark","photos":[{"name":"Isabella","path":"isabella","seriesPath":"roark","type":"object"},{"name":"Kevin Sr","path":"kevin-sr","seriesPath":"roark","type":"object"},{"name":"Laurie","path":"laurie","seriesPath":"roark","type":"object"},{"name":"Laurie And Mom","path":"laurie-and-mom","seriesPath":"roark","type":"object"},{"name":"Melanie","path":"melanie","seriesPath":"roark","type":"object"},{"name":"Moses","path":"moses","seriesPath":"roark","type":"object"}]},{"name":"Still Life","path":"still-life","photos":[{"name":"Bella With Dog","path":"bella-with-dog","seriesPath":"still-life","type":"object"},{"name":"Dylan On Github","path":"dylan-on-github","seriesPath":"still-life","type":"object"},{"name":"Laurie In The Mirror","path":"laurie-in-the-mirror","seriesPath":"still-life","type":"object"},{"name":"Meme Nancy Reading","path":"meme-nancy-reading","seriesPath":"still-life","type":"object"},{"name":"Myself In The Mirror","path":"myself-in-the-mirror","seriesPath":"still-life","type":"object"},{"name":"Photo Of Rocks","path":"photo-of-rocks","seriesPath":"still-life","type":"object"}]}]
+module.exports=[{"name":"Domestic","path":"domestic","photos":[{"name":"Bedroom","path":"bedroom","seriesPath":"domestic","upsideDown":true,"type":"object"},{"name":"Den","path":"den","seriesPath":"domestic","upsideDown":true,"type":"object"},{"name":"Elegant Living Room","path":"elegant-living-room","seriesPath":"domestic","upsideDown":true,"type":"object"},{"name":"Kitchen","path":"kitchen","seriesPath":"domestic","upsideDown":true,"type":"object"},{"name":"Living Room","path":"living-room","seriesPath":"domestic","upsideDown":true,"type":"object"}]},{"name":"Friends","path":"friends","photos":[{"name":"Desmond","path":"desmond","seriesPath":"friends","upsideDown":true,"type":"object"},{"name":"Dylan On The Couch","path":"dylan-on-the-couch","seriesPath":"friends","upsideDown":true,"type":"object"},{"name":"Half Dylan","path":"half-dylan","seriesPath":"friends","upsideDown":false,"type":"object"},{"name":"Jaq Montauk","path":"jaq-montauk","seriesPath":"friends","upsideDown":true,"type":"object"},{"name":"Nigel","path":"nigel","seriesPath":"friends","upsideDown":true,"type":"object"},{"name":"Riddhi Montauk","path":"riddhi-montauk","seriesPath":"friends","upsideDown":false,"type":"object"},{"name":"Sam","path":"sam","seriesPath":"friends","upsideDown":true,"type":"object"},{"name":"Seb Montauk","path":"seb-montauk","seriesPath":"friends","upsideDown":true,"type":"object"}]},{"name":"Natural History","path":"natural-history","photos":[{"name":"Alien Rocks","path":"alien-rocks","seriesPath":"natural-history","upsideDown":true,"type":"object"},{"name":"Big Fly","path":"big-fly","seriesPath":"natural-history","upsideDown":true,"type":"object"},{"name":"Evolution","path":"evolution","seriesPath":"natural-history","upsideDown":true,"type":"object"},{"name":"Farm Scene","path":"farm-scene","seriesPath":"natural-history","upsideDown":true,"type":"object"},{"name":"Frog Shadow","path":"frog-shadow","seriesPath":"natural-history","upsideDown":true,"type":"object"},{"name":"Lot Of Skulls","path":"lot-of-skulls","seriesPath":"natural-history","upsideDown":true,"type":"object"},{"name":"Three Skulls","path":"three-skulls","seriesPath":"natural-history","upsideDown":true,"type":"object"},{"name":"True Monkey","path":"true-monkey","seriesPath":"natural-history","upsideDown":true,"type":"object"}]},{"name":"Objects 1","path":"objects-1","photos":[{"name":"Angel","path":"angel","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Bad Father","path":"bad-father","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Basketball","path":"basketball","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Ben Franklin Bust","path":"ben-franklin-bust","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Broken Eagle","path":"broken-eagle","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Father","path":"father","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Freedom","path":"freedom","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Gator","path":"gator","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Grotto","path":"grotto","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Laptop","path":"laptop","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Last Supper","path":"last-supper","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Marble Bust","path":"marble-bust","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Mary","path":"mary","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Minion","path":"minion","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Rock","path":"rock","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Rocky","path":"rocky","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Video Camera","path":"video-camera","seriesPath":"objects-1","upsideDown":true,"type":"object"}]},{"name":"Roark","path":"roark","photos":[{"name":"Isabella","path":"isabella","seriesPath":"roark","upsideDown":true,"type":"object"},{"name":"Kevin Sr","path":"kevin-sr","seriesPath":"roark","upsideDown":true,"type":"object"},{"name":"Laurie","path":"laurie","seriesPath":"roark","upsideDown":true,"type":"object"},{"name":"Laurie And Mom","path":"laurie-and-mom","seriesPath":"roark","upsideDown":true,"type":"object"},{"name":"Melanie","path":"melanie","seriesPath":"roark","upsideDown":true,"type":"object"},{"name":"Moses","path":"moses","seriesPath":"roark","upsideDown":true,"type":"object"}]},{"name":"Still Life","path":"still-life","photos":[{"name":"Bella With Dog","path":"bella-with-dog","seriesPath":"still-life","upsideDown":true,"type":"object"},{"name":"Dylan On Github","path":"dylan-on-github","seriesPath":"still-life","upsideDown":true,"type":"object"},{"name":"Laurie In The Mirror","path":"laurie-in-the-mirror","seriesPath":"still-life","upsideDown":true,"type":"object"},{"name":"Meme Nancy Reading","path":"meme-nancy-reading","seriesPath":"still-life","upsideDown":true,"type":"object"},{"name":"Myself In The Mirror","path":"myself-in-the-mirror","seriesPath":"still-life","upsideDown":true,"type":"object"},{"name":"Photo Of Rocks","path":"photo-of-rocks","seriesPath":"still-life","upsideDown":true,"type":"object"}]}]
 },{}],3:[function(require,module,exports){
 "use strict";
 
@@ -788,7 +788,7 @@ var PhotoView = _interopRequire(require("./photo-view"));
 
 var MouseIntersector = _interopRequire(require("./mouse-intersector"));
 
-var CAMERA_POSITION = { home: 30, view: 10 };
+var HOME_CAMERA_POSITION = 30;
 
 if (isMobile.any) {
   var mobileWarning = document.createElement("div");
@@ -813,7 +813,7 @@ function go() {
   window.scene = scene;
 
   var camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 10000);
-  camera.position.z = CAMERA_POSITION.home;
+  camera.position.z = HOME_CAMERA_POSITION;
   scene.add(camera);
 
   var container = new THREE.Object3D();
@@ -946,7 +946,7 @@ function go() {
     if (photo) {
       (function () {
         state.loadingPhotoView = true;
-        var photoView = new PhotoView({ photo: photo, scene: scene });
+        var photoView = new PhotoView({ photo: photo, scene: scene, camera: camera });
         photoView.load(function () {
           state.loadingPhotoView = false;
           setPhotoView(photoView);
@@ -970,6 +970,7 @@ function go() {
     } else {
       state.photoInView.deactivate();
       scene.add(container);
+      camera.position.z = HOME_CAMERA_POSITION;
     }
 
     [dom.info, dom.photoViewInterface, dom.seriesTitle].forEach(function (el) {
@@ -977,7 +978,6 @@ function go() {
     });
 
     state.photoInView = photoView;
-    camera.position.z = photoView ? CAMERA_POSITION.view : CAMERA_POSITION.home;
   }
 
   function createScene(callback) {
@@ -1168,16 +1168,20 @@ var loadModel = _interopRequire(require("./model-cache"));
 var createGrid = _interopRequire(require("./grid"));
 
 var BACKGROUNDS = ["texture", "black", "grid"];
+var DEFAULT_CAMERA_POSITION = 10;
+var MODEL_SCALE_FACTOR = 5;
 
 var PhotoView = (function () {
   function PhotoView(_ref) {
     var photo = _ref.photo;
     var scene = _ref.scene;
+    var camera = _ref.camera;
 
     _classCallCheck(this, PhotoView);
 
     this.photo = photo;
     this.scene = scene;
+    this.camera = camera;
 
     this.container = new THREE.Object3D();
     this.state = {
@@ -1207,7 +1211,7 @@ var PhotoView = (function () {
           _this.texture = texture;
 
           geometry.center();
-
+          geometry.computeBoundingBox();
           var material = _this.material = new THREE.MeshStandardMaterial({
             roughness: 0.8,
             metalness: 0.3,
@@ -1216,6 +1220,15 @@ var PhotoView = (function () {
           material.side = THREE.DoubleSide;
 
           var mesh = _this.mesh = new THREE.Mesh(geometry, material);
+
+          var size = geometry.boundingBox.getSize();
+          var scale = MODEL_SCALE_FACTOR / size.y;
+          mesh.scale.set(scale, scale, scale);
+
+          if (photo.upsideDown) {
+            mesh.rotation.x = Math.PI;
+          }
+
           container.add(mesh);
 
           _this.setWireframe(_this.state.wireframe);
@@ -1230,6 +1243,7 @@ var PhotoView = (function () {
         this.state.active = true;
         this.setBackground(this.state.background);
         this.scene.add(this.container);
+        this.camera.position.z = DEFAULT_CAMERA_POSITION;
       }
     },
     deactivate: {

@@ -18,15 +18,20 @@ let data = seriesPaths.map(seriesPath => {
     name,
     path: seriesPath,
     photos: models.map(modelPath => {
+      let fullModelPath = `${fullSeriesPath}/${modelPath}`;
       if (makeThumbnails) {
-        makeThumbnail(`${fullSeriesPath}/${modelPath}`);
+        makeThumbnail(fullModelPath);
       }
 
       let type = typeMap[modelPath] || 'object';
+
+      let upsideDown = !isMadeByMeshlab(fullModelPath);
+
       return {
         name: dataUtil.toName(modelPath),
         path: modelPath,
         seriesPath: seriesPath,
+        upsideDown,
         type
       };
     })
@@ -36,12 +41,18 @@ let data = seriesPaths.map(seriesPath => {
 let json = JSON.stringify(data);
 fs.writeFileSync('js/data.json', json);
 
-function makeThumbnail(modelPath) {
+function makeThumbnail (modelPath) {
   let texturePath = `${modelPath}/Model.jpg`;
   let command = `convert ${texturePath} -resize 512x512 ${modelPath}/Thumbnail.jpg`;
   execSync(command);
 }
 
-function dirFilter(d) {
+function isMadeByMeshlab (modelPath) {
+  let mtlPath = `${modelPath}/Model.mtl`;
+  let text = fs.readFileSync(mtlPath);
+  return text.indexOf('Meshlab') >= 0;
+}
+
+function dirFilter (d) {
   return d !== '.DS_Store';
 }
