@@ -3,6 +3,7 @@ let THREE = require('three');
 import loadModel from './model-cache';
 import createGrid from './grid';
 import LightRing from './light-ring';
+import Controls from './controls';
 
 let BACKGROUNDS = ['texture', 'black', 'grid'];
 let LIGHTINGS = ['white', 'red', 'blue', 'green', 'yellow', 'primary'];
@@ -14,6 +15,8 @@ export default class PhotoView {
     this.photo = photo;
     this.scene = scene;
     this.camera = camera;
+
+    this.controls = new Controls({ camera });
 
     let container = this.container = new THREE.Object3D();
 
@@ -106,18 +109,26 @@ export default class PhotoView {
 
   update (delta) {
     if (this.state.active) {
+      let { lighting, rps } = this.state;
       if (this.mesh) {
-        this.mesh.rotation.y += this.state.rps * (delta / 1000);
+        this.mesh.rotation.y += rps * (delta / 1000);
       }
 
-      if (this.state.lighting === 'primary') {
+      if (lighting === 'primary') {
         this.lightRing.update(delta);
       }
+
+      this.controls.update(delta);
     }
   }
 
   keydown (ev) {
+    console.log(ev.keyCode);
+    this.controls.keydown(ev);
+  }
 
+  keyup (ev) {
+    this.controls.keyup(ev);
   }
 
   mousedown (ev) {

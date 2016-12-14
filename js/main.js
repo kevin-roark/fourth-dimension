@@ -87,15 +87,16 @@ function go () {
           break;
       }
     });
+    document.addEventListener('keyup', ev => {
+      if (state.photoInView) state.photoInView.keyup(ev);
+    });
 
     document.addEventListener('mousedown', ev => {
       if (state.photoInView) state.photoInView.mousedown(ev);
     });
-
     document.addEventListener('mouseup', ev => {
       if (state.photoInView) state.photoInView.mouseup(ev);
     });
-
     document.addEventListener('mousemove', ev => {
       if (state.photoInView) state.photoInView.mousemove(ev);
     });
