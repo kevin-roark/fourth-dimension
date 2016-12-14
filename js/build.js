@@ -57,7 +57,7 @@ var Thumbnail = (function () {
 
 module.exports = Thumbnail;
 
-},{"three":11}],2:[function(require,module,exports){
+},{"three":12}],2:[function(require,module,exports){
 module.exports=[{"name":"Domestic","path":"domestic","photos":[{"name":"Bedroom","path":"bedroom","seriesPath":"domestic","upsideDown":true,"type":"object"},{"name":"Den","path":"den","seriesPath":"domestic","upsideDown":true,"type":"object"},{"name":"Elegant Living Room","path":"elegant-living-room","seriesPath":"domestic","upsideDown":true,"type":"object"},{"name":"Kitchen","path":"kitchen","seriesPath":"domestic","upsideDown":true,"type":"object"},{"name":"Living Room","path":"living-room","seriesPath":"domestic","upsideDown":true,"type":"object"}]},{"name":"Friends","path":"friends","photos":[{"name":"Desmond","path":"desmond","seriesPath":"friends","upsideDown":true,"type":"object"},{"name":"Dylan On The Couch","path":"dylan-on-the-couch","seriesPath":"friends","upsideDown":true,"type":"object"},{"name":"Half Dylan","path":"half-dylan","seriesPath":"friends","upsideDown":false,"type":"object"},{"name":"Jaq Montauk","path":"jaq-montauk","seriesPath":"friends","upsideDown":true,"type":"object"},{"name":"Nigel","path":"nigel","seriesPath":"friends","upsideDown":true,"type":"object"},{"name":"Riddhi Montauk","path":"riddhi-montauk","seriesPath":"friends","upsideDown":false,"type":"object"},{"name":"Sam","path":"sam","seriesPath":"friends","upsideDown":true,"type":"object"},{"name":"Seb Montauk","path":"seb-montauk","seriesPath":"friends","upsideDown":true,"type":"object"}]},{"name":"Natural History","path":"natural-history","photos":[{"name":"Alien Rocks","path":"alien-rocks","seriesPath":"natural-history","upsideDown":true,"type":"object"},{"name":"Big Fly","path":"big-fly","seriesPath":"natural-history","upsideDown":true,"type":"object"},{"name":"Evolution","path":"evolution","seriesPath":"natural-history","upsideDown":true,"type":"object"},{"name":"Farm Scene","path":"farm-scene","seriesPath":"natural-history","upsideDown":true,"type":"object"},{"name":"Frog Shadow","path":"frog-shadow","seriesPath":"natural-history","upsideDown":true,"type":"object"},{"name":"Lot Of Skulls","path":"lot-of-skulls","seriesPath":"natural-history","upsideDown":true,"type":"object"},{"name":"Three Skulls","path":"three-skulls","seriesPath":"natural-history","upsideDown":true,"type":"object"},{"name":"True Monkey","path":"true-monkey","seriesPath":"natural-history","upsideDown":true,"type":"object"}]},{"name":"Objects 1","path":"objects-1","photos":[{"name":"Angel","path":"angel","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Bad Father","path":"bad-father","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Basketball","path":"basketball","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Ben Franklin Bust","path":"ben-franklin-bust","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Broken Eagle","path":"broken-eagle","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Father","path":"father","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Freedom","path":"freedom","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Gator","path":"gator","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Grotto","path":"grotto","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Laptop","path":"laptop","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Last Supper","path":"last-supper","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Marble Bust","path":"marble-bust","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Mary","path":"mary","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Minion","path":"minion","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Rock","path":"rock","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Rocky","path":"rocky","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Video Camera","path":"video-camera","seriesPath":"objects-1","upsideDown":true,"type":"object"}]},{"name":"Roark","path":"roark","photos":[{"name":"Isabella","path":"isabella","seriesPath":"roark","upsideDown":true,"type":"object"},{"name":"Kevin Sr","path":"kevin-sr","seriesPath":"roark","upsideDown":true,"type":"object"},{"name":"Laurie","path":"laurie","seriesPath":"roark","upsideDown":true,"type":"object"},{"name":"Laurie And Mom","path":"laurie-and-mom","seriesPath":"roark","upsideDown":true,"type":"object"},{"name":"Melanie","path":"melanie","seriesPath":"roark","upsideDown":true,"type":"object"},{"name":"Moses","path":"moses","seriesPath":"roark","upsideDown":true,"type":"object"}]},{"name":"Still Life","path":"still-life","photos":[{"name":"Bella With Dog","path":"bella-with-dog","seriesPath":"still-life","upsideDown":true,"type":"object"},{"name":"Dylan On Github","path":"dylan-on-github","seriesPath":"still-life","upsideDown":true,"type":"object"},{"name":"Laurie In The Mirror","path":"laurie-in-the-mirror","seriesPath":"still-life","upsideDown":true,"type":"object"},{"name":"Meme Nancy Reading","path":"meme-nancy-reading","seriesPath":"still-life","upsideDown":true,"type":"object"},{"name":"Myself In The Mirror","path":"myself-in-the-mirror","seriesPath":"still-life","upsideDown":true,"type":"object"},{"name":"Photo Of Rocks","path":"photo-of-rocks","seriesPath":"still-life","upsideDown":true,"type":"object"}]}]
 },{}],3:[function(require,module,exports){
 "use strict";
@@ -114,7 +114,7 @@ function createGrid() {
   return container;
 }
 
-},{"three":11}],4:[function(require,module,exports){
+},{"three":12}],4:[function(require,module,exports){
 
 
 /**
@@ -771,7 +771,181 @@ OBJLoader.prototype = {
 
 };
 
-},{"three":11}],5:[function(require,module,exports){
+},{"three":12}],5:[function(require,module,exports){
+"use strict";
+
+var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
+var THREE = require("three");
+var TWEEN = require("tween.js");
+
+var LightRing = (function () {
+  function LightRing() {
+    var options = arguments[0] === undefined ? {} : arguments[0];
+
+    _classCallCheck(this, LightRing);
+
+    var _options$count = options.count;
+    var count = _options$count === undefined ? 6 : _options$count;
+    var _options$radius = options.radius;
+    var radius = _options$radius === undefined ? 150 : _options$radius;
+    var _options$y = options.y;
+    var y = _options$y === undefined ? 20 : _options$y;
+    var _options$yRange = options.yRange;
+    var yRange = _options$yRange === undefined ? null : _options$yRange;
+    var _options$saturation = options.saturation;
+    var saturation = _options$saturation === undefined ? 1 : _options$saturation;
+    var _options$lightness = options.lightness;
+    var lightness = _options$lightness === undefined ? 0.5 : _options$lightness;
+    var _options$intensity = options.intensity;
+    var intensity = _options$intensity === undefined ? 1 : _options$intensity;
+    var _options$distance = options.distance;
+    var distance = _options$distance === undefined ? 500 : _options$distance;
+    var _options$angle = options.angle;
+    var angle = _options$angle === undefined ? 0.4 : _options$angle;
+    var _options$penumbra = options.penumbra;
+    var penumbra = _options$penumbra === undefined ? 0 : _options$penumbra;
+    var _options$decay = options.decay;
+    var decay = _options$decay === undefined ? 2 : _options$decay;
+    var _options$revolutionSpeed = options.revolutionSpeed;
+    var revolutionSpeed = _options$revolutionSpeed === undefined ? 0.002 : _options$revolutionSpeed;
+
+    this.count = count;
+    this.intensity = intensity;
+    this.y = y;
+    this.yRange = yRange;
+
+    this.obj = new THREE.Object3D();
+
+    this.lights = [];
+    for (var i = 0; i < count; i++) {
+      var hue = i / count * 1;
+      var color = new THREE.Color().setHSL(hue, saturation, lightness);
+
+      var light = new THREE.SpotLight(color, intensity, distance, angle, penumbra, decay);
+      light.castShadow = true;
+      light.shadow.mapSize.width = light.shadow.mapSize.height = 2048;
+      light.shadow.camera.far = 4000;
+      light.shadow.camera.fov = 30;
+
+      this.obj.add(light);
+      this.lights.push(light);
+    }
+
+    this.setRadius(radius);
+
+    this.rotate();
+    this.rotating = true;
+    this.revolutionSpeed = revolutionSpeed;
+  }
+
+  _createClass(LightRing, {
+    update: {
+      value: function update() {
+        if (this.rotating) {
+          var speed = this.revolutionSpeed;
+          this.rotate(speed, { relative: true });
+
+          if (this.yRange) {
+            for (var i = 0; i < this.lights.length; i++) {
+              var light = this.lights[i];
+              var up = light._yDirection === "up";
+              light.position.y += up ? speed : -speed;
+              if (up && light.position.y > this.y + this.yRange) {
+                light._yDirection = "down";
+              } else if (!up && light.position.y < this.y - this.yRange) {
+                light._yDirection = "up";
+              }
+            }
+          }
+        }
+      }
+    },
+    setRevolutionSpeed: {
+      value: function setRevolutionSpeed(rs) {
+        this.revolutionSpeed = rs;
+        return this;
+      }
+    },
+    setIntensity: {
+      value: function setIntensity(i) {
+        var _this = this;
+
+        var _ref = arguments[1] === undefined ? {} : arguments[1];
+
+        var _ref$duration = _ref.duration;
+        var duration = _ref$duration === undefined ? 0 : _ref$duration;
+
+        if (duration <= 0) {
+          this.intensity = i;
+          this.lights.forEach(function (light) {
+            light.intensity = i;
+          });
+        } else {
+          (function () {
+            var tweener = { i: _this.intensity };
+            new TWEEN.Tween(tweener).to({ i: i }, duration).onUpdate(function () {
+              for (var idx = 0; idx < _this.lights.length; idx++) {
+                _this.lights[idx].intensity = tweener.i;
+              }
+            }).start();
+          })();
+        }
+
+        return this;
+      }
+    },
+    rotate: {
+      value: function rotate() {
+        var y = arguments[0] === undefined ? Math.random() * 2 * Math.PI : arguments[0];
+
+        var _ref = arguments[1] === undefined ? {} : arguments[1];
+
+        var _ref$duration = _ref.duration;
+        var duration = _ref$duration === undefined ? 0 : _ref$duration;
+        var _ref$relative = _ref.relative;
+        var relative = _ref$relative === undefined ? false : _ref$relative;
+
+        if (duration <= 0) {
+          this.obj.rotation.y = relative ? this.obj.rotation.y + y : y;
+        } else {
+          var target = { y: y };
+          if (relative) target.y += this.obj.rotation.y;
+          new TWEEN.Tween(this.obj.rotation).to(target, duration).start();
+        }
+
+        return this;
+      }
+    },
+    setRadius: {
+      value: function setRadius(r) {
+        var _this = this;
+
+        this.radius = r;
+
+        this.lights.forEach(function (light, i) {
+          var radialAngle = i / _this.count * Math.PI * 2;
+          var x = r * Math.cos(radialAngle);
+          var z = r * Math.sin(radialAngle);
+          var y = _this.yRange ? _this.y - _this.yRange + i / (_this.count - 1) * _this.yRange * 2 : _this.y;
+          console.log(y);
+          light.position.set(x, y, z);
+          light._yDirection = i < _this.count / 2 ? "up" : "down";
+        });
+
+        return this;
+      }
+    }
+  });
+
+  return LightRing;
+})();
+
+module.exports = LightRing;
+
+},{"three":12,"tween.js":13}],6:[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -1022,7 +1196,7 @@ function go() {
   }
 }
 
-},{"./data":2,"./mouse-intersector":7,"./photo-view":8,"./thumbnail-pile":9,"ismobilejs":10,"three":11,"tween.js":12}],6:[function(require,module,exports){
+},{"./data":2,"./mouse-intersector":8,"./photo-view":9,"./thumbnail-pile":10,"ismobilejs":11,"three":12,"tween.js":13}],7:[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -1073,7 +1247,7 @@ function load(photo, callback) {
   });
 }
 
-},{"./lib/OBJLoader":4,"three":11}],7:[function(require,module,exports){
+},{"./lib/OBJLoader":4,"three":12}],8:[function(require,module,exports){
 "use strict";
 
 var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
@@ -1152,7 +1326,7 @@ var MouseIntersector = (function () {
 
 module.exports = MouseIntersector;
 
-},{"three":11}],8:[function(require,module,exports){
+},{"three":12}],9:[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -1167,9 +1341,12 @@ var loadModel = _interopRequire(require("./model-cache"));
 
 var createGrid = _interopRequire(require("./grid"));
 
+var LightRing = _interopRequire(require("./light-ring"));
+
 var BACKGROUNDS = ["texture", "black", "grid"];
+var LIGHTINGS = ["white", "red", "blue", "green", "yellow", "primary"];
 var DEFAULT_CAMERA_POSITION = 10;
-var MODEL_SCALE_FACTOR = 5;
+var MODEL_SCALE_FACTOR = 3.5;
 
 var PhotoView = (function () {
   function PhotoView(_ref) {
@@ -1183,13 +1360,22 @@ var PhotoView = (function () {
     this.scene = scene;
     this.camera = camera;
 
-    this.container = new THREE.Object3D();
+    var container = this.container = new THREE.Object3D();
+
+    var spotlight = this.spotlight = new THREE.SpotLight(16777215, 2, 100, 0.5, 0, 1.5); // color, intensity, distance, angle, penumbra, decay
+    spotlight.castShadow = true;
+    container.add(spotlight);
+
+    var ring = this.lightRing = new LightRing({ count: 3, radius: 15, y: 10, yRange: 6, distance: 200, angle: 0.5, revolutionSpeed: 0.004 });
+    container.add(ring.obj);
+
     this.state = {
       active: false,
       showTexture: true,
       wireframe: false,
-      background: "texture",
-      rps: 2
+      background: BACKGROUNDS[0],
+      lighting: LIGHTINGS[0],
+      rps: 1
     };
   }
 
@@ -1202,6 +1388,7 @@ var PhotoView = (function () {
 
         var photo = _ref.photo;
         var container = _ref.container;
+        var spotlight = _ref.spotlight;
 
         loadModel(photo, function (_ref2) {
           var geometry = _ref2.geometry;
@@ -1220,6 +1407,8 @@ var PhotoView = (function () {
           material.side = THREE.DoubleSide;
 
           var mesh = _this.mesh = new THREE.Mesh(geometry, material);
+          mesh.position.y = 1;
+          mesh.castShadow = true;
 
           var size = geometry.boundingBox.getSize();
           var scale = MODEL_SCALE_FACTOR / size.y;
@@ -1233,6 +1422,16 @@ var PhotoView = (function () {
 
           _this.setWireframe(_this.state.wireframe);
           _this.setShowTexture(_this.state.showTexture);
+          _this.setLighting(_this.state.lighting);
+
+          var platform = _this.platform = new THREE.Mesh(new THREE.BoxBufferGeometry(size.x + 5, 0.25, size.z + 5), new THREE.MeshStandardMaterial({
+            color: 16777215
+          }));
+          platform.receiveShadow = true;
+          platform.position.set(0, -(size.y / 2) - 2, -size.z * 0.75);
+          container.add(platform);
+
+          spotlight.position.set(0, size.y + 8, size.z + 2);
 
           if (callback) callback();
         });
@@ -1268,6 +1467,10 @@ var PhotoView = (function () {
           if (this.mesh) {
             this.mesh.rotation.y += this.state.rps * (delta / 1000);
           }
+
+          if (this.state.lighting === "primary") {
+            this.lightRing.update(delta);
+          }
         }
       }
     },
@@ -1294,7 +1497,10 @@ var PhotoView = (function () {
       }
     },
     lightingButtonPressed: {
-      value: function lightingButtonPressed() {}
+      value: function lightingButtonPressed() {
+        var index = (LIGHTINGS.indexOf(this.state.lighting) + 1) % LIGHTINGS.length;
+        this.setLighting(LIGHTINGS[index]);
+      }
     },
     backgroundButtonPressed: {
       value: function backgroundButtonPressed() {
@@ -1317,12 +1523,44 @@ var PhotoView = (function () {
 
         if (this.material) {
           if (showTexture) {
-            this.material.color.setHex(16777215);
             this.material.map = this.texture;
+            this.material.color.set(16777215);
           } else {
-            this.material.color.setHex(8947848);
             this.material.map = null;
+            this.material.color.set(6710886);
           }
+
+          this.material.needsUpdate = true;
+        }
+      }
+    },
+    setLighting: {
+      value: function setLighting(lighting) {
+        var _ref = this;
+
+        var spotlight = _ref.spotlight;
+        var lightRing = _ref.lightRing;
+        var state = _ref.state;
+
+        state.lighting = lighting;
+
+        switch (lighting) {
+          case "white":
+          case "red":
+          case "green":
+          case "blue":
+          case "yellow":
+            spotlight.intensity = lighting === "white" ? 2 : 5;
+            lightRing.setIntensity(0);
+
+            var colorMap = { white: 16777215, red: 16711680, green: 65280, blue: 255, yellow: 16776960 };
+            spotlight.color.set(colorMap[lighting]);
+            break;
+
+          case "primary":
+            spotlight.intensity = 0;
+            lightRing.setIntensity(1.4);
+            break;
         }
       }
     },
@@ -1358,7 +1596,7 @@ var PhotoView = (function () {
 
 module.exports = PhotoView;
 
-},{"./grid":3,"./model-cache":6,"three":11}],9:[function(require,module,exports){
+},{"./grid":3,"./light-ring":5,"./model-cache":7,"three":12}],10:[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -1428,7 +1666,7 @@ var ThumbnailPile = (function () {
 
 module.exports = ThumbnailPile;
 
-},{"./Thumbnail":1,"three":11}],10:[function(require,module,exports){
+},{"./Thumbnail":1,"three":12}],11:[function(require,module,exports){
 /**
  * isMobile.js v0.4.0
  *
@@ -1567,7 +1805,7 @@ module.exports = ThumbnailPile;
 
 })(this);
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -43866,7 +44104,7 @@ module.exports = ThumbnailPile;
 
 })));
 
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 (function (process){
 /**
  * Tween.js - Licensed under the MIT license
@@ -44740,7 +44978,7 @@ TWEEN.Interpolation = {
 })(this);
 
 }).call(this,require('_process'))
-},{"_process":13}],13:[function(require,module,exports){
+},{"_process":14}],14:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -44836,4 +45074,4 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}]},{},[5]);
+},{}]},{},[6]);

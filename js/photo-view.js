@@ -2,10 +2,12 @@
 let THREE = require('three');
 import loadModel from './model-cache';
 import createGrid from './grid';
+import LightRing from './light-ring';
 
 let BACKGROUNDS = ['texture', 'black', 'grid'];
+let LIGHTINGS = ['white', 'red', 'blue', 'green', 'yellow', 'primary'];
 let DEFAULT_CAMERA_POSITION = 10;
-let MODEL_SCALE_FACTOR = 5;
+let MODEL_SCALE_FACTOR = 3.5;
 
 export default class PhotoView {
   constructor ({ photo, scene, camera }) {
@@ -13,18 +15,27 @@ export default class PhotoView {
     this.scene = scene;
     this.camera = camera;
 
-    this.container = new THREE.Object3D();
+    let container = this.container = new THREE.Object3D();
+
+    let spotlight = this.spotlight = new THREE.SpotLight(0xffffff, 2, 100, 0.5, 0, 1.5); // color, intensity, distance, angle, penumbra, decay
+    spotlight.castShadow = true;
+    container.add(spotlight);
+
+    let ring = this.lightRing = new LightRing({ count: 3, radius: 15, y: 10, yRange: 6, distance: 200, angle: 0.5, revolutionSpeed: 0.004 });
+    container.add(ring.obj);
+
     this.state = {
       active: false,
       showTexture: true,
       wireframe: false,
-      background: 'texture',
-      rps: 2
+      background: BACKGROUNDS[0],
+      lighting: LIGHTINGS[0],
+      rps: 1
     };
   }
 
   load (callback) {
-    let { photo, container } = this;
+    let { photo, container, spotlight } = this;
 
     loadModel(photo, ({ geometry, texture }) => {
       this.geometry = geometry;
@@ -40,6 +51,8 @@ export default class PhotoView {
       material.side = THREE.DoubleSide;
 
       let mesh = this.mesh = new THREE.Mesh(geometry, material);
+      mesh.position.y = 1;
+      mesh.castShadow = true;
 
       let size = geometry.boundingBox.getSize();
       let scale = MODEL_SCALE_FACTOR / size.y;
@@ -53,6 +66,19 @@ export default class PhotoView {
 
       this.setWireframe(this.state.wireframe);
       this.setShowTexture(this.state.showTexture);
+      this.setLighting(this.state.lighting);
+
+      let platform = this.platform = new THREE.Mesh(
+        new THREE.BoxBufferGeometry(size.x + 5, 0.25, size.z + 5),
+        new THREE.MeshStandardMaterial({
+          color: 0xffffff
+        })
+      );
+      platform.receiveShadow = true;
+      platform.position.set(0, -(size.y / 2) - 2, -size.z * 0.75);
+      container.add(platform);
+
+      spotlight.position.set(0, size.y + 8, size.z + 2);
 
       if (callback) callback();
     });
@@ -83,6 +109,10 @@ export default class PhotoView {
       if (this.mesh) {
         this.mesh.rotation.y += this.state.rps * (delta / 1000);
       }
+
+      if (this.state.lighting === 'primary') {
+        this.lightRing.update(delta);
+      }
     }
   }
 
@@ -111,7 +141,8 @@ export default class PhotoView {
   }
 
   lightingButtonPressed () {
-
+    let index = (LIGHTINGS.indexOf(this.state.lighting) + 1) % LIGHTINGS.length;
+    this.setLighting(LIGHTINGS[index]);
   }
 
   backgroundButtonPressed () {
@@ -132,12 +163,38 @@ export default class PhotoView {
 
     if (this.material) {
       if (showTexture) {
-        this.material.color.setHex(0xffffff);
         this.material.map = this.texture;
+        this.material.color.set(0xffffff);
       } else {
-        this.material.color.setHex(0x888888);
         this.material.map = null;
+        this.material.color.set(0x666666);
       }
+
+      this.material.needsUpdate = true;
+    }
+  }
+
+  setLighting (lighting) {
+    let { spotlight, lightRing, state } = this;
+    state.lighting = lighting;
+
+    switch (lighting) {
+      case 'white':
+      case 'red':
+      case 'green':
+      case 'blue':
+      case 'yellow':
+        spotlight.intensity = lighting === 'white' ? 2 : 5;
+        lightRing.setIntensity(0);
+
+        let colorMap = { white: 0xffffff, red: 0xff0000, green: 0x00ff00, blue: 0x0000ff, yellow: 0xffff00 };
+        spotlight.color.set(colorMap[lighting]);
+        break;
+
+      case 'primary':
+        spotlight.intensity = 0;
+        lightRing.setIntensity(1.4);
+        break;
     }
   }
 
