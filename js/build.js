@@ -103,7 +103,7 @@ function TrackballKeyboardControls(object, domElement) {
 
 	this.keys = [73 /*I*/, 79 /*O*/, 80 /*P*/];
 
-	this.inactivityTime = 200;
+	this.inactivityTime = 100;
 
 	// internals
 
@@ -1773,7 +1773,7 @@ function go() {
   }
 
   function makeLights() {
-    var ambient = new THREE.AmbientLight(16777215, 1);
+    var ambient = new THREE.AmbientLight(16777215, 0.5);
     scene.add(ambient);
   }
 
@@ -2090,6 +2090,7 @@ var PhotoView = (function () {
         this.camera.position.set(0, 0, DEFAULT_CAMERA_POSITION);
         this.controls.setDefaultPosition(this.camera.position);
         this.controls.reset();
+        this.state.rps = 1;
       }
     },
     update: {
@@ -2156,8 +2157,8 @@ var PhotoView = (function () {
     controlActivityMonitor: {
       value: function controlActivityMonitor(isActive) {
         var to = { rps: isActive ? 0 : 1 };
-        var easing = isActive ? TWEEN.Easing.Quadratic.Out : TWEEN.Easing.Linear.None;
-        var duration = 1000 * Math.abs(this.state.rps - to.rps);
+        var easing = isActive ? TWEEN.Easing.Quadratic.Out : TWEEN.Easing.Quadratic.In;
+        var duration = 2500 * Math.abs(this.state.rps - to.rps);
 
         if (this.activityTween) {
           this.activityTween.stop();

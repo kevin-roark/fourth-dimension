@@ -213,7 +213,7 @@ function go () {
   }
 
   function makeLights () {
-    let ambient = new THREE.AmbientLight(0xffffff, 1);
+    let ambient = new THREE.AmbientLight(0xffffff, 0.5);
     scene.add(ambient);
   }
 

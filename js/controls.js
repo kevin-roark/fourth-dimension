@@ -40,7 +40,7 @@ export default function TrackballKeyboardControls( object, domElement ) {
 
 	this.keys = [ 73 /*I*/, 79 /*O*/, 80 /*P*/ ];
 
-  this.inactivityTime = 200;
+  this.inactivityTime = 100;
 
 	// internals
 

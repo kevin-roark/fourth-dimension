@@ -125,6 +125,7 @@ export default class PhotoView {
     this.camera.position.set(0, 0, DEFAULT_CAMERA_POSITION);
     this.controls.setDefaultPosition(this.camera.position);
     this.controls.reset();
+    this.state.rps = 1;
   }
 
   update (delta) {
@@ -184,8 +185,8 @@ export default class PhotoView {
 
   controlActivityMonitor (isActive) {
     let to = { rps: isActive ? 0 : 1 };
-    let easing = isActive ? TWEEN.Easing.Quadratic.Out : TWEEN.Easing.Linear.None;
-    let duration = 1000 * Math.abs(this.state.rps - to.rps);
+    let easing = isActive ? TWEEN.Easing.Quadratic.Out : TWEEN.Easing.Quadratic.In;
+    let duration = 2500 * Math.abs(this.state.rps - to.rps);
 
     if (this.activityTween) {
       this.activityTween.stop();
