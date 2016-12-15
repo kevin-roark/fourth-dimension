@@ -152,7 +152,7 @@ function go () {
     dom.seriesTitle.textContent = title;
 
     let cursor = thumbnail ? "url('images/basketball.png'), crosshair" : "url('images/myhand.png'), auto";
-    renderer.domElement.style.cursor = cursor;
+    dom.photoViewInterface.style.cursor = cursor;
   }
 
   function viewPhoto (photo) {
@@ -188,7 +188,8 @@ function go () {
     } else {
       state.photoInView.deactivate();
       scene.add(container);
-      camera.position.z = HOME_CAMERA_POSITION;
+      camera.position.set(0, 0, HOME_CAMERA_POSITION);
+      camera.rotation.set(0, 0, 0, 0);
     }
 
     [dom.info, dom.photoViewInterface, dom.seriesTitle].forEach(el => {

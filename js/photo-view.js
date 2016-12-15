@@ -16,7 +16,13 @@ export default class PhotoView {
     this.scene = scene;
     this.camera = camera;
 
-    this.controls = new Controls({ camera });
+    let controls = this.controls = new Controls(camera);
+    controls.dynamicDampingFactor = 0.25;
+    controls.zoomSpeed = 0.01;
+    controls.panSpeed = 0.1;
+    controls.minDistance = 0.01;
+    controls.maxDistance = 40;
+    controls.enabled = false;
 
     let container = this.container = new THREE.Object3D();
 
@@ -38,7 +44,7 @@ export default class PhotoView {
   }
 
   load (callback) {
-    let { photo, container, spotlight } = this;
+    let { photo, container, spotlight, controls } = this;
 
     loadModel(photo, ({ geometry, texture }) => {
       this.geometry = geometry;
@@ -64,6 +70,8 @@ export default class PhotoView {
       if (photo.upsideDown) {
         mesh.rotation.x = Math.PI;
       }
+
+      controls.modifyTarget(mesh.position);
 
       container.add(mesh);
 
@@ -91,7 +99,8 @@ export default class PhotoView {
     this.state.active = true;
     this.setBackground(this.state.background);
     this.scene.add(this.container);
-    this.camera.position.z = DEFAULT_CAMERA_POSITION;
+    this.controls.enabled = true;
+    this.resetCamera();
   }
 
   deactivate (permanent = true) {
@@ -99,12 +108,20 @@ export default class PhotoView {
     this.scene.background = new THREE.Color(0xffffff);
     this.scene.remove(this.container);
     this.grid = null;
+    this.controls.enabled = false;
 
     if (permanent) {
       this.container = null;
       this.material = null;
       this.mesh = null;
+      this.controls.dispose();
     }
+  }
+
+  resetCamera () {
+    this.camera.position.set(0, 0, DEFAULT_CAMERA_POSITION);
+    this.controls.setDefaultPosition(this.camera.position);
+    this.controls.reset();
   }
 
   update (delta) {
@@ -123,12 +140,31 @@ export default class PhotoView {
   }
 
   keydown (ev) {
-    console.log(ev.keyCode);
-    this.controls.keydown(ev);
+    switch (ev.keyCode) {
+      case 32: // space
+        this.resetCamera();
+        break;
+
+      case 76: // L
+        this.lightingButtonPressed();
+        break;
+
+      case 84: // T
+        this.textureButtonPressed();
+        break;
+
+      case 66: // B
+        this.backgroundButtonPressed();
+        break;
+
+      case 77: // M
+        this.wireframeButtonPressed();
+        break;
+    }
   }
 
   keyup (ev) {
-    this.controls.keyup(ev);
+
   }
 
   mousedown (ev) {
