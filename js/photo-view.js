@@ -1,5 +1,7 @@
 
 let THREE = require('three');
+let TWEEN = require('tween.js');
+
 import loadModel from './model-cache';
 import createGrid from './grid';
 import LightRing from './light-ring';
@@ -23,6 +25,7 @@ export default class PhotoView {
     controls.minDistance = 0.01;
     controls.maxDistance = 40;
     controls.enabled = false;
+    controls.addActivityMonitor(this.controlActivityMonitor.bind(this));
 
     let container = this.container = new THREE.Object3D();
 
@@ -177,6 +180,19 @@ export default class PhotoView {
 
   mousemove (ev) {
 
+  }
+
+  controlActivityMonitor (isActive) {
+    let to = { rps: isActive ? 0 : 1 };
+    let easing = isActive ? TWEEN.Easing.Quadratic.Out : TWEEN.Easing.Linear.None;
+    let duration = 1000 * Math.abs(this.state.rps - to.rps);
+
+    if (this.activityTween) {
+      this.activityTween.stop();
+      this.activityTween = null;
+    }
+
+    this.activityTween = new TWEEN.Tween(this.state).to(to, duration).easing(easing).start();
   }
 
   wireframeButtonPressed () {
