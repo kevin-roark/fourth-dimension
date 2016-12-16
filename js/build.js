@@ -57,7 +57,7 @@ var Thumbnail = (function () {
 
 module.exports = Thumbnail;
 
-},{"three":15}],2:[function(require,module,exports){
+},{"three":16}],2:[function(require,module,exports){
 "use strict";
 
 var THREE = require("three");
@@ -114,7 +114,7 @@ module.exports = {
   resize: resize
 };
 
-},{"three":15}],3:[function(require,module,exports){
+},{"three":16}],3:[function(require,module,exports){
 "use strict";
 
 module.exports = TrackballKeyboardControls;
@@ -718,7 +718,7 @@ TrackballKeyboardControls.prototype = Object.create(THREE.EventDispatcher.protot
 TrackballKeyboardControls.prototype.constructor = TrackballKeyboardControls;
 // screen.width intentional
 
-},{"three":15}],4:[function(require,module,exports){
+},{"three":16}],4:[function(require,module,exports){
 "use strict";
 
 var _slicedToArray = function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { var _arr = []; for (var _iterator = arr[Symbol.iterator](), _step; !(_step = _iterator.next()).done;) { _arr.push(_step.value); if (i && _arr.length === i) break; } return _arr; } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } };
@@ -827,7 +827,202 @@ function createGrid() {
   return container;
 }
 
-},{"three":15}],7:[function(require,module,exports){
+},{"three":16}],7:[function(require,module,exports){
+"use strict";
+
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
+var THREE = require("three");
+
+var ThumbnailPile = _interopRequire(require("./thumbnail-pile"));
+
+var MouseIntersector = _interopRequire(require("./mouse-intersector"));
+
+// Modes
+// Pile per collection that you arrow through
+// One huge pile that you explore
+// splayed out
+
+var HomeView = (function () {
+  function HomeView(_ref) {
+    var seriesData = _ref.seriesData;
+    var camera = _ref.camera;
+    var renderer = _ref.renderer;
+    var photoClickHandler = _ref.photoClickHandler;
+
+    _classCallCheck(this, HomeView);
+
+    this.seriesData = seriesData;
+    this.camera = camera;
+    this.renderer = renderer;
+    this.photoClickHandler = photoClickHandler;
+
+    this.piles = [];
+    this.thumbnailMeshes = [];
+    this.thumbnailIntersector = null;
+    this.container = new THREE.Object3D();
+
+    this.lights = new THREE.Object3D();
+    this.container.add(this.lights);
+
+    this.dom = {
+      seriesTitle: document.querySelector(".series-title"),
+      photoViewInterface: document.querySelector(".photo-view-interface")
+    };
+
+    this.state = {
+      active: false,
+      pileStyle: "spread"
+    };
+  }
+
+  _createClass(HomeView, {
+    update: {
+      value: function update(delta) {
+        for (var i = 0; i < this.piles.length; i++) {
+          this.piles[i].update(delta);
+        }
+      }
+    },
+    load: {
+      value: function load(callback) {
+        var _this = this;
+
+        var _ref = this;
+
+        var renderer = _ref.renderer;
+        var camera = _ref.camera;
+
+        this.makeLights();
+        this.makePiles(function () {
+          var thumbnailIntersector = _this.thumbnailIntersector = new MouseIntersector({ camera: camera, renderer: renderer, meshes: _this.thumbnailMeshes });
+          thumbnailIntersector.addHoverListener(function (mesh) {
+            if (_this.state.active) {
+              _this.setHoverThumnbail(mesh ? mesh._thumbnail : null);
+            }
+          });
+          thumbnailIntersector.addClickListener(function (mesh) {
+            if (_this.state.active) {
+              if (_this.photoClickHandler) {
+                _this.photoClickHandler(mesh ? mesh._thumbnail.photo : null);
+              }
+            }
+          });
+
+          if (callback) callback();
+        });
+      }
+    },
+    activate: {
+      value: function activate(scene) {
+        this.state.active = true;
+        scene.add(this.container);
+      }
+    },
+    deactivate: {
+      value: function deactivate(scene) {
+        this.state.active = false;
+        scene.remove(this.container);
+      }
+    },
+    setHoverThumnbail: {
+      value: function setHoverThumnbail(thumbnail) {
+        var title = thumbnail ? "" + thumbnail._pile.series.name + " — " + thumbnail.photo.name : "";
+        this.dom.seriesTitle.textContent = title;
+
+        var cursor = thumbnail ? "url('images/basketball.png'), crosshair" : "url('images/myhand.png'), auto";
+        this.dom.photoViewInterface.style.cursor = cursor;
+      }
+    },
+    makeLights: {
+      value: function makeLights() {
+        var spotlight = new THREE.SpotLight(16777215, 2, 5000, 3.14, 0, 1);
+        spotlight.position.set(100, 100, 100);
+        shadowConfig(spotlight);
+        this.lights.add(spotlight);
+
+        var spotlight2 = new THREE.SpotLight(16777215, 2, 5000, 3.14, 0, 1);
+        spotlight2.position.set(-100, 100, -100);
+        shadowConfig(spotlight2);
+        this.lights.add(spotlight2);
+
+        function shadowConfig(light) {
+          light.castShadow = true;
+          light.shadow.mapSize.width = spotlight.shadow.mapSize.height = 1024;
+          light.shadow.camera.near = 1;
+          light.shadow.camera.far = 500;
+          light.shadow.camera.fov = 30;
+        }
+      }
+    },
+    makePiles: {
+      value: function makePiles(callback) {
+        var _this = this;
+
+        var _ref = this;
+
+        var seriesData = _ref.seriesData;
+        var container = _ref.container;
+        var piles = _ref.piles;
+        var state = _ref.state;
+
+        var remaining = seriesData.length;
+
+        seriesData.forEach(function (series, idx) {
+          var pile = new ThumbnailPile({ series: series, style: state.pileStyle });
+          pile.load(function () {
+            piles.push(pile);
+            container.add(pile.mesh);
+            _this.thumbnailMeshes = _this.thumbnailMeshes.concat(pile.thumbnails.map(function (t) {
+              return t.mesh;
+            }));
+
+            remaining -= 1;
+            if (remaining === 0 && callback) {
+              _this.arrangePiles();
+              callback();
+            }
+          });
+        });
+      }
+    },
+    arrangePiles: {
+      value: function arrangePiles() {
+        var style = this.state.pileStyle;
+        var half = Math.floor(this.seriesData.length / 2);
+
+        this.piles.forEach(function (pile, idx) {
+          var x = undefined,
+              y = undefined;
+          var z = 0;
+          switch (style) {
+            case "spread":
+              // although this does look beautiful if they are all in one big pile
+              x = -21 + 60 * (idx % half / half);
+              y = idx % 2 === 0 ? 10 : -10;
+              break;
+
+            case "neat":
+              x = -window.innerWidth / 2 + 5;
+              y = window.innerHeight / 2 - 5 - idx * 15;
+              break;
+          }
+          pile.mesh.position.set(x, y, z);
+        });
+      }
+    }
+  });
+
+  return HomeView;
+})();
+
+module.exports = HomeView;
+
+},{"./mouse-intersector":12,"./thumbnail-pile":14,"three":16}],8:[function(require,module,exports){
 
 
 /**
@@ -1484,7 +1679,7 @@ OBJLoader.prototype = {
 
 };
 
-},{"three":15}],8:[function(require,module,exports){
+},{"three":16}],9:[function(require,module,exports){
 "use strict";
 
 var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
@@ -1658,7 +1853,7 @@ var LightRing = (function () {
 
 module.exports = LightRing;
 
-},{"three":15,"tween.js":16}],9:[function(require,module,exports){
+},{"three":16,"tween.js":17}],10:[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -1673,11 +1868,9 @@ var dataUtil = _interopRequire(require("./data-util"));
 
 var cameras = _interopRequire(require("./cameras"));
 
-var ThumbnailPile = _interopRequire(require("./thumbnail-pile"));
-
 var PhotoView = _interopRequire(require("./photo-view"));
 
-var MouseIntersector = _interopRequire(require("./mouse-intersector"));
+var HomeView = _interopRequire(require("./home-view"));
 
 if (isMobile.any) {
   var mobileWarning = document.createElement("div");
@@ -1704,8 +1897,8 @@ function go() {
   scene.add(cameras.perspectiveCamera);
   scene.add(cameras.orthographicCamera);
 
-  var container = new THREE.Object3D();
-  scene.add(container);
+  var homeView = new HomeView({ seriesData: seriesData, camera: cameras.orthographicCamera, renderer: renderer, photoClickHandler: viewPhoto });
+  homeView.activate(scene);
 
   document.body.appendChild(renderer.domElement);
 
@@ -1727,32 +1920,13 @@ function go() {
     photoInView: null,
     startTime: null,
     lastTime: null,
-    activeCamera: cameras.orthographicCamera,
-    pileStyle: "spread"
+    activeCamera: cameras.orthographicCamera
   };
-
-  var objects = {
-    thumbnailPiles: [],
-    thumbnailMeshes: [],
-    thumbnailIntersector: null,
-    homeLights: new THREE.Object3D()
-  };
-  container.add(objects.homeLights);
 
   window.addEventListener("resize", resize);
   resize();
 
   createScene(function () {
-    var thumbnailIntersector = objects.thumbnailIntersector = new MouseIntersector({ camera: state.activeCamera, renderer: renderer, meshes: objects.thumbnailMeshes });
-    thumbnailIntersector.addHoverListener(function (mesh) {
-      if (state.photoInView || state.loadingPhotoView) return;
-      setHoverThumnbail(mesh ? mesh._thumbnail : null);
-    });
-    thumbnailIntersector.addClickListener(function (mesh) {
-      if (state.photoInView || state.loadingPhotoView) return;
-      viewPhoto(mesh ? mesh._thumbnail.photo : null);
-    });
-
     document.addEventListener("keydown", function (ev) {
       switch (ev.keyCode) {
         case 27:
@@ -1829,23 +2003,13 @@ function go() {
     if (state.photoInView) {
       state.photoInView.update(delta);
     } else {
-      for (var i = 0; i < objects.thumbnailPiles.length; i++) {
-        objects.thumbnailPiles[i].update(delta);
-      }
+      homeView.update(delta);
     }
 
     renderer.render(scene, state.activeCamera);
     state.lastTime = time;
 
     window.requestAnimationFrame(update);
-  }
-
-  function setHoverThumnbail(thumbnail) {
-    var title = thumbnail ? "" + thumbnail._pile.series.name + " — " + thumbnail.photo.name : "";
-    dom.seriesTitle.textContent = title;
-
-    var cursor = thumbnail ? "url('images/basketball.png'), crosshair" : "url('images/myhand.png'), auto";
-    dom.photoViewInterface.style.cursor = cursor;
   }
 
   function viewPhoto(photo) {
@@ -1882,11 +2046,11 @@ function go() {
 
   function setPhotoView(photoView) {
     if (photoView) {
-      scene.remove(container);
+      homeView.deactivate(scene);
       photoView.activate();
     } else {
       state.photoInView.deactivate();
-      scene.add(container);
+      homeView.activate(scene);
       cameras.resetPerspectiveCamera();
     }
 
@@ -1896,89 +2060,23 @@ function go() {
 
     state.photoInView = photoView;
     state.activeCamera = photoView || state.pileStyle !== "neat" ? cameras.perspectiveCamera : cameras.orthographicCamera;
-    if (objects.thumbnailIntersector) objects.thumbnailIntersector.camera = state.activeCamera;
+    if (homeView.thumbnailIntersector) homeView.thumbnailIntersector.camera = state.activeCamera;
   }
 
   function createScene(callback) {
-    var remaining = 1;
-
     makeLights();
-    makePiles(loaded);
-
-    function loaded() {
-      remaining -= 1;
-      if (remaining === 0) callback();
-    }
+    homeView.load(function () {
+      callback();
+    });
   }
 
   function makeLights() {
     var ambient = new THREE.AmbientLight(16777215, 0.5);
     scene.add(ambient);
-
-    var spotlight = new THREE.SpotLight(16777215, 2, 5000, 3.14, 0, 1);
-    spotlight.position.set(100, 100, 100);
-    shadowConfig(spotlight);
-    objects.homeLights.add(spotlight);
-
-    var spotlight2 = new THREE.SpotLight(16777215, 2, 5000, 3.14, 0, 1);
-    spotlight2.position.set(-100, 100, -100);
-    shadowConfig(spotlight2);
-    objects.homeLights.add(spotlight2);
-
-    function shadowConfig(light) {
-      light.castShadow = true;
-      light.shadow.mapSize.width = spotlight.shadow.mapSize.height = 1024;
-      light.shadow.camera.near = 1;
-      light.shadow.camera.far = 500;
-      light.shadow.camera.fov = 30;
-    }
-  }
-
-  function makePiles(callback) {
-    var remaining = seriesData.length;
-
-    seriesData.forEach(function (series, idx) {
-      var thumbnailPile = new ThumbnailPile({ series: series, style: state.pileStyle });
-      thumbnailPile.load(function () {
-        objects.thumbnailPiles.push(thumbnailPile);
-        container.add(thumbnailPile.mesh);
-        objects.thumbnailMeshes = objects.thumbnailMeshes.concat(thumbnailPile.thumbnails.map(function (t) {
-          return t.mesh;
-        }));
-
-        remaining -= 1;
-        if (remaining === 0 && callback) {
-          arrangePiles(state.pileStyle);
-          callback();
-        }
-      });
-    });
-  }
-
-  function arrangePiles(style) {
-    var half = Math.floor(seriesData.length / 2);
-
-    objects.thumbnailPiles.forEach(function (pile, idx) {
-      var x = undefined,
-          y = undefined;
-      var z = 0;
-      switch (style) {
-        case "spread":
-          x = -21 + 60 * (idx % half / half);
-          y = idx % 2 === 0 ? 10 : -10;
-          break;
-
-        case "neat":
-          x = -window.innerWidth / 2 + 5;
-          y = window.innerHeight / 2 - 5 - idx * 15;
-          break;
-      }
-      pile.mesh.position.set(x, y, z);
-    });
   }
 }
 
-},{"./cameras":2,"./data":5,"./data-util":4,"./mouse-intersector":11,"./photo-view":12,"./thumbnail-pile":13,"ismobilejs":14,"three":15,"tween.js":16}],10:[function(require,module,exports){
+},{"./cameras":2,"./data":5,"./data-util":4,"./home-view":7,"./photo-view":13,"ismobilejs":15,"three":16,"tween.js":17}],11:[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -2029,7 +2127,7 @@ function load(photo, callback) {
   });
 }
 
-},{"./lib/OBJLoader":7,"three":15}],11:[function(require,module,exports){
+},{"./lib/OBJLoader":8,"three":16}],12:[function(require,module,exports){
 "use strict";
 
 var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
@@ -2108,7 +2206,7 @@ var MouseIntersector = (function () {
 
 module.exports = MouseIntersector;
 
-},{"three":15}],12:[function(require,module,exports){
+},{"three":16}],13:[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -2455,7 +2553,7 @@ var PhotoView = (function () {
 
 module.exports = PhotoView;
 
-},{"./controls":3,"./grid":6,"./light-ring":8,"./model-cache":10,"three":15,"tween.js":16}],13:[function(require,module,exports){
+},{"./controls":3,"./grid":6,"./light-ring":9,"./model-cache":11,"three":16,"tween.js":17}],14:[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -2594,7 +2692,7 @@ var ThumbnailPile = (function () {
 
 exports["default"] = ThumbnailPile;
 
-},{"./Thumbnail":1,"three":15}],14:[function(require,module,exports){
+},{"./Thumbnail":1,"three":16}],15:[function(require,module,exports){
 /**
  * isMobile.js v0.4.0
  *
@@ -2733,7 +2831,7 @@ exports["default"] = ThumbnailPile;
 
 })(this);
 
-},{}],15:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -45032,7 +45130,7 @@ exports["default"] = ThumbnailPile;
 
 })));
 
-},{}],16:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 (function (process){
 /**
  * Tween.js - Licensed under the MIT license
@@ -45906,7 +46004,7 @@ TWEEN.Interpolation = {
 })(this);
 
 }).call(this,require('_process'))
-},{"_process":17}],17:[function(require,module,exports){
+},{"_process":18}],18:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -46002,4 +46100,4 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}]},{},[9]);
+},{}]},{},[10]);
