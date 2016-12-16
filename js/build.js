@@ -29,12 +29,10 @@ var Thumbnail = (function () {
         var _ref = this;
 
         var photo = _ref.photo;
-        var scale = _ref.scale;
 
         var texturePath = "models/" + photo.seriesPath + "/" + photo.path + "/Thumbnail.jpg";
         textureLoader.load(texturePath, function (texture) {
-          var length = 1 * scale;
-          var geometry = new THREE.BoxBufferGeometry(length, length, length);
+          var geometry = new THREE.BoxBufferGeometry(1, 1, 1);
 
           var material = new THREE.MeshStandardMaterial({
             color: 16777215,
@@ -46,8 +44,19 @@ var Thumbnail = (function () {
 
           var mesh = _this.mesh = new THREE.Mesh(geometry, material);
           mesh._thumbnail = _this;
+          _this.setScale();
           if (callback) callback(mesh);
         });
+      }
+    },
+    setScale: {
+      value: function setScale() {
+        var scale = arguments[0] === undefined ? this.scale : arguments[0];
+
+        this.scale = scale;
+        if (this.mesh) {
+          this.mesh.scale.set(scale, scale, scale);
+        }
       }
     }
   });
@@ -837,10 +846,15 @@ var _createClass = (function () { function defineProperties(target, props) { for
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
 var THREE = require("three");
+var TWEEN = require("tween.js");
 
 var ThumbnailPile = _interopRequire(require("./thumbnail-pile"));
 
 var MouseIntersector = _interopRequire(require("./mouse-intersector"));
+
+var cameras = _interopRequire(require("./cameras"));
+
+var pileStyles = ["collection", "crazy", "neat"];
 
 // Modes
 // Pile per collection that you arrow through
@@ -876,8 +890,11 @@ var HomeView = (function () {
 
     this.state = {
       active: false,
-      pileStyle: "spread"
+      pileStyle: "collection",
+      collectionPile: null
     };
+
+    window.addEventListener("keydown", this.keydown.bind(this), false);
   }
 
   _createClass(HomeView, {
@@ -927,6 +944,30 @@ var HomeView = (function () {
       value: function deactivate(scene) {
         this.state.active = false;
         scene.remove(this.container);
+      }
+    },
+    keydown: {
+      value: function keydown(ev) {
+        if (!this.state.active) {
+          return;
+        }switch (ev.keyCode) {
+          case 37:
+            this.cycleCollectionPile(false);
+            break;
+
+          case 39:
+            this.cycleCollectionPile(true);
+            break;
+
+          case 32:
+            this.cyclePileStyle();
+            break;
+        }
+      }
+    },
+    resize: {
+      value: function resize() {
+        this.arrangePiles();
       }
     },
     setHoverThumnbail: {
@@ -983,6 +1024,7 @@ var HomeView = (function () {
 
             remaining -= 1;
             if (remaining === 0 && callback) {
+              _this.state.collectionPile = piles[Math.floor(piles.length * Math.random())];
               _this.arrangePiles();
               callback();
             }
@@ -990,29 +1032,88 @@ var HomeView = (function () {
         });
       }
     },
+    cyclePileStyle: {
+      value: function cyclePileStyle() {
+        var styleIndex = (pileStyles.indexOf(this.state.pileStyle) + 1) % pileStyles.length;
+        this.setPileStyle(pileStyles[styleIndex]);
+      }
+    },
+    setPileStyle: {
+      value: function setPileStyle() {
+        var pileStyle = arguments[0] === undefined ? this.state.pileStyle : arguments[0];
+
+        this.state.pileStyle = pileStyle;
+        this.arrangePiles();
+      }
+    },
     arrangePiles: {
       value: function arrangePiles() {
+        var _this = this;
+
         var style = this.state.pileStyle;
-        var half = Math.floor(this.seriesData.length / 2);
+        var viewport = cameras.getOrthographicViewport();
 
         this.piles.forEach(function (pile, idx) {
-          var x = undefined,
-              y = undefined;
-          var z = 0;
-          switch (style) {
-            case "spread":
-              // although this does look beautiful if they are all in one big pile
-              x = -21 + 60 * (idx % half / half);
-              y = idx % 2 === 0 ? 10 : -10;
-              break;
-
-            case "neat":
-              x = -window.innerWidth / 2 + 5;
-              y = window.innerHeight / 2 - 5 - idx * 15;
-              break;
-          }
-          pile.mesh.position.set(x, y, z);
+          pile.state.viewport = viewport;
+          pile.setStyle(style);
         });
+
+        switch (style) {
+          case "collection":
+            var collectionPileIndex = this.piles.indexOf(this.state.collectionPile);
+            this.piles.forEach(function (p, idx) {
+              return p.mesh.position.set((idx - collectionPileIndex) * viewport.width, 0, 0);
+            });
+            break;
+
+          case "crazy":
+            this.piles.forEach(function (p) {
+              return p.mesh.position.set((Math.random() - 0.5) * viewport.width * 0.25, (Math.random() - 0.5) * viewport.height * 0.25, 0);
+            });
+            break;
+
+          case "neat":
+            {
+              (function () {
+                var y = viewport.height / 2 - 5;
+                _this.piles.forEach(function (p) {
+                  p.mesh.position.set(-viewport.width / 2 + 5, y, 0);
+                  y -= p.getHeight() + 5;
+                  console.log(y, p.series.name);
+                });
+              })();
+            }break;
+        }
+      }
+    },
+    cycleCollectionPile: {
+      value: function cycleCollectionPile() {
+        var forward = arguments[0] === undefined ? true : arguments[0];
+
+        var delta = forward ? 1 : -1;
+        var collectionPileIndex = this.piles.indexOf(this.state.collectionPile) + delta;
+        if (collectionPileIndex < 0) collectionPileIndex = this.piles.length - 1;
+        if (collectionPileIndex > this.piles.length - 1) collectionPileIndex = 0;
+        this.setCollectionPile(this.piles[collectionPileIndex]);
+      }
+    },
+    setCollectionPile: {
+      value: function setCollectionPile(collectionPile) {
+        this.state.collectionPile = collectionPile;
+
+        var viewport = cameras.getOrthographicViewport();
+        var collectionPileIndex = this.piles.indexOf(collectionPile);
+
+        if (this.state.pileStyle === "collection") {
+          this.piles.forEach(function (pile, idx) {
+            if (pile._collectionTween) {
+              pile._collectionTween.stop();
+            }
+
+            var to = { x: (idx - collectionPileIndex) * viewport.width };
+            pile._collectionTween = new TWEEN.Tween(pile.mesh.position).to(to, 500).easing(TWEEN.Easing.Quadratic.InOut).start();
+          });
+        }
       }
     }
   });
@@ -1022,7 +1123,7 @@ var HomeView = (function () {
 
 module.exports = HomeView;
 
-},{"./mouse-intersector":12,"./thumbnail-pile":14,"three":16}],8:[function(require,module,exports){
+},{"./cameras":2,"./mouse-intersector":12,"./thumbnail-pile":14,"three":16,"tween.js":17}],8:[function(require,module,exports){
 
 
 /**
@@ -1988,6 +2089,7 @@ function go() {
     renderer.setSize(w, h);
 
     cameras.resize();
+    homeView.resize();
   }
 
   function start() {
@@ -2059,7 +2161,7 @@ function go() {
     });
 
     state.photoInView = photoView;
-    state.activeCamera = photoView || state.pileStyle !== "neat" ? cameras.perspectiveCamera : cameras.orthographicCamera;
+    state.activeCamera = photoView ? cameras.perspectiveCamera : cameras.orthographicCamera;
     if (homeView.thumbnailIntersector) homeView.thumbnailIntersector.camera = state.activeCamera;
   }
 
@@ -2562,28 +2664,19 @@ var _createClass = (function () { function defineProperties(target, props) { for
 
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
 var THREE = require("three");
 
 var Thumbnail = _interopRequire(require("./Thumbnail"));
 
-var styles = ["spread", "neat"];
-var pileStyles = { spread: "spread", neat: "neat" };
-
-exports.pileStyles = pileStyles;
+var cameras = _interopRequire(require("./cameras"));
 
 var ThumbnailPile = (function () {
   function ThumbnailPile(_ref) {
     var series = _ref.series;
     var _ref$style = _ref.style;
     var style = _ref$style === undefined ? "neat" : _ref$style;
-    var _ref$spread = _ref.spread;
-    var spread = _ref$spread === undefined ? 10 : _ref$spread;
-    var _ref$scale = _ref.scale;
-    var scale = _ref$scale === undefined ? 10 : _ref$scale;
+    var _ref$viewport = _ref.viewport;
+    var viewport = _ref$viewport === undefined ? cameras.getOrthographicViewport() : _ref$viewport;
 
     _classCallCheck(this, ThumbnailPile);
 
@@ -2594,9 +2687,12 @@ var ThumbnailPile = (function () {
 
     this.state = {
       rps: 0.8,
-      scale: scale,
+      collectionWidthPercentage: 0.45,
+      collectionHeightPercentage: 0.8,
+      crazyWidthPercentage: 0.8,
+      crazyHeightPercentage: 0.8,
       style: style,
-      spread: spread
+      viewport: viewport
     };
   }
 
@@ -2614,7 +2710,7 @@ var ThumbnailPile = (function () {
         var thumbnails = this.thumbnails = [];
 
         series.photos.forEach(function (photo) {
-          var thumbnail = new Thumbnail({ photo: photo, seriesPath: series.path, scale: _this.state.scale });
+          var thumbnail = new Thumbnail({ photo: photo, seriesPath: series.path, scale: _this.scaleForStyle() });
           thumbnail._pile = _this;
           thumbnails.push(thumbnail);
 
@@ -2630,36 +2726,32 @@ var ThumbnailPile = (function () {
         });
       }
     },
-    sp: {
-      value: function sp() {
-        return (Math.random() - 0.5) * this.state.spread;
-      }
-    },
     update: {
       value: function update(delta) {
         switch (this.state.style) {
-          case "spread":
+          case "collection":
+          case "crazy":
             this.mesh.rotation.y += this.state.rps * (delta / 1000);
             break;
 
           case "neat":
             for (var i = 0; i < this.thumbnails.length; i++) {
               var thumb = this.thumbnails[i];
-              thumb.mesh.rotation.y += this.state.rps * (delta / 1000);
+              // thumb.mesh.rotation.y += this.state.rps * (delta / 1000);
+              thumb.mesh.position.x += (Math.random() - 0.5) * 0.02;
+              thumb.mesh.position.y += (Math.random() - 0.5) * 0.02;
+              thumb.mesh.position.z += (Math.random() - 0.5) * 0.02;
+              thumb.mesh.rotation.x += (Math.random() - 0.5) * 0.1;
+              thumb.mesh.rotation.y += (Math.random() - 0.5) * 0.1;
+              thumb.mesh.rotation.z += (Math.random() - 0.5) * 0.1;
             }
             break;
         }
       }
     },
-    cycleStyle: {
-      value: function cycleStyle() {
-        var styleIndex = (styles.indexOf(this.state.style) + 1) % styles.length;
-        this.setStyle(styles[styleIndex]);
-      }
-    },
     setStyle: {
-      value: function setStyle(style) {
-        var _this = this;
+      value: function setStyle() {
+        var style = arguments[0] === undefined ? this.state.style : arguments[0];
 
         var _ref = this;
 
@@ -2668,20 +2760,90 @@ var ThumbnailPile = (function () {
 
         state.style = style;
 
+        var viewport = state.viewport;
+
+        var scale = this.scaleForStyle(style);
+        var ws = viewport.width - scale / 2;
+        var hs = viewport.height - scale / 2;
+
+        thumbnails.forEach(function (t) {
+          return t.setScale(scale);
+        });
+
         switch (style) {
-          case "spread":
+          case "collection":
             thumbnails.forEach(function (thumbnail) {
-              thumbnail.mesh.position.set(_this.sp(), _this.sp(), _this.sp());
+              var sp = function (w) {
+                return (Math.random() - 0.5) * (w ? ws * state.collectionWidthPercentage : hs * state.collectionHeightPercentage);
+              };
+              thumbnail.mesh.position.set(sp(true), sp(false), sp(true));
+              thumbnail.mesh.rotation.set(Math.PI / 2 + (Math.random() - 0.5) * 0.2, Math.random() * Math.PI * 2, Math.random() * Math.PI * 2);
+            });
+            break;
+
+          case "crazy":
+            thumbnails.forEach(function (thumbnail) {
+              var sp = function (w) {
+                return (Math.random() - 0.5) * (w ? ws * state.crazyWidthPercentage : hs * state.crazyHeightPercentage);
+              };
+              thumbnail.mesh.position.set(sp(true), sp(false), sp(true));
               thumbnail.mesh.rotation.set(Math.PI / 2 + (Math.random() - 0.5) * 0.2, Math.random() * Math.PI * 2, Math.random() * Math.PI * 2);
             });
             break;
 
           case "neat":
+            this.mesh.rotation.y = 0;
+            var x = 0;
+            var y = 0;
+            var space = this.state.viewport.width * 0.05;
             thumbnails.forEach(function (thumbnail, idx) {
-              thumbnail.mesh.position.set((state.scale + 5) * idx, 0, 0);
+              thumbnail.mesh.position.set(x, y, 0);
               thumbnail.mesh.rotation.set(0, 0, 0, 0);
+              x += scale + space;
+              if (x + scale > ws) {
+                x = 0;
+                y -= scale + space * 0.2;
+              }
             });
             break;
+        }
+      }
+    },
+    setViewport: {
+      value: function setViewport() {
+        var viewport = arguments[0] === undefined ? this.state.viewport : arguments[0];
+
+        this.state.viewport = viewport;
+        this.setStyle();
+      }
+    },
+    scaleForStyle: {
+      value: function scaleForStyle() {
+        var style = arguments[0] === undefined ? this.state.style : arguments[0];
+
+        switch (style) {
+          case "collection":
+            return this.state.viewport.width * 0.1;
+
+          case "crazy":
+            return this.state.viewport.width * 0.08;
+
+          case "neat":
+            return this.state.viewport.width * 0.05;
+        }
+      }
+    },
+    getHeight: {
+      value: function getHeight() {
+        switch (this.state.style) {
+          case "collection":
+            return this.state.viewport.height * this.state.collectionHeightPercentage;
+
+          case "crazy":
+            return this.state.viewport.height * this.state.crazyHeightPercentage;
+
+          case "neat":
+            return Math.abs(this.thumbnails[this.thumbnails.length - 1].mesh.position.y) + this.scaleForStyle();
         }
       }
     }
@@ -2690,9 +2852,9 @@ var ThumbnailPile = (function () {
   return ThumbnailPile;
 })();
 
-exports["default"] = ThumbnailPile;
+module.exports = ThumbnailPile;
 
-},{"./Thumbnail":1,"three":16}],15:[function(require,module,exports){
+},{"./Thumbnail":1,"./cameras":2,"three":16}],15:[function(require,module,exports){
 /**
  * isMobile.js v0.4.0
  *

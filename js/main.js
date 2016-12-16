@@ -124,6 +124,7 @@ function go () {
     renderer.setSize(w, h);
 
     cameras.resize();
+    homeView.resize();
   }
 
   function start () {
@@ -194,7 +195,7 @@ function go () {
     });
 
     state.photoInView = photoView;
-    state.activeCamera = photoView || state.pileStyle !== 'neat' ? cameras.perspectiveCamera : cameras.orthographicCamera;
+    state.activeCamera = photoView ? cameras.perspectiveCamera : cameras.orthographicCamera;
     if (homeView.thumbnailIntersector) homeView.thumbnailIntersector.camera = state.activeCamera;
   }
 

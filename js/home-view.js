@@ -1,8 +1,12 @@
 
 let THREE = require('three');
+let TWEEN = require('tween.js');
 
 import ThumbnailPile from './thumbnail-pile';
 import MouseIntersector from './mouse-intersector';
+import cameras from './cameras';
+
+let pileStyles = ['collection', 'crazy', 'neat'];
 
 // Modes
 // Pile per collection that you arrow through
@@ -30,8 +34,11 @@ export default class HomeView {
 
     this.state = {
       active: false,
-      pileStyle: 'spread'
+      pileStyle: 'collection',
+      collectionPile: null
     };
+
+    window.addEventListener('keydown', this.keydown.bind(this), false);
   }
 
   update (delta) {
@@ -71,6 +78,28 @@ export default class HomeView {
   deactivate (scene) {
     this.state.active = false;
     scene.remove(this.container);
+  }
+
+  keydown (ev) {
+    if (!this.state.active) return;
+
+    switch (ev.keyCode) {
+      case 37:
+        this.cycleCollectionPile(false);
+        break;
+
+      case 39:
+        this.cycleCollectionPile(true);
+        break;
+
+      case 32:
+        this.cyclePileStyle();
+        break;
+    }
+  }
+
+  resize () {
+    this.arrangePiles();
   }
 
   setHoverThumnbail (thumbnail) {
@@ -114,6 +143,7 @@ export default class HomeView {
 
         remaining -= 1;
         if (remaining === 0 && callback) {
+          this.state.collectionPile = piles[Math.floor(piles.length * Math.random())];
           this.arrangePiles();
           callback();
         }
@@ -121,26 +151,69 @@ export default class HomeView {
     });
   }
 
-  arrangePiles () {
-    let style = this.state.pileStyle;
-    let half = Math.floor(this.seriesData.length / 2);
-
-    this.piles.forEach((pile, idx) => {
-      let x, y;
-      let z = 0;
-      switch (style) {
-        case 'spread': // although this does look beautiful if they are all in one big pile
-          x = -21 + 60 * ((idx % half) / half);
-          y = idx % 2 === 0 ? 10 : -10;
-          break;
-
-        case 'neat':
-          x = -window.innerWidth / 2 + 5;
-          y = window.innerHeight / 2 - 5 - idx * 15;
-          break;
-      }
-      pile.mesh.position.set(x, y, z);
-    });
+  cyclePileStyle () {
+    let styleIndex = (pileStyles.indexOf(this.state.pileStyle) + 1) % pileStyles.length;
+    this.setPileStyle(pileStyles[styleIndex]);
   }
 
+  setPileStyle (pileStyle = this.state.pileStyle) {
+    this.state.pileStyle = pileStyle;
+    this.arrangePiles();
+  }
+
+  arrangePiles () {
+    let style = this.state.pileStyle;
+    let viewport = cameras.getOrthographicViewport();
+
+    this.piles.forEach((pile, idx) => {
+      pile.state.viewport = viewport;
+      pile.setStyle(style);
+    });
+
+    switch (style) {
+      case 'collection':
+        let collectionPileIndex = this.piles.indexOf(this.state.collectionPile);
+        this.piles.forEach((p, idx) => p.mesh.position.set((idx - collectionPileIndex) * viewport.width, 0, 0));
+        break;
+
+      case 'crazy':
+        this.piles.forEach(p => p.mesh.position.set((Math.random() - 0.5) * viewport.width * 0.25, (Math.random() - 0.5) * viewport.height * 0.25, 0));
+        break;
+
+      case 'neat': {
+        let y = viewport.height / 2 - 5;
+        this.piles.forEach(p => {
+          p.mesh.position.set(-viewport.width / 2 + 5, y, 0);
+          y -= (p.getHeight() + 5);
+          console.log(y, p.series.name);
+        });
+      } break;
+    }
+  }
+
+  cycleCollectionPile (forward = true) {
+    let delta = forward ? 1 : -1;
+    let collectionPileIndex = this.piles.indexOf(this.state.collectionPile) + delta;
+    if (collectionPileIndex < 0) collectionPileIndex = this.piles.length - 1;
+    if (collectionPileIndex > this.piles.length - 1) collectionPileIndex = 0;
+    this.setCollectionPile(this.piles[collectionPileIndex]);
+  }
+
+  setCollectionPile (collectionPile) {
+    this.state.collectionPile = collectionPile;
+
+    let viewport = cameras.getOrthographicViewport();
+    let collectionPileIndex = this.piles.indexOf(collectionPile);
+
+    if (this.state.pileStyle === 'collection') {
+      this.piles.forEach((pile, idx) => {
+        if (pile._collectionTween) {
+          pile._collectionTween.stop();
+        }
+
+        let to = { x: (idx - collectionPileIndex) * viewport.width };
+        pile._collectionTween = new TWEEN.Tween(pile.mesh.position).to(to, 500).easing(TWEEN.Easing.Quadratic.InOut).start();
+      });
+    }
+  }
 }
