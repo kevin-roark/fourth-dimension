@@ -100,11 +100,17 @@ function getOrthographicViewport() {
   return { width: orthographicViewportWidth, height: orthographicViewportWidth / aspect };
 }
 
+function resetPerspectiveCamera() {
+  perspectiveCamera.position.copy(HOME_CAMERA_POSITION);
+  perspectiveCamera.rotation.set(0, 0, 0, 0);
+}
+
 module.exports = {
   perspectiveCamera: perspectiveCamera,
   orthographicCamera: orthographicCamera,
   getCameraViewport: getCameraViewport,
   getOrthographicViewport: getOrthographicViewport,
+  resetPerspectiveCamera: resetPerspectiveCamera,
   resize: resize
 };
 
@@ -1881,6 +1887,7 @@ function go() {
     } else {
       state.photoInView.deactivate();
       scene.add(container);
+      cameras.resetPerspectiveCamera();
     }
 
     [dom.info, dom.photoViewInterface, dom.seriesTitle].forEach(function (el) {
@@ -2476,7 +2483,9 @@ var ThumbnailPile = (function () {
     var _ref$style = _ref.style;
     var style = _ref$style === undefined ? "neat" : _ref$style;
     var _ref$spread = _ref.spread;
-    var spread = _ref$spread === undefined ? 8 : _ref$spread;
+    var spread = _ref$spread === undefined ? 10 : _ref$spread;
+    var _ref$scale = _ref.scale;
+    var scale = _ref$scale === undefined ? 10 : _ref$scale;
 
     _classCallCheck(this, ThumbnailPile);
 
@@ -2487,7 +2496,7 @@ var ThumbnailPile = (function () {
 
     this.state = {
       rps: 0.8,
-      scale: 10,
+      scale: scale,
       style: style,
       spread: spread
     };
@@ -2564,7 +2573,7 @@ var ThumbnailPile = (function () {
         switch (style) {
           case "spread":
             thumbnails.forEach(function (thumbnail) {
-              thumbnail.mesh.position.set(_this.sp(), _this.sp(), 0);
+              thumbnail.mesh.position.set(_this.sp(), _this.sp(), _this.sp());
               thumbnail.mesh.rotation.set(Math.PI / 2 + (Math.random() - 0.5) * 0.2, Math.random() * Math.PI * 2, Math.random() * Math.PI * 2);
             });
             break;

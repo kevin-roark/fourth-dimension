@@ -215,6 +215,7 @@ function go () {
     } else {
       state.photoInView.deactivate();
       scene.add(container);
+      cameras.resetPerspectiveCamera();
     }
 
     [dom.info, dom.photoViewInterface, dom.seriesTitle].forEach(el => {

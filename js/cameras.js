@@ -39,10 +39,16 @@ function getOrthographicViewport () {
   return { width: orthographicViewportWidth, height: orthographicViewportWidth / aspect };
 }
 
+function resetPerspectiveCamera () {
+  perspectiveCamera.position.copy(HOME_CAMERA_POSITION);
+  perspectiveCamera.rotation.set(0, 0, 0, 0);
+}
+
 export default {
   perspectiveCamera,
   orthographicCamera,
   getCameraViewport,
   getOrthographicViewport,
+  resetPerspectiveCamera,
   resize
 };
