@@ -4,11 +4,11 @@ let TWEEN = require('tween.js');
 let isMobile = require('ismobilejs');
 
 import seriesData from './data';
+import dataUtil from './data-util';
+import cameras from './cameras';
 import ThumbnailPile from './thumbnail-pile';
 import PhotoView from './photo-view';
 import MouseIntersector from './mouse-intersector';
-
-let HOME_CAMERA_POSITION = 30;
 
 if (isMobile.any) {
   let mobileWarning = document.createElement('div');
@@ -32,9 +32,8 @@ function go () {
   let scene = new THREE.Scene();
   window.scene = scene;
 
-  let camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 10000);
-  camera.position.z = HOME_CAMERA_POSITION;
-  scene.add(camera);
+  scene.add(cameras.perspectiveCamera);
+  scene.add(cameras.orthographicCamera);
 
   let container = new THREE.Object3D();
   scene.add(container);
@@ -58,16 +57,24 @@ function go () {
     loadingPhotoView: false,
     photoInView: null,
     startTime: null,
-    lastTime: null
+    lastTime: null,
+    activeCamera: cameras.orthographicCamera,
+    pileStyle: 'spread'
   };
 
-  let thumbnailMeshes = [];
+  let objects = {
+    thumbnailPiles: [],
+    thumbnailMeshes: [],
+    thumbnailIntersector: null,
+    homeLights: new THREE.Object3D()
+  };
+  container.add(objects.homeLights);
 
   window.addEventListener('resize', resize);
   resize();
 
   createScene(() => {
-    let thumbnailIntersector = new MouseIntersector({ camera, renderer, meshes: thumbnailMeshes });
+    let thumbnailIntersector = objects.thumbnailIntersector = new MouseIntersector({ camera: state.activeCamera, renderer, meshes: objects.thumbnailMeshes });
     thumbnailIntersector.addHoverListener(mesh => {
       if (state.photoInView || state.loadingPhotoView) return;
       setHoverThumnbail(mesh ? mesh._thumbnail : null);
@@ -115,8 +122,19 @@ function go () {
     dom.photoViewControlButtons.background.addEventListener('click', () => {
       if (state.photoInView) state.photoInView.backgroundButtonPressed();
     });
+
+    // url handling
+    if (window.location.hash && window.location.hash.length > 0) {
+      let photo = dataUtil.hashToPhoto(window.location.hash, seriesData);
+      if (photo) {
+        viewPhoto(photo);
+      } else {
+        window.history.replaceState('', document.title, window.location.pathname);
+      }
+    }
   });
-  renderer.render(scene, camera);
+
+  renderer.render(scene, state.activeCamera);
   start();
 
   function resize () {
@@ -125,8 +143,7 @@ function go () {
 
     renderer.setSize(w, h);
 
-    camera.aspect = w / h;
-    camera.updateProjectionMatrix();
+    cameras.resize();
   }
 
   function start () {
@@ -139,9 +156,15 @@ function go () {
 
     TWEEN.update(time);
 
-    if (state.photoInView) state.photoInView.update(delta);
+    if (state.photoInView) {
+      state.photoInView.update(delta);
+    } else {
+      for (let i = 0; i < objects.thumbnailPiles.length; i++) {
+        objects.thumbnailPiles[i].update(delta);
+      }
+    }
 
-    renderer.render(scene, camera);
+    renderer.render(scene, state.activeCamera);
     state.lastTime = time;
 
     window.requestAnimationFrame(update);
@@ -163,9 +186,13 @@ function go () {
       return;
     }
 
+    // url updating
+    let hash = photo ? `#${dataUtil.photoToHash(photo)}` : '';
+    window.history.replaceState('', document.title, `${window.location.pathname}${hash}`);
+
     if (photo) {
       state.loadingPhotoView = true;
-      let photoView = new PhotoView({ photo, scene, camera });
+      let photoView = new PhotoView({ photo, scene, camera: cameras.perspectiveCamera });
       photoView.load(() => {
         state.loadingPhotoView = false;
         setPhotoView(photoView);
@@ -188,8 +215,6 @@ function go () {
     } else {
       state.photoInView.deactivate();
       scene.add(container);
-      camera.position.set(0, 0, HOME_CAMERA_POSITION);
-      camera.rotation.set(0, 0, 0, 0);
     }
 
     [dom.info, dom.photoViewInterface, dom.seriesTitle].forEach(el => {
@@ -198,6 +223,8 @@ function go () {
     });
 
     state.photoInView = photoView;
+    state.activeCamera = photoView || state.pileStyle !== 'neat' ? cameras.perspectiveCamera : cameras.orthographicCamera;
+    if (objects.thumbnailIntersector) objects.thumbnailIntersector.camera = state.activeCamera;
   }
 
   function createScene (callback) {
@@ -215,27 +242,63 @@ function go () {
   function makeLights () {
     let ambient = new THREE.AmbientLight(0xffffff, 0.5);
     scene.add(ambient);
+
+    let spotlight = new THREE.SpotLight(0xffffff, 2, 5000, 3.14, 0, 1);
+    spotlight.position.set(100, 100, 100);
+    shadowConfig(spotlight);
+    objects.homeLights.add(spotlight);
+
+    let spotlight2 = new THREE.SpotLight(0xffffff, 2, 5000, 3.14, 0, 1);
+    spotlight2.position.set(-100, 100, -100);
+    shadowConfig(spotlight2);
+    objects.homeLights.add(spotlight2);
+
+    function shadowConfig (light) {
+      light.castShadow = true;
+      light.shadow.mapSize.width = spotlight.shadow.mapSize.height = 1024;
+      light.shadow.camera.near = 1;
+      light.shadow.camera.far = 500;
+      light.shadow.camera.fov = 30;
+    }
   }
 
   function makePiles (callback) {
     let remaining = seriesData.length;
-    let half = Math.floor(seriesData.length / 2);
 
     seriesData.forEach((series, idx) => {
-      let thumbnailPile = new ThumbnailPile({ series });
+      let thumbnailPile = new ThumbnailPile({ series, style: state.pileStyle });
       thumbnailPile.load(() => {
-        let x = -21 + 60 * ((idx % half) / half);
-        let y = idx % 2 === 0 ? 10 : -10;
-        thumbnailPile.mesh.position.set(x, y, 0);
-
+        objects.thumbnailPiles.push(thumbnailPile);
         container.add(thumbnailPile.mesh);
-        thumbnailMeshes = thumbnailMeshes.concat(thumbnailPile.thumbnails.map(t => t.mesh));
+        objects.thumbnailMeshes = objects.thumbnailMeshes.concat(thumbnailPile.thumbnails.map(t => t.mesh));
 
         remaining -= 1;
         if (remaining === 0 && callback) {
+          arrangePiles(state.pileStyle);
           callback();
         }
       });
+    });
+  }
+
+  function arrangePiles (style) {
+    let half = Math.floor(seriesData.length / 2);
+
+    objects.thumbnailPiles.forEach((pile, idx) => {
+      let x, y;
+      let z = 0;
+      switch (style) {
+        case 'spread':
+          x = -21 + 60 * ((idx % half) / half);
+          y = idx % 2 === 0 ? 10 : -10;
+          break;
+
+        case 'neat':
+          x = -window.innerWidth / 2 + 5;
+          y = window.innerHeight / 2 - 5 - idx * 15;
+          break;
+      }
+      pile.mesh.position.set(x, y, z);
     });
   }
 }

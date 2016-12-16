@@ -123,6 +123,7 @@ export default class PhotoView {
 
   resetCamera () {
     this.camera.position.set(0, 0, DEFAULT_CAMERA_POSITION);
+    this.camera.rotation.set(0, 0, 0, 0);
     this.controls.setDefaultPosition(this.camera.position);
     this.controls.reset();
     this.state.rps = 1;

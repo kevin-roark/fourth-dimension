@@ -34,7 +34,7 @@ var Thumbnail = (function () {
         var texturePath = "models/" + photo.seriesPath + "/" + photo.path + "/Thumbnail.jpg";
         textureLoader.load(texturePath, function (texture) {
           var length = 1 * scale;
-          var geometry = new THREE.BoxBufferGeometry(length, length, 0.2);
+          var geometry = new THREE.BoxBufferGeometry(length, length, length);
 
           var material = new THREE.MeshStandardMaterial({
             color: 16777215,
@@ -57,7 +57,58 @@ var Thumbnail = (function () {
 
 module.exports = Thumbnail;
 
-},{"three":13}],2:[function(require,module,exports){
+},{"three":15}],2:[function(require,module,exports){
+"use strict";
+
+var THREE = require("three");
+
+var HOME_CAMERA_POSITION = { x: 0, y: 0, z: 30 };
+
+var perspectiveCamera = new THREE.PerspectiveCamera(70, 1, 0.01, 10000);
+perspectiveCamera.position.copy(HOME_CAMERA_POSITION);
+
+var orthographicViewportWidth = 100;
+var orthographicCamera = new THREE.OrthographicCamera(-orthographicViewportWidth / 2, orthographicViewportWidth / 2, 1, 1, 0.01, 10000);
+orthographicCamera.position.copy(HOME_CAMERA_POSITION);
+
+resize();
+
+function resize() {
+  var w = window.innerWidth;
+  var h = window.innerHeight;
+
+  var aspect = perspectiveCamera.aspect = w / h;
+  perspectiveCamera.updateProjectionMatrix();
+
+  var orthographicHeight = orthographicViewportWidth / aspect;
+  orthographicCamera.top = orthographicHeight / 2;
+  orthographicCamera.bottom = -orthographicHeight / 2;
+  orthographicCamera.updateProjectionMatrix();
+
+  console.log(getCameraViewport(35.5));
+}
+
+function getCameraViewport(zDist) {
+  var vFOV = perspectiveCamera.fov * Math.PI / 180;
+  var height = 2 * Math.tan(vFOV / 2) * zDist;
+  var width = height * perspectiveCamera.aspect;
+  return { width: width, height: height, x: -width / 2, y: height / 2 };
+}
+
+function getOrthographicViewport() {
+  var aspect = perspectiveCamera.aspect;
+  return { width: orthographicViewportWidth, height: orthographicViewportWidth / aspect };
+}
+
+module.exports = {
+  perspectiveCamera: perspectiveCamera,
+  orthographicCamera: orthographicCamera,
+  getCameraViewport: getCameraViewport,
+  getOrthographicViewport: getOrthographicViewport,
+  resize: resize
+};
+
+},{"three":15}],3:[function(require,module,exports){
 "use strict";
 
 module.exports = TrackballKeyboardControls;
@@ -661,9 +712,61 @@ TrackballKeyboardControls.prototype = Object.create(THREE.EventDispatcher.protot
 TrackballKeyboardControls.prototype.constructor = TrackballKeyboardControls;
 // screen.width intentional
 
-},{"three":13}],3:[function(require,module,exports){
+},{"three":15}],4:[function(require,module,exports){
+"use strict";
+
+var _slicedToArray = function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { var _arr = []; for (var _iterator = arr[Symbol.iterator](), _step; !(_step = _iterator.next()).done;) { _arr.push(_step.value); if (i && _arr.length === i) break; } return _arr; } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } };
+
+function toPath(name) {
+  return name.toLowerCase().replace(/ /g, "-");
+}
+
+function toName(path) {
+  return toTitleCase(path.replace(/-/g, " "));
+}
+
+function photoToHash(photo) {
+  return "" + photo.seriesPath + "__" + photo.path;
+}
+
+function hashToPhoto(hash, seriesData) {
+  var _hash$split = hash.split("__");
+
+  var _hash$split2 = _slicedToArray(_hash$split, 2);
+
+  var seriesPath = _hash$split2[0];
+  var photoPath = _hash$split2[1];
+
+  seriesPath = seriesPath.replace("#", "");
+
+  var series = seriesData.find(function (s) {
+    return s.path === seriesPath;
+  });
+  if (!series) {
+    return null;
+  }var photo = series.photos.find(function (p) {
+    return p.path === photoPath;
+  });
+  return photo;
+}
+
+// using old export for node ;)
+module.exports = {
+  toName: toName,
+  toPath: toPath,
+  photoToHash: photoToHash,
+  hashToPhoto: hashToPhoto
+};
+
+function toTitleCase(str) {
+  return str.replace(/\w\S*/g, function (txt) {
+    return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+  });
+}
+
+},{}],5:[function(require,module,exports){
 module.exports=[{"name":"Domestic","path":"domestic","photos":[{"name":"Bedroom","path":"bedroom","seriesPath":"domestic","upsideDown":true,"type":"object"},{"name":"Den","path":"den","seriesPath":"domestic","upsideDown":true,"type":"object"},{"name":"Elegant Living Room","path":"elegant-living-room","seriesPath":"domestic","upsideDown":true,"type":"object"},{"name":"Kitchen","path":"kitchen","seriesPath":"domestic","upsideDown":true,"type":"object"},{"name":"Living Room","path":"living-room","seriesPath":"domestic","upsideDown":true,"type":"object"}]},{"name":"Friends","path":"friends","photos":[{"name":"Desmond","path":"desmond","seriesPath":"friends","upsideDown":true,"type":"object"},{"name":"Dylan On The Couch","path":"dylan-on-the-couch","seriesPath":"friends","upsideDown":true,"type":"object"},{"name":"Half Dylan","path":"half-dylan","seriesPath":"friends","upsideDown":false,"type":"object"},{"name":"Jaq Montauk","path":"jaq-montauk","seriesPath":"friends","upsideDown":true,"type":"object"},{"name":"Nigel","path":"nigel","seriesPath":"friends","upsideDown":true,"type":"object"},{"name":"Riddhi Montauk","path":"riddhi-montauk","seriesPath":"friends","upsideDown":false,"type":"object"},{"name":"Sam","path":"sam","seriesPath":"friends","upsideDown":true,"type":"object"},{"name":"Seb Montauk","path":"seb-montauk","seriesPath":"friends","upsideDown":true,"type":"object"}]},{"name":"Natural History","path":"natural-history","photos":[{"name":"Alien Rocks","path":"alien-rocks","seriesPath":"natural-history","upsideDown":true,"type":"object"},{"name":"Big Fly","path":"big-fly","seriesPath":"natural-history","upsideDown":true,"type":"object"},{"name":"Evolution","path":"evolution","seriesPath":"natural-history","upsideDown":true,"type":"object"},{"name":"Farm Scene","path":"farm-scene","seriesPath":"natural-history","upsideDown":true,"type":"object"},{"name":"Frog Shadow","path":"frog-shadow","seriesPath":"natural-history","upsideDown":true,"type":"object"},{"name":"Lot Of Skulls","path":"lot-of-skulls","seriesPath":"natural-history","upsideDown":true,"type":"object"},{"name":"Three Skulls","path":"three-skulls","seriesPath":"natural-history","upsideDown":true,"type":"object"},{"name":"True Monkey","path":"true-monkey","seriesPath":"natural-history","upsideDown":true,"type":"object"}]},{"name":"Objects 1","path":"objects-1","photos":[{"name":"Angel","path":"angel","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Bad Father","path":"bad-father","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Basketball","path":"basketball","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Ben Franklin Bust","path":"ben-franklin-bust","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Broken Eagle","path":"broken-eagle","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Father","path":"father","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Freedom","path":"freedom","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Gator","path":"gator","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Grotto","path":"grotto","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Laptop","path":"laptop","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Last Supper","path":"last-supper","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Marble Bust","path":"marble-bust","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Mary","path":"mary","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Minion","path":"minion","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Rock","path":"rock","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Rocky","path":"rocky","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Video Camera","path":"video-camera","seriesPath":"objects-1","upsideDown":true,"type":"object"}]},{"name":"Roark","path":"roark","photos":[{"name":"Isabella","path":"isabella","seriesPath":"roark","upsideDown":true,"type":"object"},{"name":"Kevin Sr","path":"kevin-sr","seriesPath":"roark","upsideDown":true,"type":"object"},{"name":"Laurie","path":"laurie","seriesPath":"roark","upsideDown":true,"type":"object"},{"name":"Laurie And Mom","path":"laurie-and-mom","seriesPath":"roark","upsideDown":true,"type":"object"},{"name":"Melanie","path":"melanie","seriesPath":"roark","upsideDown":true,"type":"object"},{"name":"Moses","path":"moses","seriesPath":"roark","upsideDown":true,"type":"object"}]},{"name":"Still Life","path":"still-life","photos":[{"name":"Bella With Dog","path":"bella-with-dog","seriesPath":"still-life","upsideDown":true,"type":"object"},{"name":"Dylan On Github","path":"dylan-on-github","seriesPath":"still-life","upsideDown":true,"type":"object"},{"name":"Laurie In The Mirror","path":"laurie-in-the-mirror","seriesPath":"still-life","upsideDown":true,"type":"object"},{"name":"Meme Nancy Reading","path":"meme-nancy-reading","seriesPath":"still-life","upsideDown":true,"type":"object"},{"name":"Myself In The Mirror","path":"myself-in-the-mirror","seriesPath":"still-life","upsideDown":true,"type":"object"},{"name":"Photo Of Rocks","path":"photo-of-rocks","seriesPath":"still-life","upsideDown":true,"type":"object"}]}]
-},{}],4:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 "use strict";
 
 module.exports = createGrid;
@@ -718,7 +821,7 @@ function createGrid() {
   return container;
 }
 
-},{"three":13}],5:[function(require,module,exports){
+},{"three":15}],7:[function(require,module,exports){
 
 
 /**
@@ -1375,7 +1478,7 @@ OBJLoader.prototype = {
 
 };
 
-},{"three":13}],6:[function(require,module,exports){
+},{"three":15}],8:[function(require,module,exports){
 "use strict";
 
 var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
@@ -1549,7 +1652,7 @@ var LightRing = (function () {
 
 module.exports = LightRing;
 
-},{"three":13,"tween.js":14}],7:[function(require,module,exports){
+},{"three":15,"tween.js":16}],9:[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -1560,13 +1663,15 @@ var isMobile = require("ismobilejs");
 
 var seriesData = _interopRequire(require("./data"));
 
+var dataUtil = _interopRequire(require("./data-util"));
+
+var cameras = _interopRequire(require("./cameras"));
+
 var ThumbnailPile = _interopRequire(require("./thumbnail-pile"));
 
 var PhotoView = _interopRequire(require("./photo-view"));
 
 var MouseIntersector = _interopRequire(require("./mouse-intersector"));
-
-var HOME_CAMERA_POSITION = 30;
 
 if (isMobile.any) {
   var mobileWarning = document.createElement("div");
@@ -1590,9 +1695,8 @@ function go() {
   var scene = new THREE.Scene();
   window.scene = scene;
 
-  var camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 10000);
-  camera.position.z = HOME_CAMERA_POSITION;
-  scene.add(camera);
+  scene.add(cameras.perspectiveCamera);
+  scene.add(cameras.orthographicCamera);
 
   var container = new THREE.Object3D();
   scene.add(container);
@@ -1616,16 +1720,24 @@ function go() {
     loadingPhotoView: false,
     photoInView: null,
     startTime: null,
-    lastTime: null
+    lastTime: null,
+    activeCamera: cameras.orthographicCamera,
+    pileStyle: "spread"
   };
 
-  var thumbnailMeshes = [];
+  var objects = {
+    thumbnailPiles: [],
+    thumbnailMeshes: [],
+    thumbnailIntersector: null,
+    homeLights: new THREE.Object3D()
+  };
+  container.add(objects.homeLights);
 
   window.addEventListener("resize", resize);
   resize();
 
   createScene(function () {
-    var thumbnailIntersector = new MouseIntersector({ camera: camera, renderer: renderer, meshes: thumbnailMeshes });
+    var thumbnailIntersector = objects.thumbnailIntersector = new MouseIntersector({ camera: state.activeCamera, renderer: renderer, meshes: objects.thumbnailMeshes });
     thumbnailIntersector.addHoverListener(function (mesh) {
       if (state.photoInView || state.loadingPhotoView) return;
       setHoverThumnbail(mesh ? mesh._thumbnail : null);
@@ -1674,8 +1786,19 @@ function go() {
     dom.photoViewControlButtons.background.addEventListener("click", function () {
       if (state.photoInView) state.photoInView.backgroundButtonPressed();
     });
+
+    // url handling
+    if (window.location.hash && window.location.hash.length > 0) {
+      var photo = dataUtil.hashToPhoto(window.location.hash, seriesData);
+      if (photo) {
+        viewPhoto(photo);
+      } else {
+        window.history.replaceState("", document.title, window.location.pathname);
+      }
+    }
   });
-  renderer.render(scene, camera);
+
+  renderer.render(scene, state.activeCamera);
   start();
 
   function resize() {
@@ -1684,8 +1807,7 @@ function go() {
 
     renderer.setSize(w, h);
 
-    camera.aspect = w / h;
-    camera.updateProjectionMatrix();
+    cameras.resize();
   }
 
   function start() {
@@ -1698,9 +1820,15 @@ function go() {
 
     TWEEN.update(time);
 
-    if (state.photoInView) state.photoInView.update(delta);
+    if (state.photoInView) {
+      state.photoInView.update(delta);
+    } else {
+      for (var i = 0; i < objects.thumbnailPiles.length; i++) {
+        objects.thumbnailPiles[i].update(delta);
+      }
+    }
 
-    renderer.render(scene, camera);
+    renderer.render(scene, state.activeCamera);
     state.lastTime = time;
 
     window.requestAnimationFrame(update);
@@ -1722,10 +1850,14 @@ function go() {
       return;
     }
 
+    // url updating
+    var hash = photo ? "#" + dataUtil.photoToHash(photo) : "";
+    window.history.replaceState("", document.title, "" + window.location.pathname + "" + hash);
+
     if (photo) {
       (function () {
         state.loadingPhotoView = true;
-        var photoView = new PhotoView({ photo: photo, scene: scene, camera: camera });
+        var photoView = new PhotoView({ photo: photo, scene: scene, camera: cameras.perspectiveCamera });
         photoView.load(function () {
           state.loadingPhotoView = false;
           setPhotoView(photoView);
@@ -1749,8 +1881,6 @@ function go() {
     } else {
       state.photoInView.deactivate();
       scene.add(container);
-      camera.position.set(0, 0, HOME_CAMERA_POSITION);
-      camera.rotation.set(0, 0, 0, 0);
     }
 
     [dom.info, dom.photoViewInterface, dom.seriesTitle].forEach(function (el) {
@@ -1758,6 +1888,8 @@ function go() {
     });
 
     state.photoInView = photoView;
+    state.activeCamera = photoView || state.pileStyle !== "neat" ? cameras.perspectiveCamera : cameras.orthographicCamera;
+    if (objects.thumbnailIntersector) objects.thumbnailIntersector.camera = state.activeCamera;
   }
 
   function createScene(callback) {
@@ -1775,34 +1907,71 @@ function go() {
   function makeLights() {
     var ambient = new THREE.AmbientLight(16777215, 0.5);
     scene.add(ambient);
+
+    var spotlight = new THREE.SpotLight(16777215, 2, 5000, 3.14, 0, 1);
+    spotlight.position.set(100, 100, 100);
+    shadowConfig(spotlight);
+    objects.homeLights.add(spotlight);
+
+    var spotlight2 = new THREE.SpotLight(16777215, 2, 5000, 3.14, 0, 1);
+    spotlight2.position.set(-100, 100, -100);
+    shadowConfig(spotlight2);
+    objects.homeLights.add(spotlight2);
+
+    function shadowConfig(light) {
+      light.castShadow = true;
+      light.shadow.mapSize.width = spotlight.shadow.mapSize.height = 1024;
+      light.shadow.camera.near = 1;
+      light.shadow.camera.far = 500;
+      light.shadow.camera.fov = 30;
+    }
   }
 
   function makePiles(callback) {
     var remaining = seriesData.length;
-    var half = Math.floor(seriesData.length / 2);
 
     seriesData.forEach(function (series, idx) {
-      var thumbnailPile = new ThumbnailPile({ series: series });
+      var thumbnailPile = new ThumbnailPile({ series: series, style: state.pileStyle });
       thumbnailPile.load(function () {
-        var x = -21 + 60 * (idx % half / half);
-        var y = idx % 2 === 0 ? 10 : -10;
-        thumbnailPile.mesh.position.set(x, y, 0);
-
+        objects.thumbnailPiles.push(thumbnailPile);
         container.add(thumbnailPile.mesh);
-        thumbnailMeshes = thumbnailMeshes.concat(thumbnailPile.thumbnails.map(function (t) {
+        objects.thumbnailMeshes = objects.thumbnailMeshes.concat(thumbnailPile.thumbnails.map(function (t) {
           return t.mesh;
         }));
 
         remaining -= 1;
         if (remaining === 0 && callback) {
+          arrangePiles(state.pileStyle);
           callback();
         }
       });
     });
   }
+
+  function arrangePiles(style) {
+    var half = Math.floor(seriesData.length / 2);
+
+    objects.thumbnailPiles.forEach(function (pile, idx) {
+      var x = undefined,
+          y = undefined;
+      var z = 0;
+      switch (style) {
+        case "spread":
+          x = -21 + 60 * (idx % half / half);
+          y = idx % 2 === 0 ? 10 : -10;
+          break;
+
+        case "neat":
+          x = -window.innerWidth / 2 + 5;
+          y = window.innerHeight / 2 - 5 - idx * 15;
+          break;
+      }
+      pile.mesh.position.set(x, y, z);
+    });
+  }
 }
 
-},{"./data":3,"./mouse-intersector":9,"./photo-view":10,"./thumbnail-pile":11,"ismobilejs":12,"three":13,"tween.js":14}],8:[function(require,module,exports){
+},{"./cameras":2,"./data":5,"./data-util":4,"./mouse-intersector":11,"./photo-view":12,"./thumbnail-pile":13,"ismobilejs":14,"three":15,"tween.js":16}],10:[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -1853,7 +2022,7 @@ function load(photo, callback) {
   });
 }
 
-},{"./lib/OBJLoader":5,"three":13}],9:[function(require,module,exports){
+},{"./lib/OBJLoader":7,"three":15}],11:[function(require,module,exports){
 "use strict";
 
 var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
@@ -1932,7 +2101,7 @@ var MouseIntersector = (function () {
 
 module.exports = MouseIntersector;
 
-},{"three":13}],10:[function(require,module,exports){
+},{"three":15}],12:[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -2088,6 +2257,7 @@ var PhotoView = (function () {
     resetCamera: {
       value: function resetCamera() {
         this.camera.position.set(0, 0, DEFAULT_CAMERA_POSITION);
+        this.camera.rotation.set(0, 0, 0, 0);
         this.controls.setDefaultPosition(this.camera.position);
         this.controls.reset();
         this.state.rps = 1;
@@ -2278,7 +2448,7 @@ var PhotoView = (function () {
 
 module.exports = PhotoView;
 
-},{"./controls":2,"./grid":4,"./light-ring":6,"./model-cache":8,"three":13,"tween.js":14}],11:[function(require,module,exports){
+},{"./controls":3,"./grid":6,"./light-ring":8,"./model-cache":10,"three":15,"tween.js":16}],13:[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -2287,22 +2457,40 @@ var _createClass = (function () { function defineProperties(target, props) { for
 
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
 var THREE = require("three");
 
 var Thumbnail = _interopRequire(require("./Thumbnail"));
 
+var styles = ["spread", "neat"];
+var pileStyles = { spread: "spread", neat: "neat" };
+
+exports.pileStyles = pileStyles;
+
 var ThumbnailPile = (function () {
   function ThumbnailPile(_ref) {
     var series = _ref.series;
+    var _ref$style = _ref.style;
+    var style = _ref$style === undefined ? "neat" : _ref$style;
     var _ref$spread = _ref.spread;
-    var spread = _ref$spread === undefined ? 5 : _ref$spread;
+    var spread = _ref$spread === undefined ? 8 : _ref$spread;
 
     _classCallCheck(this, ThumbnailPile);
 
     this.series = series;
-    this.spread = spread;
+
     this.mesh = new THREE.Object3D();
     this.mesh._pile = this;
+
+    this.state = {
+      rps: 0.8,
+      scale: 10,
+      style: style,
+      spread: spread
+    };
   }
 
   _createClass(ThumbnailPile, {
@@ -2319,17 +2507,16 @@ var ThumbnailPile = (function () {
         var thumbnails = this.thumbnails = [];
 
         series.photos.forEach(function (photo) {
-          var thumbnail = new Thumbnail({ photo: photo, seriesPath: series.path, scale: 2 });
+          var thumbnail = new Thumbnail({ photo: photo, seriesPath: series.path, scale: _this.state.scale });
           thumbnail._pile = _this;
           thumbnails.push(thumbnail);
 
           thumbnail.load(function () {
-            thumbnail.mesh.position.set(_this.sp(), _this.sp(), _this.sp());
-            thumbnail.mesh.rotation.set(Math.PI / 2 + (Math.random() - 0.5) * 0.2, Math.random() * Math.PI * 2, Math.random() * Math.PI * 2);
             mesh.add(thumbnail.mesh);
 
             remaining -= 1;
             if (callback && remaining === 0) {
+              _this.setStyle(_this.state.style);
               callback();
             }
           });
@@ -2338,7 +2525,57 @@ var ThumbnailPile = (function () {
     },
     sp: {
       value: function sp() {
-        return (Math.random() - 0.5) * this.spread;
+        return (Math.random() - 0.5) * this.state.spread;
+      }
+    },
+    update: {
+      value: function update(delta) {
+        switch (this.state.style) {
+          case "spread":
+            this.mesh.rotation.y += this.state.rps * (delta / 1000);
+            break;
+
+          case "neat":
+            for (var i = 0; i < this.thumbnails.length; i++) {
+              var thumb = this.thumbnails[i];
+              thumb.mesh.rotation.y += this.state.rps * (delta / 1000);
+            }
+            break;
+        }
+      }
+    },
+    cycleStyle: {
+      value: function cycleStyle() {
+        var styleIndex = (styles.indexOf(this.state.style) + 1) % styles.length;
+        this.setStyle(styles[styleIndex]);
+      }
+    },
+    setStyle: {
+      value: function setStyle(style) {
+        var _this = this;
+
+        var _ref = this;
+
+        var thumbnails = _ref.thumbnails;
+        var state = _ref.state;
+
+        state.style = style;
+
+        switch (style) {
+          case "spread":
+            thumbnails.forEach(function (thumbnail) {
+              thumbnail.mesh.position.set(_this.sp(), _this.sp(), 0);
+              thumbnail.mesh.rotation.set(Math.PI / 2 + (Math.random() - 0.5) * 0.2, Math.random() * Math.PI * 2, Math.random() * Math.PI * 2);
+            });
+            break;
+
+          case "neat":
+            thumbnails.forEach(function (thumbnail, idx) {
+              thumbnail.mesh.position.set((state.scale + 5) * idx, 0, 0);
+              thumbnail.mesh.rotation.set(0, 0, 0, 0);
+            });
+            break;
+        }
       }
     }
   });
@@ -2346,9 +2583,9 @@ var ThumbnailPile = (function () {
   return ThumbnailPile;
 })();
 
-module.exports = ThumbnailPile;
+exports["default"] = ThumbnailPile;
 
-},{"./Thumbnail":1,"three":13}],12:[function(require,module,exports){
+},{"./Thumbnail":1,"three":15}],14:[function(require,module,exports){
 /**
  * isMobile.js v0.4.0
  *
@@ -2487,7 +2724,7 @@ module.exports = ThumbnailPile;
 
 })(this);
 
-},{}],13:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -44786,7 +45023,7 @@ module.exports = ThumbnailPile;
 
 })));
 
-},{}],14:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 (function (process){
 /**
  * Tween.js - Licensed under the MIT license
@@ -45660,7 +45897,7 @@ TWEEN.Interpolation = {
 })(this);
 
 }).call(this,require('_process'))
-},{"_process":15}],15:[function(require,module,exports){
+},{"_process":17}],17:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -45756,4 +45993,4 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}]},{},[7]);
+},{}]},{},[9]);

@@ -15,7 +15,7 @@ export default class Thumbnail {
     let texturePath = `models/${photo.seriesPath}/${photo.path}/Thumbnail.jpg`;
     textureLoader.load(texturePath, texture => {
       let length = 1 * scale;
-      let geometry = new THREE.BoxBufferGeometry(length, length, 0.2);
+      let geometry = new THREE.BoxBufferGeometry(length, length, length);
 
       let material = new THREE.MeshStandardMaterial({
         color: 0xffffff,
