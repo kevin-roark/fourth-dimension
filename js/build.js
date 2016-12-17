@@ -43,6 +43,7 @@ var Thumbnail = (function () {
           material.side = THREE.DoubleSide;
 
           var mesh = _this.mesh = new THREE.Mesh(geometry, material);
+          mesh.castShadow = true;
           mesh._thumbnail = _this;
           _this.setScale();
           if (callback) callback(mesh);
@@ -57,6 +58,16 @@ var Thumbnail = (function () {
         if (this.mesh) {
           this.mesh.scale.set(scale, scale, scale);
         }
+      }
+    },
+    multiplyScale: {
+      value: function multiplyScale() {
+        var f = arguments[0] === undefined ? 3 : arguments[0];
+
+        if (!this.mesh) {
+          return;
+        }var s = this.scale * f;
+        this.mesh.scale.set(s, s, s);
       }
     }
   });
@@ -83,8 +94,8 @@ orthographicCamera.position.copy(HOME_CAMERA_POSITION);
 resize();
 
 function resize() {
-  var w = window.innerWidth;
-  var h = window.innerHeight;
+  var w = arguments[0] === undefined ? window.innerWidth : arguments[0];
+  var h = arguments[1] === undefined ? window.innerHeight : arguments[1];
 
   var aspect = perspectiveCamera.aspect = w / h;
   perspectiveCamera.updateProjectionMatrix();
@@ -114,12 +125,20 @@ function resetPerspectiveCamera() {
   perspectiveCamera.rotation.set(0, 0, 0, 0);
 }
 
+function worldUnitsInPixels() {
+  var units = arguments[0] === undefined ? 1 : arguments[0];
+
+  var pixelsPerUnit = window.innerWidth / orthographicViewportWidth;
+  return pixelsPerUnit * units;
+}
+
 module.exports = {
   perspectiveCamera: perspectiveCamera,
   orthographicCamera: orthographicCamera,
   getCameraViewport: getCameraViewport,
   getOrthographicViewport: getOrthographicViewport,
   resetPerspectiveCamera: resetPerspectiveCamera,
+  worldUnitsInPixels: worldUnitsInPixels,
   resize: resize
 };
 
@@ -885,13 +904,16 @@ var HomeView = (function () {
 
     this.dom = {
       seriesTitle: document.querySelector(".series-title"),
-      photoViewInterface: document.querySelector(".photo-view-interface")
+      photoViewInterface: document.querySelector(".photo-view-interface"),
+      neatTitleContainer: this.createNeatTitleContainer()
     };
 
     this.state = {
       active: false,
       pileStyle: "collection",
-      collectionPile: null
+      collectionPile: null,
+      pileOverflowTween: null,
+      hoverThumbnail: null
     };
 
     window.addEventListener("keydown", this.keydown.bind(this), false);
@@ -902,6 +924,12 @@ var HomeView = (function () {
       value: function update(delta) {
         for (var i = 0; i < this.piles.length; i++) {
           this.piles[i].update(delta);
+        }
+
+        for (var i = 0; i < this.lights.children.length; i++) {
+          if (this.lights.children[i]._helper) {
+            this.lights.children[i]._helper.update();
+          }
         }
       }
     },
@@ -977,27 +1005,42 @@ var HomeView = (function () {
 
         var cursor = thumbnail ? "url('images/basketball.png'), crosshair" : "url('images/myhand.png'), auto";
         this.dom.photoViewInterface.style.cursor = cursor;
+
+        if (this.state.hoverThumbnail) {
+          this.state.hoverThumbnail.setScale();
+        }
+
+        if (thumbnail) {
+          thumbnail.multiplyScale(this.hoverScaleForPileStyle());
+        }
+
+        this.state.hoverThumbnail = thumbnail;
       }
     },
     makeLights: {
       value: function makeLights() {
-        var spotlight = new THREE.SpotLight(16777215, 2, 5000, 3.14, 0, 1);
-        spotlight.position.set(100, 100, 100);
-        shadowConfig(spotlight);
-        this.lights.add(spotlight);
+        var _this = this;
 
-        var spotlight2 = new THREE.SpotLight(16777215, 2, 5000, 3.14, 0, 1);
-        spotlight2.position.set(-100, 100, -100);
-        shadowConfig(spotlight2);
-        this.lights.add(spotlight2);
-
-        function shadowConfig(light) {
+        var shadowConfig = function (light) {
           light.castShadow = true;
           light.shadow.mapSize.width = spotlight.shadow.mapSize.height = 1024;
           light.shadow.camera.near = 1;
           light.shadow.camera.far = 500;
           light.shadow.camera.fov = 30;
-        }
+
+          var spotLightHelper = light._helper = new THREE.SpotLightHelper(light);
+          _this.lights.add(spotLightHelper);
+        };
+
+        var spotlight = new THREE.SpotLight(16777215, 2, 5000, 3.14, 0, 1);
+        spotlight.position.set(50, 50, 50);
+        shadowConfig(spotlight);
+        this.lights.add(spotlight);
+
+        var spotlight2 = new THREE.SpotLight(16777215, 2, 5000, 3.14, 0, 1);
+        spotlight2.position.set(-50, 50, -50);
+        shadowConfig(spotlight2);
+        this.lights.add(spotlight2);
       }
     },
     makePiles: {
@@ -1024,7 +1067,7 @@ var HomeView = (function () {
 
             remaining -= 1;
             if (remaining === 0 && callback) {
-              _this.state.collectionPile = piles[Math.floor(piles.length * Math.random())];
+              _this.state.collectionPile = piles[0];
               _this.arrangePiles();
               callback();
             }
@@ -1053,6 +1096,11 @@ var HomeView = (function () {
         var style = this.state.pileStyle;
         var viewport = cameras.getOrthographicViewport();
 
+        if (this.state.pileOverflowTween) {
+          this.state.pileOverflowTween.stop();
+          this.camera.position.y = 0;
+        }
+
         this.piles.forEach(function (pile, idx) {
           pile.state.viewport = viewport;
           pile.setStyle(style);
@@ -1062,27 +1110,50 @@ var HomeView = (function () {
           case "collection":
             var collectionPileIndex = this.piles.indexOf(this.state.collectionPile);
             this.piles.forEach(function (p, idx) {
-              return p.mesh.position.set((idx - collectionPileIndex) * viewport.width, 0, 0);
+              return p.mesh.position.set((idx - collectionPileIndex) * viewport.width, 0, -25);
             });
             break;
 
           case "crazy":
             this.piles.forEach(function (p) {
-              return p.mesh.position.set((Math.random() - 0.5) * viewport.width * 0.25, (Math.random() - 0.5) * viewport.height * 0.25, 0);
+              return p.mesh.position.set((Math.random() - 0.5) * viewport.width * 0.25, (Math.random() - 0.5) * viewport.height * 0.25, -50);
             });
             break;
 
           case "neat":
             {
               (function () {
+                var rowSpacing = 6;
                 var y = viewport.height / 2 - 5;
                 _this.piles.forEach(function (p) {
                   p.mesh.position.set(-viewport.width / 2 + 5, y, 0);
-                  y -= p.getHeight() + 5;
-                  console.log(y, p.series.name);
+                  y -= p.getHeight() + rowSpacing;
                 });
+
+                var overflow = viewport.height / -2 - (y + rowSpacing);
+                if (overflow > 0) {
+                  var to = { y: -overflow };
+                  var speed = 1.5; // units per second
+                  var duration = overflow / speed * 1000;
+                  _this.state.pileOverflowTween = new TWEEN.Tween(_this.camera.position).to(to, duration).delay(3000).repeat(Infinity).yoyo(true).start();
+                }
               })();
             }break;
+        }
+      }
+    },
+    hoverScaleForPileStyle: {
+      value: function hoverScaleForPileStyle() {
+        var style = arguments[0] === undefined ? this.state.pileStyle : arguments[0];
+
+        switch (style) {
+          case "neat":
+            return 4;
+
+          case "collection":
+          case "crazy":
+          default:
+            return 2;
         }
       }
     },
@@ -1113,6 +1184,39 @@ var HomeView = (function () {
             var to = { x: (idx - collectionPileIndex) * viewport.width };
             pile._collectionTween = new TWEEN.Tween(pile.mesh.position).to(to, 500).easing(TWEEN.Easing.Quadratic.InOut).start();
           });
+        }
+      }
+    },
+    createNeatTitleContainer: {
+      value: function createNeatTitleContainer() {
+        var el = document.createElement("div");
+        el.className = "home-view-neat-title-container";
+        return el;
+      }
+    },
+    activateNeatTitles: {
+      value: function activateNeatTitles() {
+        var _this = this;
+
+        var viewport = cameras.getOrthographicViewport();
+
+        this.piles.forEach(function (pile) {
+          var el = document.createElement("div");
+          el.className = "home-view-neat-title";
+          el.textContent = pile.series.name;
+          console.log(pile.series.name, pile.mesh.position.y, cameras.worldUnitsInPixels(pile.mesh.position.y), viewport.height / 2);
+          el.style.bottom = cameras.worldUnitsInPixels(pile.mesh.position.y + viewport.height / 2) + "px";
+          _this.dom.neatTitleContainer.appendChild(el);
+        });
+
+        document.body.appendChild(this.dom.neatTitleContainer);
+      }
+    },
+    deactivateNeatTitles: {
+      value: function deactivateNeatTitles() {
+        this.dom.neatTitleContainer.innerHTML = "";
+        if (this.dom.neatTitleContainer.parentNode) {
+          this.dom.neatTitleContainer.parentNode.removeChild(this.dom.neatTitleContainer);
         }
       }
     }
@@ -1985,6 +2089,10 @@ if (isMobile.any) {
 function go() {
   window.THREE = THREE;
 
+  seriesData.sort(function () {
+    return Math.random() - 0.5;
+  });
+
   var renderer = new THREE.WebGLRenderer({
     antialias: true
   });
@@ -2088,8 +2196,8 @@ function go() {
 
     renderer.setSize(w, h);
 
-    cameras.resize();
-    homeView.resize();
+    cameras.resize(w, h);
+    homeView.resize(w, h);
   }
 
   function start() {
@@ -2738,9 +2846,9 @@ var ThumbnailPile = (function () {
             for (var i = 0; i < this.thumbnails.length; i++) {
               var thumb = this.thumbnails[i];
               // thumb.mesh.rotation.y += this.state.rps * (delta / 1000);
-              thumb.mesh.position.x += (Math.random() - 0.5) * 0.02;
-              thumb.mesh.position.y += (Math.random() - 0.5) * 0.02;
-              thumb.mesh.position.z += (Math.random() - 0.5) * 0.02;
+              // thumb.mesh.position.x += (Math.random() - 0.5) * 0.02;
+              // thumb.mesh.position.y += (Math.random() - 0.5) * 0.02;
+              // thumb.mesh.position.z += (Math.random() - 0.5) * 0.02;
               thumb.mesh.rotation.x += (Math.random() - 0.5) * 0.1;
               thumb.mesh.rotation.y += (Math.random() - 0.5) * 0.1;
               thumb.mesh.rotation.z += (Math.random() - 0.5) * 0.1;
@@ -2751,6 +2859,8 @@ var ThumbnailPile = (function () {
     },
     setStyle: {
       value: function setStyle() {
+        var _this = this;
+
         var style = arguments[0] === undefined ? this.state.style : arguments[0];
 
         var _ref = this;
@@ -2767,7 +2877,12 @@ var ThumbnailPile = (function () {
         var hs = viewport.height - scale / 2;
 
         thumbnails.forEach(function (t) {
-          return t.setScale(scale);
+          t.setScale(scale);
+
+          if (t._pedestalMesh && style !== "neat") {
+            _this.mesh.remove(t._pedestalMesh);
+            t._pedestalMesh = null;
+          }
         });
 
         switch (style) {
@@ -2795,7 +2910,7 @@ var ThumbnailPile = (function () {
             this.mesh.rotation.y = 0;
             var x = 0;
             var y = 0;
-            var space = this.state.viewport.width * 0.05;
+            var space = this.state.viewport.width * 0.025;
             thumbnails.forEach(function (thumbnail, idx) {
               thumbnail.mesh.position.set(x, y, 0);
               thumbnail.mesh.rotation.set(0, 0, 0, 0);
@@ -2803,6 +2918,16 @@ var ThumbnailPile = (function () {
               if (x + scale > ws) {
                 x = 0;
                 y -= scale + space * 0.2;
+              }
+
+              if (!thumbnail._pedestalMesh) {
+                var pedestal = thumbnail._pedestalMesh = new THREE.Mesh(new THREE.BoxBufferGeometry(1, 0.25, 1), new THREE.MeshStandardMaterial({
+                  color: 16777215
+                }));
+                pedestal.receiveShadow = true;
+                pedestal.scale.copy(thumbnail.mesh.scale);
+                pedestal.position.set(thumbnail.mesh.position.x, thumbnail.mesh.position.y - thumbnail.mesh.scale.y * 1.2, thumbnail.mesh.position.z);
+                _this.mesh.add(pedestal);
               }
             });
             break;
@@ -2829,7 +2954,7 @@ var ThumbnailPile = (function () {
             return this.state.viewport.width * 0.08;
 
           case "neat":
-            return this.state.viewport.width * 0.05;
+            return this.state.viewport.width * 0.025;
         }
       }
     },

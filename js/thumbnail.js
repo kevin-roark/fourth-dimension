@@ -25,6 +25,7 @@ export default class Thumbnail {
       material.side = THREE.DoubleSide;
 
       let mesh = this.mesh = new THREE.Mesh(geometry, material);
+      mesh.castShadow = true;
       mesh._thumbnail = this;
       this.setScale();
       if (callback) callback(mesh);
@@ -36,5 +37,11 @@ export default class Thumbnail {
     if (this.mesh) {
       this.mesh.scale.set(scale, scale, scale);
     }
+  }
+
+  multiplyScale (f = 3) {
+    if (!this.mesh) return;
+    let s = this.scale * f;
+    this.mesh.scale.set(s, s, s);
   }
 }

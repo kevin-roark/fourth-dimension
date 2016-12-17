@@ -21,6 +21,8 @@ if (isMobile.any) {
 function go () {
   window.THREE = THREE;
 
+  seriesData.sort(() => Math.random() - 0.5);
+
   let renderer = new THREE.WebGLRenderer({
     antialias: true
   });
@@ -123,8 +125,8 @@ function go () {
 
     renderer.setSize(w, h);
 
-    cameras.resize();
-    homeView.resize();
+    cameras.resize(w, h);
+    homeView.resize(w, h);
   }
 
   function start () {

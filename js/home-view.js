@@ -29,13 +29,16 @@ export default class HomeView {
 
     this.dom = {
       seriesTitle: document.querySelector('.series-title'),
-      photoViewInterface: document.querySelector('.photo-view-interface')
+      photoViewInterface: document.querySelector('.photo-view-interface'),
+      neatTitleContainer: this.createNeatTitleContainer()
     };
 
     this.state = {
       active: false,
       pileStyle: 'collection',
-      collectionPile: null
+      collectionPile: null,
+      pileOverflowTween: null,
+      hoverThumbnail: null
     };
 
     window.addEventListener('keydown', this.keydown.bind(this), false);
@@ -44,6 +47,12 @@ export default class HomeView {
   update (delta) {
     for (let i = 0; i < this.piles.length; i++) {
       this.piles[i].update(delta);
+    }
+
+    for (let i = 0; i < this.lights.children.length; i++) {
+      if (this.lights.children[i]._helper) {
+        this.lights.children[i]._helper.update();
+      }
     }
   }
 
@@ -108,26 +117,39 @@ export default class HomeView {
 
     let cursor = thumbnail ? "url('images/basketball.png'), crosshair" : "url('images/myhand.png'), auto";
     this.dom.photoViewInterface.style.cursor = cursor;
+
+    if (this.state.hoverThumbnail) {
+      this.state.hoverThumbnail.setScale();
+    }
+
+    if (thumbnail) {
+      thumbnail.multiplyScale(this.hoverScaleForPileStyle());
+    }
+
+    this.state.hoverThumbnail = thumbnail;
   }
 
   makeLights () {
-    let spotlight = new THREE.SpotLight(0xffffff, 2, 5000, 3.14, 0, 1);
-    spotlight.position.set(100, 100, 100);
-    shadowConfig(spotlight);
-    this.lights.add(spotlight);
-
-    let spotlight2 = new THREE.SpotLight(0xffffff, 2, 5000, 3.14, 0, 1);
-    spotlight2.position.set(-100, 100, -100);
-    shadowConfig(spotlight2);
-    this.lights.add(spotlight2);
-
-    function shadowConfig (light) {
+    let shadowConfig = light => {
       light.castShadow = true;
       light.shadow.mapSize.width = spotlight.shadow.mapSize.height = 1024;
       light.shadow.camera.near = 1;
       light.shadow.camera.far = 500;
       light.shadow.camera.fov = 30;
-    }
+
+      let spotLightHelper = light._helper = new THREE.SpotLightHelper(light);
+      this.lights.add(spotLightHelper);
+    };
+
+    let spotlight = new THREE.SpotLight(0xffffff, 2, 5000, 3.14, 0, 1);
+    spotlight.position.set(50, 50, 50);
+    shadowConfig(spotlight);
+    this.lights.add(spotlight);
+
+    let spotlight2 = new THREE.SpotLight(0xffffff, 2, 5000, 3.14, 0, 1);
+    spotlight2.position.set(-50, 50, -50);
+    shadowConfig(spotlight2);
+    this.lights.add(spotlight2);
   }
 
   makePiles (callback) {
@@ -143,7 +165,7 @@ export default class HomeView {
 
         remaining -= 1;
         if (remaining === 0 && callback) {
-          this.state.collectionPile = piles[Math.floor(piles.length * Math.random())];
+          this.state.collectionPile = piles[0];
           this.arrangePiles();
           callback();
         }
@@ -165,6 +187,11 @@ export default class HomeView {
     let style = this.state.pileStyle;
     let viewport = cameras.getOrthographicViewport();
 
+    if (this.state.pileOverflowTween) {
+      this.state.pileOverflowTween.stop();
+      this.camera.position.y = 0;
+    }
+
     this.piles.forEach((pile, idx) => {
       pile.state.viewport = viewport;
       pile.setStyle(style);
@@ -173,21 +200,41 @@ export default class HomeView {
     switch (style) {
       case 'collection':
         let collectionPileIndex = this.piles.indexOf(this.state.collectionPile);
-        this.piles.forEach((p, idx) => p.mesh.position.set((idx - collectionPileIndex) * viewport.width, 0, 0));
+        this.piles.forEach((p, idx) => p.mesh.position.set((idx - collectionPileIndex) * viewport.width, 0, -25));
         break;
 
       case 'crazy':
-        this.piles.forEach(p => p.mesh.position.set((Math.random() - 0.5) * viewport.width * 0.25, (Math.random() - 0.5) * viewport.height * 0.25, 0));
+        this.piles.forEach(p => p.mesh.position.set((Math.random() - 0.5) * viewport.width * 0.25, (Math.random() - 0.5) * viewport.height * 0.25, -50));
         break;
 
       case 'neat': {
+        let rowSpacing = 6;
         let y = viewport.height / 2 - 5;
         this.piles.forEach(p => {
           p.mesh.position.set(-viewport.width / 2 + 5, y, 0);
-          y -= (p.getHeight() + 5);
-          console.log(y, p.series.name);
+          y -= (p.getHeight() + rowSpacing);
         });
+
+        let overflow = (viewport.height / -2) - (y + rowSpacing);
+        if (overflow > 0) {
+          let to = { y: -overflow };
+          let speed = 1.5; // units per second
+          let duration = (overflow / speed) * 1000;
+          this.state.pileOverflowTween = new TWEEN.Tween(this.camera.position).to(to, duration).delay(3000).repeat(Infinity).yoyo(true).start();
+        }
       } break;
+    }
+  }
+
+  hoverScaleForPileStyle (style = this.state.pileStyle) {
+    switch (style) {
+      case 'neat':
+        return 4;
+
+      case 'collection':
+      case 'crazy':
+      default:
+        return 2;
     }
   }
 
@@ -214,6 +261,34 @@ export default class HomeView {
         let to = { x: (idx - collectionPileIndex) * viewport.width };
         pile._collectionTween = new TWEEN.Tween(pile.mesh.position).to(to, 500).easing(TWEEN.Easing.Quadratic.InOut).start();
       });
+    }
+  }
+
+  createNeatTitleContainer () {
+    let el = document.createElement('div');
+    el.className = 'home-view-neat-title-container';
+    return el;
+  }
+
+  activateNeatTitles () {
+    let viewport = cameras.getOrthographicViewport();
+
+    this.piles.forEach(pile => {
+      let el = document.createElement('div');
+      el.className = 'home-view-neat-title';
+      el.textContent = pile.series.name;
+      console.log(pile.series.name, pile.mesh.position.y, cameras.worldUnitsInPixels(pile.mesh.position.y), viewport.height / 2);
+      el.style.bottom = cameras.worldUnitsInPixels(pile.mesh.position.y + viewport.height / 2) + 'px';
+      this.dom.neatTitleContainer.appendChild(el);
+    });
+
+    document.body.appendChild(this.dom.neatTitleContainer);
+  }
+
+  deactivateNeatTitles () {
+    this.dom.neatTitleContainer.innerHTML = '';
+    if (this.dom.neatTitleContainer.parentNode) {
+      this.dom.neatTitleContainer.parentNode.removeChild(this.dom.neatTitleContainer);
     }
   }
 }

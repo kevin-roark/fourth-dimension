@@ -12,10 +12,7 @@ orthographicCamera.position.copy(HOME_CAMERA_POSITION);
 
 resize();
 
-function resize () {
-  let w = window.innerWidth;
-  let h = window.innerHeight;
-
+function resize (w = window.innerWidth, h = window.innerHeight) {
   let aspect = perspectiveCamera.aspect = w / h;
   perspectiveCamera.updateProjectionMatrix();
 
@@ -44,11 +41,17 @@ function resetPerspectiveCamera () {
   perspectiveCamera.rotation.set(0, 0, 0, 0);
 }
 
+function worldUnitsInPixels (units = 1) {
+  let pixelsPerUnit = window.innerWidth / orthographicViewportWidth;
+  return pixelsPerUnit * units;
+}
+
 export default {
   perspectiveCamera,
   orthographicCamera,
   getCameraViewport,
   getOrthographicViewport,
   resetPerspectiveCamera,
+  worldUnitsInPixels,
   resize
 };

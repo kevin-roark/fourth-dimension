@@ -54,9 +54,9 @@ export default class ThumbnailPile {
         for (let i = 0; i < this.thumbnails.length; i++) {
           let thumb = this.thumbnails[i];
           // thumb.mesh.rotation.y += this.state.rps * (delta / 1000);
-          thumb.mesh.position.x += (Math.random() - 0.5) * 0.02;
-          thumb.mesh.position.y += (Math.random() - 0.5) * 0.02;
-          thumb.mesh.position.z += (Math.random() - 0.5) * 0.02;
+          // thumb.mesh.position.x += (Math.random() - 0.5) * 0.02;
+          // thumb.mesh.position.y += (Math.random() - 0.5) * 0.02;
+          // thumb.mesh.position.z += (Math.random() - 0.5) * 0.02;
           thumb.mesh.rotation.x += (Math.random() - 0.5) * 0.1;
           thumb.mesh.rotation.y += (Math.random() - 0.5) * 0.1;
           thumb.mesh.rotation.z += (Math.random() - 0.5) * 0.1;
@@ -74,7 +74,14 @@ export default class ThumbnailPile {
     let ws = viewport.width - scale / 2;
     let hs = viewport.height - scale / 2;
 
-    thumbnails.forEach(t => t.setScale(scale));
+    thumbnails.forEach(t => {
+      t.setScale(scale)
+
+      if (t._pedestalMesh && style !== 'neat') {
+        this.mesh.remove(t._pedestalMesh);
+        t._pedestalMesh = null;
+      }
+    });
 
     switch (style) {
       case 'collection':
@@ -97,7 +104,7 @@ export default class ThumbnailPile {
         this.mesh.rotation.y = 0;
         let x = 0;
         let y = 0;
-        let space = this.state.viewport.width * 0.05;
+        let space = this.state.viewport.width * 0.025;
         thumbnails.forEach((thumbnail, idx) => {
           thumbnail.mesh.position.set(x, y, 0);
           thumbnail.mesh.rotation.set(0, 0, 0, 0);
@@ -105,6 +112,19 @@ export default class ThumbnailPile {
           if (x + scale > ws) {
             x = 0;
             y -= (scale + space * 0.2);
+          }
+
+          if (!thumbnail._pedestalMesh) {
+            let pedestal = thumbnail._pedestalMesh = new THREE.Mesh(
+              new THREE.BoxBufferGeometry(1, 0.25, 1),
+              new THREE.MeshStandardMaterial({
+                color: 0xffffff
+              })
+            );
+            pedestal.receiveShadow = true;
+            pedestal.scale.copy(thumbnail.mesh.scale);
+            pedestal.position.set(thumbnail.mesh.position.x, thumbnail.mesh.position.y - thumbnail.mesh.scale.y * 1.2, thumbnail.mesh.position.z);
+            this.mesh.add(pedestal);
           }
         });
         break;
@@ -125,7 +145,7 @@ export default class ThumbnailPile {
         return this.state.viewport.width * 0.08;
 
       case 'neat':
-        return this.state.viewport.width * 0.05;
+        return this.state.viewport.width * 0.025;
     }
   }
 
