@@ -26,6 +26,7 @@ export default class Thumbnail {
 
       let mesh = this.mesh = new THREE.Mesh(geometry, material);
       mesh.castShadow = true;
+      mesh.receiveShadow = true;
       mesh._thumbnail = this;
       this.setScale();
       if (callback) callback(mesh);

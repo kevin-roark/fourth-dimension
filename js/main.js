@@ -26,7 +26,7 @@ function go () {
   let renderer = new THREE.WebGLRenderer({
     antialias: true
   });
-  renderer.setClearColor(0xffffff);
+  renderer.setClearColor(0x000000);
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 

@@ -75,7 +75,7 @@ export default class ThumbnailPile {
     let hs = viewport.height - scale / 2;
 
     thumbnails.forEach(t => {
-      t.setScale(scale)
+      t.setScale(scale);
 
       if (t._pedestalMesh && style !== 'neat') {
         this.mesh.remove(t._pedestalMesh);

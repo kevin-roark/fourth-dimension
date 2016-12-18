@@ -44,6 +44,7 @@ var Thumbnail = (function () {
 
           var mesh = _this.mesh = new THREE.Mesh(geometry, material);
           mesh.castShadow = true;
+          mesh.receiveShadow = true;
           mesh._thumbnail = _this;
           _this.setScale();
           if (callback) callback(mesh);
@@ -1019,28 +1020,48 @@ var HomeView = (function () {
     },
     makeLights: {
       value: function makeLights() {
-        var _this = this;
-
         var shadowConfig = function (light) {
           light.castShadow = true;
-          light.shadow.mapSize.width = spotlight.shadow.mapSize.height = 1024;
+          light.shadow.mapSize.width = light.shadow.mapSize.height = 1024;
           light.shadow.camera.near = 1;
-          light.shadow.camera.far = 500;
-          light.shadow.camera.fov = 30;
-
-          var spotLightHelper = light._helper = new THREE.SpotLightHelper(light);
-          _this.lights.add(spotLightHelper);
+          light.shadow.camera.far = 1000;
+          light.shadow.camera.fov = 120;
         };
 
-        var spotlight = new THREE.SpotLight(16777215, 2, 5000, 3.14, 0, 1);
-        spotlight.position.set(50, 50, 50);
-        shadowConfig(spotlight);
-        this.lights.add(spotlight);
+        var setupPositionTween = function (light) {
+          var viewport = cameras.getOrthographicViewport();
+          console.log(light.position);
+          new TWEEN.Tween(light.position).to({
+            x: (Math.random() - 0.5) * viewport.width * 2,
+            y: (Math.random() - 0.5) * viewport.height * 2,
+            z: -50 + Math.random() * 450
+          }, 5000).start().onComplete(function () {
+            return setupPositionTween(light);
+          });
+        };
 
-        var spotlight2 = new THREE.SpotLight(16777215, 2, 5000, 3.14, 0, 1);
-        spotlight2.position.set(-50, 50, -50);
-        shadowConfig(spotlight2);
-        this.lights.add(spotlight2);
+        var pointlight0 = new THREE.PointLight(16777215, 0.4, 5000, 2);
+        pointlight0.position.set(100, 100, 300);
+        shadowConfig(pointlight0);
+        this.lights.add(pointlight0);
+
+        var pointlight1 = new THREE.PointLight(255, 0.3, 5000, 2);
+        pointlight1.position.set(-100, -25, 300);
+        shadowConfig(pointlight1);
+        setupPositionTween(pointlight1);
+        this.lights.add(pointlight1);
+
+        var pointlight2 = new THREE.PointLight(16711680, 0.3, 5000, 2);
+        pointlight2.position.set(100, 25, 300);
+        shadowConfig(pointlight2);
+        setupPositionTween(pointlight2);
+        this.lights.add(pointlight2);
+
+        var pointlight3 = new THREE.PointLight(16776960, 0.3, 5000, 2);
+        pointlight3.position.set(0, 0, 300);
+        shadowConfig(pointlight3);
+        setupPositionTween(pointlight3);
+        this.lights.add(pointlight3);
       }
     },
     makePiles: {
@@ -1153,7 +1174,7 @@ var HomeView = (function () {
           case "collection":
           case "crazy":
           default:
-            return 2;
+            return 1.4;
         }
       }
     },
@@ -2096,7 +2117,7 @@ function go() {
   var renderer = new THREE.WebGLRenderer({
     antialias: true
   });
-  renderer.setClearColor(16777215);
+  renderer.setClearColor(0);
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
