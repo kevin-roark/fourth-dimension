@@ -43,6 +43,7 @@ function go () {
 
   let dom = {
     info: document.querySelector('.info'),
+    title: document.querySelector('.title'),
     seriesTitle: document.querySelector('.series-title'),
     photoViewInterface: document.querySelector('.photo-view-interface'),
     photoViewCloseButton: document.querySelector('.photo-view-close-button'),
@@ -114,9 +115,12 @@ function go () {
         window.history.replaceState('', document.title, window.location.pathname);
       }
     }
+
+    setTimeout(() => {
+      [document.body, dom.info, dom.title, renderer.domElement].forEach(el => el.classList.add('loaded'));
+    }, 500);
   });
 
-  renderer.render(scene, state.activeCamera);
   start();
 
   function resize () {

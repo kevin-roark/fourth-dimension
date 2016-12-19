@@ -78,7 +78,7 @@ var Thumbnail = (function () {
 
 module.exports = Thumbnail;
 
-},{"three":16}],2:[function(require,module,exports){
+},{"three":17}],2:[function(require,module,exports){
 "use strict";
 
 var THREE = require("three");
@@ -143,7 +143,93 @@ module.exports = {
   resize: resize
 };
 
-},{"three":16}],3:[function(require,module,exports){
+},{"three":17}],3:[function(require,module,exports){
+"use strict";
+
+var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
+var CollectionHud = (function () {
+  function CollectionHud(_ref) {
+    var arrowHandler = _ref.arrowHandler;
+
+    _classCallCheck(this, CollectionHud);
+
+    var el = this.el = div("home-view-collection-hud");
+
+    var label = this.label = div("home-view-collection-hud-label");
+    label.textContent = "collection";
+    el.appendChild(label);
+
+    var title = this.title = div("home-view-collection-hud-title");
+    el.appendChild(title);
+
+    var arrowContainer = this.arrowContainer = div("home-view-collection-hud-arrow-container");
+    el.appendChild(arrowContainer);
+
+    var leftArrow = this.leftArrow = div("home-view-collection-hud-arrow");
+    leftArrow.textContent = "PREV";
+    leftArrow.addEventListener("click", function () {
+      if (arrowHandler) arrowHandler(-1);
+    }, false);
+    arrowContainer.appendChild(leftArrow);
+
+    var rightArrow = this.rightArrow = div("home-view-collection-hud-arrow");
+    rightArrow.textContent = "NEXT";
+    rightArrow.addEventListener("click", function () {
+      if (arrowHandler) arrowHandler(1);
+    }, false);
+    arrowContainer.appendChild(rightArrow);
+
+    this.state = {
+      titleCount: 0
+    };
+  }
+
+  _createClass(CollectionHud, {
+    setTitle: {
+      value: function setTitle(title) {
+        var _this = this;
+
+        this.title.textContent = title;
+
+        this.state.titleCount += 1;
+        var count = this.state.titleCount;
+        this.el.classList.add("active");
+        setTimeout(function () {
+          if (count === _this.state.titleCount) {
+            _this.el.classList.remove("active");
+          }
+        }, 500);
+      }
+    },
+    addToParent: {
+      value: function addToParent(parent) {
+        parent.appendChild(this.el);
+      }
+    },
+    removeFromParent: {
+      value: function removeFromParent() {
+        if (this.el.parentNode) {
+          this.el.parentNode.removeChild(this.el);
+        }
+      }
+    }
+  });
+
+  return CollectionHud;
+})();
+
+module.exports = CollectionHud;
+
+function div(className) {
+  var div = document.createElement("div");
+  div.className = className;
+  return div;
+}
+
+},{}],4:[function(require,module,exports){
 "use strict";
 
 module.exports = TrackballKeyboardControls;
@@ -747,7 +833,7 @@ TrackballKeyboardControls.prototype = Object.create(THREE.EventDispatcher.protot
 TrackballKeyboardControls.prototype.constructor = TrackballKeyboardControls;
 // screen.width intentional
 
-},{"three":16}],4:[function(require,module,exports){
+},{"three":17}],5:[function(require,module,exports){
 "use strict";
 
 var _slicedToArray = function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { var _arr = []; for (var _iterator = arr[Symbol.iterator](), _step; !(_step = _iterator.next()).done;) { _arr.push(_step.value); if (i && _arr.length === i) break; } return _arr; } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } };
@@ -799,9 +885,9 @@ function toTitleCase(str) {
   });
 }
 
-},{}],5:[function(require,module,exports){
-module.exports=[{"name":"Domestic","path":"domestic","photos":[{"name":"Bedroom","path":"bedroom","seriesPath":"domestic","upsideDown":true,"type":"object"},{"name":"Den","path":"den","seriesPath":"domestic","upsideDown":true,"type":"object"},{"name":"Elegant Living Room","path":"elegant-living-room","seriesPath":"domestic","upsideDown":true,"type":"object"},{"name":"Kitchen","path":"kitchen","seriesPath":"domestic","upsideDown":true,"type":"object"},{"name":"Living Room","path":"living-room","seriesPath":"domestic","upsideDown":true,"type":"object"}]},{"name":"Friends","path":"friends","photos":[{"name":"Desmond","path":"desmond","seriesPath":"friends","upsideDown":true,"type":"object"},{"name":"Dylan On The Couch","path":"dylan-on-the-couch","seriesPath":"friends","upsideDown":true,"type":"object"},{"name":"Half Dylan","path":"half-dylan","seriesPath":"friends","upsideDown":false,"type":"object"},{"name":"Jaq Montauk","path":"jaq-montauk","seriesPath":"friends","upsideDown":true,"type":"object"},{"name":"Nigel","path":"nigel","seriesPath":"friends","upsideDown":true,"type":"object"},{"name":"Riddhi Montauk","path":"riddhi-montauk","seriesPath":"friends","upsideDown":false,"type":"object"},{"name":"Sam","path":"sam","seriesPath":"friends","upsideDown":true,"type":"object"},{"name":"Seb Montauk","path":"seb-montauk","seriesPath":"friends","upsideDown":true,"type":"object"}]},{"name":"Natural History","path":"natural-history","photos":[{"name":"Alien Rocks","path":"alien-rocks","seriesPath":"natural-history","upsideDown":true,"type":"object"},{"name":"Big Fly","path":"big-fly","seriesPath":"natural-history","upsideDown":true,"type":"object"},{"name":"Evolution","path":"evolution","seriesPath":"natural-history","upsideDown":true,"type":"object"},{"name":"Farm Scene","path":"farm-scene","seriesPath":"natural-history","upsideDown":true,"type":"object"},{"name":"Frog Shadow","path":"frog-shadow","seriesPath":"natural-history","upsideDown":true,"type":"object"},{"name":"Lot Of Skulls","path":"lot-of-skulls","seriesPath":"natural-history","upsideDown":true,"type":"object"},{"name":"Three Skulls","path":"three-skulls","seriesPath":"natural-history","upsideDown":true,"type":"object"},{"name":"True Monkey","path":"true-monkey","seriesPath":"natural-history","upsideDown":true,"type":"object"}]},{"name":"Objects 1","path":"objects-1","photos":[{"name":"Angel","path":"angel","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Bad Father","path":"bad-father","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Basketball","path":"basketball","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Ben Franklin Bust","path":"ben-franklin-bust","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Broken Eagle","path":"broken-eagle","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Father","path":"father","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Freedom","path":"freedom","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Gator","path":"gator","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Grotto","path":"grotto","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Laptop","path":"laptop","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Last Supper","path":"last-supper","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Marble Bust","path":"marble-bust","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Mary","path":"mary","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Minion","path":"minion","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Rock","path":"rock","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Rocky","path":"rocky","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Video Camera","path":"video-camera","seriesPath":"objects-1","upsideDown":true,"type":"object"}]},{"name":"Roark","path":"roark","photos":[{"name":"Isabella","path":"isabella","seriesPath":"roark","upsideDown":true,"type":"object"},{"name":"Kevin Sr","path":"kevin-sr","seriesPath":"roark","upsideDown":true,"type":"object"},{"name":"Laurie","path":"laurie","seriesPath":"roark","upsideDown":true,"type":"object"},{"name":"Laurie And Mom","path":"laurie-and-mom","seriesPath":"roark","upsideDown":true,"type":"object"},{"name":"Melanie","path":"melanie","seriesPath":"roark","upsideDown":true,"type":"object"},{"name":"Moses","path":"moses","seriesPath":"roark","upsideDown":true,"type":"object"}]},{"name":"Still Life","path":"still-life","photos":[{"name":"Bella With Dog","path":"bella-with-dog","seriesPath":"still-life","upsideDown":true,"type":"object"},{"name":"Dylan On Github","path":"dylan-on-github","seriesPath":"still-life","upsideDown":true,"type":"object"},{"name":"Laurie In The Mirror","path":"laurie-in-the-mirror","seriesPath":"still-life","upsideDown":true,"type":"object"},{"name":"Meme Nancy Reading","path":"meme-nancy-reading","seriesPath":"still-life","upsideDown":true,"type":"object"},{"name":"Myself In The Mirror","path":"myself-in-the-mirror","seriesPath":"still-life","upsideDown":true,"type":"object"},{"name":"Photo Of Rocks","path":"photo-of-rocks","seriesPath":"still-life","upsideDown":true,"type":"object"}]}]
 },{}],6:[function(require,module,exports){
+module.exports=[{"name":"Domestic","path":"domestic","photos":[{"name":"Bedroom","path":"bedroom","seriesPath":"domestic","upsideDown":true,"type":"object"},{"name":"Den","path":"den","seriesPath":"domestic","upsideDown":true,"type":"object"},{"name":"Elegant Living Room","path":"elegant-living-room","seriesPath":"domestic","upsideDown":true,"type":"object"},{"name":"Kitchen","path":"kitchen","seriesPath":"domestic","upsideDown":true,"type":"object"},{"name":"Living Room","path":"living-room","seriesPath":"domestic","upsideDown":true,"type":"object"}]},{"name":"Friends","path":"friends","photos":[{"name":"Desmond","path":"desmond","seriesPath":"friends","upsideDown":true,"type":"object"},{"name":"Dylan On The Couch","path":"dylan-on-the-couch","seriesPath":"friends","upsideDown":true,"type":"object"},{"name":"Half Dylan","path":"half-dylan","seriesPath":"friends","upsideDown":false,"type":"object"},{"name":"Jaq Montauk","path":"jaq-montauk","seriesPath":"friends","upsideDown":true,"type":"object"},{"name":"Nigel","path":"nigel","seriesPath":"friends","upsideDown":true,"type":"object"},{"name":"Riddhi Montauk","path":"riddhi-montauk","seriesPath":"friends","upsideDown":false,"type":"object"},{"name":"Sam","path":"sam","seriesPath":"friends","upsideDown":true,"type":"object"},{"name":"Seb Montauk","path":"seb-montauk","seriesPath":"friends","upsideDown":true,"type":"object"}]},{"name":"Natural History","path":"natural-history","photos":[{"name":"Alien Rocks","path":"alien-rocks","seriesPath":"natural-history","upsideDown":true,"type":"object"},{"name":"Big Fly","path":"big-fly","seriesPath":"natural-history","upsideDown":true,"type":"object"},{"name":"Evolution","path":"evolution","seriesPath":"natural-history","upsideDown":true,"type":"object"},{"name":"Farm Scene","path":"farm-scene","seriesPath":"natural-history","upsideDown":true,"type":"object"},{"name":"Frog Shadow","path":"frog-shadow","seriesPath":"natural-history","upsideDown":true,"type":"object"},{"name":"Lot Of Skulls","path":"lot-of-skulls","seriesPath":"natural-history","upsideDown":true,"type":"object"},{"name":"Three Skulls","path":"three-skulls","seriesPath":"natural-history","upsideDown":true,"type":"object"},{"name":"True Monkey","path":"true-monkey","seriesPath":"natural-history","upsideDown":true,"type":"object"}]},{"name":"Objects 1","path":"objects-1","photos":[{"name":"Angel","path":"angel","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Bad Father","path":"bad-father","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Basketball","path":"basketball","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Ben Franklin Bust","path":"ben-franklin-bust","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Broken Eagle","path":"broken-eagle","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Father","path":"father","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Freedom","path":"freedom","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Gator","path":"gator","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Grotto","path":"grotto","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Laptop","path":"laptop","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Last Supper","path":"last-supper","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Marble Bust","path":"marble-bust","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Mary","path":"mary","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Minion","path":"minion","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Rock","path":"rock","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Rocky","path":"rocky","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Video Camera","path":"video-camera","seriesPath":"objects-1","upsideDown":true,"type":"object"}]},{"name":"Roark","path":"roark","photos":[{"name":"Isabella","path":"isabella","seriesPath":"roark","upsideDown":true,"type":"object"},{"name":"Kevin Sr","path":"kevin-sr","seriesPath":"roark","upsideDown":true,"type":"object"},{"name":"Laurie","path":"laurie","seriesPath":"roark","upsideDown":true,"type":"object"},{"name":"Laurie And Mom","path":"laurie-and-mom","seriesPath":"roark","upsideDown":true,"type":"object"},{"name":"Melanie","path":"melanie","seriesPath":"roark","upsideDown":true,"type":"object"},{"name":"Moses","path":"moses","seriesPath":"roark","upsideDown":true,"type":"object"}]},{"name":"Still Life","path":"still-life","photos":[{"name":"Bella With Dog","path":"bella-with-dog","seriesPath":"still-life","upsideDown":true,"type":"object"},{"name":"Dylan On Github","path":"dylan-on-github","seriesPath":"still-life","upsideDown":true,"type":"object"},{"name":"Laurie In The Mirror","path":"laurie-in-the-mirror","seriesPath":"still-life","upsideDown":true,"type":"object"},{"name":"Meme Nancy Reading","path":"meme-nancy-reading","seriesPath":"still-life","upsideDown":true,"type":"object"},{"name":"Myself In The Mirror","path":"myself-in-the-mirror","seriesPath":"still-life","upsideDown":true,"type":"object"},{"name":"Photo Of Rocks","path":"photo-of-rocks","seriesPath":"still-life","upsideDown":true,"type":"object"}]}]
+},{}],7:[function(require,module,exports){
 "use strict";
 
 module.exports = createGrid;
@@ -856,7 +942,7 @@ function createGrid() {
   return container;
 }
 
-},{"three":16}],7:[function(require,module,exports){
+},{"three":17}],8:[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -874,6 +960,8 @@ var MouseIntersector = _interopRequire(require("./mouse-intersector"));
 
 var cameras = _interopRequire(require("./cameras"));
 
+var CollectionHud = _interopRequire(require("./collection-hud"));
+
 var pileStyles = ["collection", "crazy", "neat"];
 
 // Modes
@@ -883,6 +971,8 @@ var pileStyles = ["collection", "crazy", "neat"];
 
 var HomeView = (function () {
   function HomeView(_ref) {
+    var _this = this;
+
     var seriesData = _ref.seriesData;
     var camera = _ref.camera;
     var renderer = _ref.renderer;
@@ -903,9 +993,14 @@ var HomeView = (function () {
     this.lights = new THREE.Object3D();
     this.container.add(this.lights);
 
+    this.collectionHud = new CollectionHud({ arrowHandler: function (delta) {
+        _this.cycleCollectionPile(delta > 0);
+      } });
+
     this.dom = {
       seriesTitle: document.querySelector(".series-title"),
       photoViewInterface: document.querySelector(".photo-view-interface"),
+      collectionHud: this.collectionHud.el,
       neatTitleContainer: this.createNeatTitleContainer()
     };
 
@@ -1001,7 +1096,10 @@ var HomeView = (function () {
     },
     setHoverThumnbail: {
       value: function setHoverThumnbail(thumbnail) {
-        var title = thumbnail ? "" + thumbnail._pile.series.name + " — " + thumbnail.photo.name : "";
+        var title = "";
+        if (thumbnail) {
+          title = this.state.pileStyle === "collection" ? thumbnail.photo.name : "" + thumbnail._pile.series.name + " — " + thumbnail.photo.name;
+        }
         this.dom.seriesTitle.textContent = title;
 
         var cursor = thumbnail ? "url('images/basketball.png'), crosshair" : "url('images/myhand.png'), auto";
@@ -1088,7 +1186,7 @@ var HomeView = (function () {
 
             remaining -= 1;
             if (remaining === 0 && callback) {
-              _this.state.collectionPile = piles[0];
+              _this.setCollectionPile(piles[0]);
               _this.arrangePiles();
               callback();
             }
@@ -1122,6 +1220,8 @@ var HomeView = (function () {
           this.camera.position.y = 0;
         }
 
+        this.collectionHud.removeFromParent();
+
         this.piles.forEach(function (pile, idx) {
           pile.state.viewport = viewport;
           pile.setStyle(style);
@@ -1129,6 +1229,8 @@ var HomeView = (function () {
 
         switch (style) {
           case "collection":
+            this.collectionHud.addToParent(document.body);
+
             var collectionPileIndex = this.piles.indexOf(this.state.collectionPile);
             this.piles.forEach(function (p, idx) {
               return p.mesh.position.set((idx - collectionPileIndex) * viewport.width, 0, -25);
@@ -1191,20 +1293,25 @@ var HomeView = (function () {
     },
     setCollectionPile: {
       value: function setCollectionPile(collectionPile) {
-        this.state.collectionPile = collectionPile;
+        var _this = this;
 
-        var viewport = cameras.getOrthographicViewport();
-        var collectionPileIndex = this.piles.indexOf(collectionPile);
+        this.state.collectionPile = collectionPile;
+        this.collectionHud.setTitle(collectionPile ? collectionPile.series.name : "");
 
         if (this.state.pileStyle === "collection") {
-          this.piles.forEach(function (pile, idx) {
-            if (pile._collectionTween) {
-              pile._collectionTween.stop();
-            }
+          (function () {
+            var collectionPileIndex = _this.piles.indexOf(collectionPile);
+            var viewport = cameras.getOrthographicViewport();
 
-            var to = { x: (idx - collectionPileIndex) * viewport.width };
-            pile._collectionTween = new TWEEN.Tween(pile.mesh.position).to(to, 500).easing(TWEEN.Easing.Quadratic.InOut).start();
-          });
+            _this.piles.forEach(function (pile, idx) {
+              if (pile._collectionTween) {
+                pile._collectionTween.stop();
+              }
+
+              var to = { x: (idx - collectionPileIndex) * viewport.width };
+              pile._collectionTween = new TWEEN.Tween(pile.mesh.position).to(to, 500).easing(TWEEN.Easing.Quadratic.InOut).start();
+            });
+          })();
         }
       }
     },
@@ -1248,7 +1355,7 @@ var HomeView = (function () {
 
 module.exports = HomeView;
 
-},{"./cameras":2,"./mouse-intersector":12,"./thumbnail-pile":14,"three":16,"tween.js":17}],8:[function(require,module,exports){
+},{"./cameras":2,"./collection-hud":3,"./mouse-intersector":13,"./thumbnail-pile":15,"three":17,"tween.js":18}],9:[function(require,module,exports){
 
 
 /**
@@ -1905,7 +2012,7 @@ OBJLoader.prototype = {
 
 };
 
-},{"three":16}],9:[function(require,module,exports){
+},{"three":17}],10:[function(require,module,exports){
 "use strict";
 
 var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
@@ -2079,7 +2186,7 @@ var LightRing = (function () {
 
 module.exports = LightRing;
 
-},{"three":16,"tween.js":17}],10:[function(require,module,exports){
+},{"three":17,"tween.js":18}],11:[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -2134,6 +2241,7 @@ function go() {
 
   var dom = {
     info: document.querySelector(".info"),
+    title: document.querySelector(".title"),
     seriesTitle: document.querySelector(".series-title"),
     photoViewInterface: document.querySelector(".photo-view-interface"),
     photoViewCloseButton: document.querySelector(".photo-view-close-button"),
@@ -2206,9 +2314,14 @@ function go() {
         window.history.replaceState("", document.title, window.location.pathname);
       }
     }
+
+    setTimeout(function () {
+      [document.body, dom.info, dom.title, renderer.domElement].forEach(function (el) {
+        return el.classList.add("loaded");
+      });
+    }, 500);
   });
 
-  renderer.render(scene, state.activeCamera);
   start();
 
   function resize() {
@@ -2307,7 +2420,7 @@ function go() {
   }
 }
 
-},{"./cameras":2,"./data":5,"./data-util":4,"./home-view":7,"./photo-view":13,"ismobilejs":15,"three":16,"tween.js":17}],11:[function(require,module,exports){
+},{"./cameras":2,"./data":6,"./data-util":5,"./home-view":8,"./photo-view":14,"ismobilejs":16,"three":17,"tween.js":18}],12:[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -2358,7 +2471,7 @@ function load(photo, callback) {
   });
 }
 
-},{"./lib/OBJLoader":8,"three":16}],12:[function(require,module,exports){
+},{"./lib/OBJLoader":9,"three":17}],13:[function(require,module,exports){
 "use strict";
 
 var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
@@ -2437,7 +2550,7 @@ var MouseIntersector = (function () {
 
 module.exports = MouseIntersector;
 
-},{"three":16}],13:[function(require,module,exports){
+},{"three":17}],14:[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -2784,7 +2897,7 @@ var PhotoView = (function () {
 
 module.exports = PhotoView;
 
-},{"./controls":3,"./grid":6,"./light-ring":9,"./model-cache":11,"three":16,"tween.js":17}],14:[function(require,module,exports){
+},{"./controls":4,"./grid":7,"./light-ring":10,"./model-cache":12,"three":17,"tween.js":18}],15:[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -2818,8 +2931,8 @@ var ThumbnailPile = (function () {
       rps: 0.8,
       collectionWidthPercentage: 0.45,
       collectionHeightPercentage: 0.8,
-      crazyWidthPercentage: 0.8,
-      crazyHeightPercentage: 0.8,
+      crazyWidthPercentage: 0.66,
+      crazyHeightPercentage: 0.7,
       style: style,
       viewport: viewport
     };
@@ -2972,7 +3085,7 @@ var ThumbnailPile = (function () {
             return this.state.viewport.width * 0.1;
 
           case "crazy":
-            return this.state.viewport.width * 0.08;
+            return this.state.viewport.width * 0.1;
 
           case "neat":
             return this.state.viewport.width * 0.025;
@@ -3000,7 +3113,7 @@ var ThumbnailPile = (function () {
 
 module.exports = ThumbnailPile;
 
-},{"./Thumbnail":1,"./cameras":2,"three":16}],15:[function(require,module,exports){
+},{"./Thumbnail":1,"./cameras":2,"three":17}],16:[function(require,module,exports){
 /**
  * isMobile.js v0.4.0
  *
@@ -3139,7 +3252,7 @@ module.exports = ThumbnailPile;
 
 })(this);
 
-},{}],16:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -45438,7 +45551,7 @@ module.exports = ThumbnailPile;
 
 })));
 
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 (function (process){
 /**
  * Tween.js - Licensed under the MIT license
@@ -46312,7 +46425,7 @@ TWEEN.Interpolation = {
 })(this);
 
 }).call(this,require('_process'))
-},{"_process":18}],18:[function(require,module,exports){
+},{"_process":19}],19:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -46408,4 +46521,4 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}]},{},[10]);
+},{}]},{},[11]);

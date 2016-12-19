@@ -5,6 +5,7 @@ let TWEEN = require('tween.js');
 import ThumbnailPile from './thumbnail-pile';
 import MouseIntersector from './mouse-intersector';
 import cameras from './cameras';
+import CollectionHud from './collection-hud';
 
 let pileStyles = ['collection', 'crazy', 'neat'];
 
@@ -27,9 +28,14 @@ export default class HomeView {
     this.lights = new THREE.Object3D();
     this.container.add(this.lights);
 
+    this.collectionHud = new CollectionHud({ arrowHandler: delta => {
+      this.cycleCollectionPile(delta > 0);
+    } });
+
     this.dom = {
       seriesTitle: document.querySelector('.series-title'),
       photoViewInterface: document.querySelector('.photo-view-interface'),
+      collectionHud: this.collectionHud.el,
       neatTitleContainer: this.createNeatTitleContainer()
     };
 
@@ -112,7 +118,10 @@ export default class HomeView {
   }
 
   setHoverThumnbail (thumbnail) {
-    let title = thumbnail ? `${thumbnail._pile.series.name} — ${thumbnail.photo.name}` : '';
+    let title = '';
+    if (thumbnail) {
+      title = this.state.pileStyle === 'collection' ? thumbnail.photo.name : `${thumbnail._pile.series.name} — ${thumbnail.photo.name}`;
+    }
     this.dom.seriesTitle.textContent = title;
 
     let cursor = thumbnail ? "url('images/basketball.png'), crosshair" : "url('images/myhand.png'), auto";
@@ -188,7 +197,7 @@ export default class HomeView {
 
         remaining -= 1;
         if (remaining === 0 && callback) {
-          this.state.collectionPile = piles[0];
+          this.setCollectionPile(piles[0]);
           this.arrangePiles();
           callback();
         }
@@ -215,6 +224,8 @@ export default class HomeView {
       this.camera.position.y = 0;
     }
 
+    this.collectionHud.removeFromParent();
+
     this.piles.forEach((pile, idx) => {
       pile.state.viewport = viewport;
       pile.setStyle(style);
@@ -222,6 +233,8 @@ export default class HomeView {
 
     switch (style) {
       case 'collection':
+        this.collectionHud.addToParent(document.body);
+
         let collectionPileIndex = this.piles.indexOf(this.state.collectionPile);
         this.piles.forEach((p, idx) => p.mesh.position.set((idx - collectionPileIndex) * viewport.width, 0, -25));
         break;
@@ -271,11 +284,12 @@ export default class HomeView {
 
   setCollectionPile (collectionPile) {
     this.state.collectionPile = collectionPile;
-
-    let viewport = cameras.getOrthographicViewport();
-    let collectionPileIndex = this.piles.indexOf(collectionPile);
+    this.collectionHud.setTitle(collectionPile ? collectionPile.series.name : '');
 
     if (this.state.pileStyle === 'collection') {
+      let collectionPileIndex = this.piles.indexOf(collectionPile);
+      let viewport = cameras.getOrthographicViewport();
+
       this.piles.forEach((pile, idx) => {
         if (pile._collectionTween) {
           pile._collectionTween.stop();

@@ -14,8 +14,8 @@ export default class ThumbnailPile {
       rps: 0.8,
       collectionWidthPercentage: 0.45,
       collectionHeightPercentage: 0.8,
-      crazyWidthPercentage: 0.8,
-      crazyHeightPercentage: 0.8,
+      crazyWidthPercentage: 0.66,
+      crazyHeightPercentage: 0.7,
       style,
       viewport
     };
@@ -142,7 +142,7 @@ export default class ThumbnailPile {
         return this.state.viewport.width * 0.1;
 
       case 'crazy':
-        return this.state.viewport.width * 0.08;
+        return this.state.viewport.width * 0.1;
 
       case 'neat':
         return this.state.viewport.width * 0.025;
