@@ -5,7 +5,7 @@ let TWEEN = require('tween.js');
 import ThumbnailPile from './thumbnail-pile';
 import MouseIntersector from './mouse-intersector';
 import cameras from './cameras';
-import CollectionHud from './collection-hud';
+import CollectionHud from './components/collection-hud';
 
 let pileStyles = ['collection', 'crazy', 'neat'];
 
@@ -33,8 +33,8 @@ export default class HomeView {
     } });
 
     this.dom = {
+      container: this.createDomContainer(),
       seriesTitle: document.querySelector('.series-title'),
-      photoViewInterface: document.querySelector('.photo-view-interface'),
       collectionHud: this.collectionHud.el,
       neatTitleContainer: this.createNeatTitleContainer()
     };
@@ -88,11 +88,13 @@ export default class HomeView {
   activate (scene) {
     this.state.active = true;
     scene.add(this.container);
+    document.body.appendChild(this.dom.container);
   }
 
   deactivate (scene) {
     this.state.active = false;
     scene.remove(this.container);
+    document.body.removeChild(this.dom.container);
   }
 
   keydown (ev) {
@@ -125,7 +127,7 @@ export default class HomeView {
     this.dom.seriesTitle.textContent = title;
 
     let cursor = thumbnail ? "url('images/basketball.png'), crosshair" : "url('images/myhand.png'), auto";
-    this.dom.photoViewInterface.style.cursor = cursor;
+    this.renderer.domElement.style.cursor = cursor;
 
     if (this.state.hoverThumbnail) {
       this.state.hoverThumbnail.setScale();
@@ -149,7 +151,6 @@ export default class HomeView {
 
     let setupPositionTween = light => {
       let viewport = cameras.getOrthographicViewport();
-      console.log(light.position);
       new TWEEN.Tween(light.position)
         .to({
           x: (Math.random() - 0.5) * viewport.width * 2,
@@ -233,7 +234,7 @@ export default class HomeView {
 
     switch (style) {
       case 'collection':
-        this.collectionHud.addToParent(document.body);
+        this.collectionHud.addToParent(this.dom.container);
 
         let collectionPileIndex = this.piles.indexOf(this.state.collectionPile);
         this.piles.forEach((p, idx) => p.mesh.position.set((idx - collectionPileIndex) * viewport.width, 0, -25));
@@ -301,6 +302,12 @@ export default class HomeView {
     }
   }
 
+  createDomContainer () {
+    let el = document.createElement('div');
+    el.className = 'home-view-dom-container';
+    return el;
+  }
+
   createNeatTitleContainer () {
     let el = document.createElement('div');
     el.className = 'home-view-neat-title-container';
@@ -314,12 +321,11 @@ export default class HomeView {
       let el = document.createElement('div');
       el.className = 'home-view-neat-title';
       el.textContent = pile.series.name;
-      console.log(pile.series.name, pile.mesh.position.y, cameras.worldUnitsInPixels(pile.mesh.position.y), viewport.height / 2);
       el.style.bottom = cameras.worldUnitsInPixels(pile.mesh.position.y + viewport.height / 2) + 'px';
       this.dom.neatTitleContainer.appendChild(el);
     });
 
-    document.body.appendChild(this.dom.neatTitleContainer);
+    this.dom.container.appendChild(this.dom.neatTitleContainer);
   }
 
   deactivateNeatTitles () {

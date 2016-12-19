@@ -78,7 +78,7 @@ var Thumbnail = (function () {
 
 module.exports = Thumbnail;
 
-},{"three":17}],2:[function(require,module,exports){
+},{"three":19}],2:[function(require,module,exports){
 "use strict";
 
 var THREE = require("three");
@@ -143,40 +143,47 @@ module.exports = {
   resize: resize
 };
 
-},{"three":17}],3:[function(require,module,exports){
+},{"three":19}],3:[function(require,module,exports){
 "use strict";
+
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
 
 var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
+var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc && desc.writable) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
+
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
-var CollectionHud = (function () {
+var Component = _interopRequire(require("./component"));
+
+var CollectionHud = (function (_Component) {
   function CollectionHud(_ref) {
     var arrowHandler = _ref.arrowHandler;
 
     _classCallCheck(this, CollectionHud);
 
-    var el = this.el = div("home-view-collection-hud");
+    _get(Object.getPrototypeOf(CollectionHud.prototype), "constructor", this).call(this);
 
-    var label = this.label = div("home-view-collection-hud-label");
-    label.textContent = "collection";
+    var el = this.el = this.div("home-view-collection-hud");
+
+    var label = this.label = this.div("home-view-collection-hud-label", null, "collection");
     el.appendChild(label);
 
-    var title = this.title = div("home-view-collection-hud-title");
+    var title = this.title = this.div("home-view-collection-hud-title");
     el.appendChild(title);
 
-    var arrowContainer = this.arrowContainer = div("home-view-collection-hud-arrow-container");
+    var arrowContainer = this.arrowContainer = this.div("home-view-collection-hud-arrow-container");
     el.appendChild(arrowContainer);
 
-    var leftArrow = this.leftArrow = div("home-view-collection-hud-arrow");
-    leftArrow.textContent = "PREV";
+    var leftArrow = this.leftArrow = this.div("home-view-collection-hud-arrow", null, "PREV");
     leftArrow.addEventListener("click", function () {
       if (arrowHandler) arrowHandler(-1);
     }, false);
     arrowContainer.appendChild(leftArrow);
 
-    var rightArrow = this.rightArrow = div("home-view-collection-hud-arrow");
-    rightArrow.textContent = "NEXT";
+    var rightArrow = this.rightArrow = this.div("home-view-collection-hud-arrow", null, "NEXT");
     rightArrow.addEventListener("click", function () {
       if (arrowHandler) arrowHandler(1);
     }, false);
@@ -186,6 +193,8 @@ var CollectionHud = (function () {
       titleCount: 0
     };
   }
+
+  _inherits(CollectionHud, _Component);
 
   _createClass(CollectionHud, {
     setTitle: {
@@ -203,7 +212,27 @@ var CollectionHud = (function () {
           }
         }, 500);
       }
-    },
+    }
+  });
+
+  return CollectionHud;
+})(Component);
+
+module.exports = CollectionHud;
+
+},{"./component":4}],4:[function(require,module,exports){
+"use strict";
+
+var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
+var Component = (function () {
+  function Component() {
+    _classCallCheck(this, Component);
+  }
+
+  _createClass(Component, {
     addToParent: {
       value: function addToParent(parent) {
         parent.appendChild(this.el);
@@ -215,21 +244,85 @@ var CollectionHud = (function () {
           this.el.parentNode.removeChild(this.el);
         }
       }
+    },
+    div: {
+      value: function div(className) {
+        var id = arguments[1] === undefined ? null : arguments[1];
+        var textContent = arguments[2] === undefined ? "" : arguments[2];
+
+        var el = document.createElement("div");
+        el.className = className;
+        if (id) el.id = id;
+        el.textContent = textContent;
+        return el;
+      }
     }
   });
 
-  return CollectionHud;
+  return Component;
 })();
 
-module.exports = CollectionHud;
+module.exports = Component;
 
-function div(className) {
-  var div = document.createElement("div");
-  div.className = className;
-  return div;
-}
+},{}],5:[function(require,module,exports){
+"use strict";
 
-},{}],4:[function(require,module,exports){
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc && desc.writable) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
+var Component = _interopRequire(require("./component"));
+
+var PhotoViewInterface = (function (_Component) {
+  function PhotoViewInterface(_ref) {
+    var closeHandler = _ref.closeHandler;
+    var wireframeHandler = _ref.wireframeHandler;
+    var textureHandler = _ref.textureHandler;
+    var lightingHandler = _ref.lightingHandler;
+    var backgroundHandler = _ref.backgroundHandler;
+
+    _classCallCheck(this, PhotoViewInterface);
+
+    _get(Object.getPrototypeOf(PhotoViewInterface.prototype), "constructor", this).call(this);
+
+    var el = this.el = this.div("photo-view-interface");
+
+    this.closeButton = this.div("photo-view-close-button");
+    this.closeButton.addEventListener("click", closeHandler, false);
+    el.appendChild(this.closeButton);
+
+    var buttons = this.controlButtons = this.div("photo-view-control-buttons");
+    el.appendChild(buttons);
+
+    this.wireframeButton = this.div("photo-view-control-button", "wireframe-button", "WIREFRAME");
+    this.wireframeButton.addEventListener("click", wireframeHandler, false);
+    buttons.appendChild(this.wireframeButton);
+
+    this.textureButton = this.div("photo-view-control-button", "texture-button", "TEXTURE");
+    this.textureButton.addEventListener("click", textureHandler, false);
+    buttons.appendChild(this.textureButton);
+
+    this.lightingButton = this.div("photo-view-control-button", "lighting-button", "LIGHTING");
+    this.lightingButton.addEventListener("click", lightingHandler, false);
+    buttons.appendChild(this.lightingButton);
+
+    this.backgroundButton = this.div("photo-view-control-button", "background-button", "BACKGROUND");
+    this.backgroundButton.addEventListener("click", backgroundHandler, false);
+    buttons.appendChild(this.backgroundButton);
+  }
+
+  _inherits(PhotoViewInterface, _Component);
+
+  return PhotoViewInterface;
+})(Component);
+
+module.exports = PhotoViewInterface;
+
+},{"./component":4}],6:[function(require,module,exports){
 "use strict";
 
 module.exports = TrackballKeyboardControls;
@@ -833,7 +926,7 @@ TrackballKeyboardControls.prototype = Object.create(THREE.EventDispatcher.protot
 TrackballKeyboardControls.prototype.constructor = TrackballKeyboardControls;
 // screen.width intentional
 
-},{"three":17}],5:[function(require,module,exports){
+},{"three":19}],7:[function(require,module,exports){
 "use strict";
 
 var _slicedToArray = function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { var _arr = []; for (var _iterator = arr[Symbol.iterator](), _step; !(_step = _iterator.next()).done;) { _arr.push(_step.value); if (i && _arr.length === i) break; } return _arr; } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } };
@@ -885,9 +978,9 @@ function toTitleCase(str) {
   });
 }
 
-},{}],6:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 module.exports=[{"name":"Domestic","path":"domestic","photos":[{"name":"Bedroom","path":"bedroom","seriesPath":"domestic","upsideDown":true,"type":"object"},{"name":"Den","path":"den","seriesPath":"domestic","upsideDown":true,"type":"object"},{"name":"Elegant Living Room","path":"elegant-living-room","seriesPath":"domestic","upsideDown":true,"type":"object"},{"name":"Kitchen","path":"kitchen","seriesPath":"domestic","upsideDown":true,"type":"object"},{"name":"Living Room","path":"living-room","seriesPath":"domestic","upsideDown":true,"type":"object"}]},{"name":"Friends","path":"friends","photos":[{"name":"Desmond","path":"desmond","seriesPath":"friends","upsideDown":true,"type":"object"},{"name":"Dylan On The Couch","path":"dylan-on-the-couch","seriesPath":"friends","upsideDown":true,"type":"object"},{"name":"Half Dylan","path":"half-dylan","seriesPath":"friends","upsideDown":false,"type":"object"},{"name":"Jaq Montauk","path":"jaq-montauk","seriesPath":"friends","upsideDown":true,"type":"object"},{"name":"Nigel","path":"nigel","seriesPath":"friends","upsideDown":true,"type":"object"},{"name":"Riddhi Montauk","path":"riddhi-montauk","seriesPath":"friends","upsideDown":false,"type":"object"},{"name":"Sam","path":"sam","seriesPath":"friends","upsideDown":true,"type":"object"},{"name":"Seb Montauk","path":"seb-montauk","seriesPath":"friends","upsideDown":true,"type":"object"}]},{"name":"Natural History","path":"natural-history","photos":[{"name":"Alien Rocks","path":"alien-rocks","seriesPath":"natural-history","upsideDown":true,"type":"object"},{"name":"Big Fly","path":"big-fly","seriesPath":"natural-history","upsideDown":true,"type":"object"},{"name":"Evolution","path":"evolution","seriesPath":"natural-history","upsideDown":true,"type":"object"},{"name":"Farm Scene","path":"farm-scene","seriesPath":"natural-history","upsideDown":true,"type":"object"},{"name":"Frog Shadow","path":"frog-shadow","seriesPath":"natural-history","upsideDown":true,"type":"object"},{"name":"Lot Of Skulls","path":"lot-of-skulls","seriesPath":"natural-history","upsideDown":true,"type":"object"},{"name":"Three Skulls","path":"three-skulls","seriesPath":"natural-history","upsideDown":true,"type":"object"},{"name":"True Monkey","path":"true-monkey","seriesPath":"natural-history","upsideDown":true,"type":"object"}]},{"name":"Objects 1","path":"objects-1","photos":[{"name":"Angel","path":"angel","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Bad Father","path":"bad-father","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Basketball","path":"basketball","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Ben Franklin Bust","path":"ben-franklin-bust","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Broken Eagle","path":"broken-eagle","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Father","path":"father","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Freedom","path":"freedom","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Gator","path":"gator","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Grotto","path":"grotto","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Laptop","path":"laptop","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Last Supper","path":"last-supper","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Marble Bust","path":"marble-bust","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Mary","path":"mary","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Minion","path":"minion","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Rock","path":"rock","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Rocky","path":"rocky","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Video Camera","path":"video-camera","seriesPath":"objects-1","upsideDown":true,"type":"object"}]},{"name":"Roark","path":"roark","photos":[{"name":"Isabella","path":"isabella","seriesPath":"roark","upsideDown":true,"type":"object"},{"name":"Kevin Sr","path":"kevin-sr","seriesPath":"roark","upsideDown":true,"type":"object"},{"name":"Laurie","path":"laurie","seriesPath":"roark","upsideDown":true,"type":"object"},{"name":"Laurie And Mom","path":"laurie-and-mom","seriesPath":"roark","upsideDown":true,"type":"object"},{"name":"Melanie","path":"melanie","seriesPath":"roark","upsideDown":true,"type":"object"},{"name":"Moses","path":"moses","seriesPath":"roark","upsideDown":true,"type":"object"}]},{"name":"Still Life","path":"still-life","photos":[{"name":"Bella With Dog","path":"bella-with-dog","seriesPath":"still-life","upsideDown":true,"type":"object"},{"name":"Dylan On Github","path":"dylan-on-github","seriesPath":"still-life","upsideDown":true,"type":"object"},{"name":"Laurie In The Mirror","path":"laurie-in-the-mirror","seriesPath":"still-life","upsideDown":true,"type":"object"},{"name":"Meme Nancy Reading","path":"meme-nancy-reading","seriesPath":"still-life","upsideDown":true,"type":"object"},{"name":"Myself In The Mirror","path":"myself-in-the-mirror","seriesPath":"still-life","upsideDown":true,"type":"object"},{"name":"Photo Of Rocks","path":"photo-of-rocks","seriesPath":"still-life","upsideDown":true,"type":"object"}]}]
-},{}],7:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 "use strict";
 
 module.exports = createGrid;
@@ -942,7 +1035,7 @@ function createGrid() {
   return container;
 }
 
-},{"three":17}],8:[function(require,module,exports){
+},{"three":19}],10:[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -960,7 +1053,7 @@ var MouseIntersector = _interopRequire(require("./mouse-intersector"));
 
 var cameras = _interopRequire(require("./cameras"));
 
-var CollectionHud = _interopRequire(require("./collection-hud"));
+var CollectionHud = _interopRequire(require("./components/collection-hud"));
 
 var pileStyles = ["collection", "crazy", "neat"];
 
@@ -998,8 +1091,8 @@ var HomeView = (function () {
       } });
 
     this.dom = {
+      container: this.createDomContainer(),
       seriesTitle: document.querySelector(".series-title"),
-      photoViewInterface: document.querySelector(".photo-view-interface"),
       collectionHud: this.collectionHud.el,
       neatTitleContainer: this.createNeatTitleContainer()
     };
@@ -1062,12 +1155,14 @@ var HomeView = (function () {
       value: function activate(scene) {
         this.state.active = true;
         scene.add(this.container);
+        document.body.appendChild(this.dom.container);
       }
     },
     deactivate: {
       value: function deactivate(scene) {
         this.state.active = false;
         scene.remove(this.container);
+        document.body.removeChild(this.dom.container);
       }
     },
     keydown: {
@@ -1103,7 +1198,7 @@ var HomeView = (function () {
         this.dom.seriesTitle.textContent = title;
 
         var cursor = thumbnail ? "url('images/basketball.png'), crosshair" : "url('images/myhand.png'), auto";
-        this.dom.photoViewInterface.style.cursor = cursor;
+        this.renderer.domElement.style.cursor = cursor;
 
         if (this.state.hoverThumbnail) {
           this.state.hoverThumbnail.setScale();
@@ -1128,7 +1223,6 @@ var HomeView = (function () {
 
         var setupPositionTween = function (light) {
           var viewport = cameras.getOrthographicViewport();
-          console.log(light.position);
           new TWEEN.Tween(light.position).to({
             x: (Math.random() - 0.5) * viewport.width * 2,
             y: (Math.random() - 0.5) * viewport.height * 2,
@@ -1229,7 +1323,7 @@ var HomeView = (function () {
 
         switch (style) {
           case "collection":
-            this.collectionHud.addToParent(document.body);
+            this.collectionHud.addToParent(this.dom.container);
 
             var collectionPileIndex = this.piles.indexOf(this.state.collectionPile);
             this.piles.forEach(function (p, idx) {
@@ -1315,6 +1409,13 @@ var HomeView = (function () {
         }
       }
     },
+    createDomContainer: {
+      value: function createDomContainer() {
+        var el = document.createElement("div");
+        el.className = "home-view-dom-container";
+        return el;
+      }
+    },
     createNeatTitleContainer: {
       value: function createNeatTitleContainer() {
         var el = document.createElement("div");
@@ -1332,12 +1433,11 @@ var HomeView = (function () {
           var el = document.createElement("div");
           el.className = "home-view-neat-title";
           el.textContent = pile.series.name;
-          console.log(pile.series.name, pile.mesh.position.y, cameras.worldUnitsInPixels(pile.mesh.position.y), viewport.height / 2);
           el.style.bottom = cameras.worldUnitsInPixels(pile.mesh.position.y + viewport.height / 2) + "px";
           _this.dom.neatTitleContainer.appendChild(el);
         });
 
-        document.body.appendChild(this.dom.neatTitleContainer);
+        this.dom.container.appendChild(this.dom.neatTitleContainer);
       }
     },
     deactivateNeatTitles: {
@@ -1355,7 +1455,7 @@ var HomeView = (function () {
 
 module.exports = HomeView;
 
-},{"./cameras":2,"./collection-hud":3,"./mouse-intersector":13,"./thumbnail-pile":15,"three":17,"tween.js":18}],9:[function(require,module,exports){
+},{"./cameras":2,"./components/collection-hud":3,"./mouse-intersector":15,"./thumbnail-pile":17,"three":19,"tween.js":20}],11:[function(require,module,exports){
 
 
 /**
@@ -2012,7 +2112,7 @@ OBJLoader.prototype = {
 
 };
 
-},{"three":17}],10:[function(require,module,exports){
+},{"three":19}],12:[function(require,module,exports){
 "use strict";
 
 var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
@@ -2186,7 +2286,7 @@ var LightRing = (function () {
 
 module.exports = LightRing;
 
-},{"three":17,"tween.js":18}],11:[function(require,module,exports){
+},{"three":19,"tween.js":20}],13:[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -2201,9 +2301,9 @@ var dataUtil = _interopRequire(require("./data-util"));
 
 var cameras = _interopRequire(require("./cameras"));
 
-var PhotoView = _interopRequire(require("./photo-view"));
-
 var HomeView = _interopRequire(require("./home-view"));
+
+var PhotoView = _interopRequire(require("./photo-view"));
 
 if (isMobile.any) {
   var mobileWarning = document.createElement("div");
@@ -2242,15 +2342,7 @@ function go() {
   var dom = {
     info: document.querySelector(".info"),
     title: document.querySelector(".title"),
-    seriesTitle: document.querySelector(".series-title"),
-    photoViewInterface: document.querySelector(".photo-view-interface"),
-    photoViewCloseButton: document.querySelector(".photo-view-close-button"),
-    photoViewControlButtons: {
-      wireframe: document.querySelector("#wireframe-button"),
-      texture: document.querySelector("#texture-button"),
-      lighting: document.querySelector("#lighting-button"),
-      background: document.querySelector("#background-button")
-    }
+    seriesTitle: document.querySelector(".series-title")
   };
 
   var state = {
@@ -2288,21 +2380,6 @@ function go() {
     });
     document.addEventListener("mousemove", function (ev) {
       if (state.photoInView) state.photoInView.mousemove(ev);
-    });
-
-    dom.photoViewCloseButton.addEventListener("click", exitCurrentPhotoView);
-
-    dom.photoViewControlButtons.wireframe.addEventListener("click", function () {
-      if (state.photoInView) state.photoInView.wireframeButtonPressed();
-    });
-    dom.photoViewControlButtons.texture.addEventListener("click", function () {
-      if (state.photoInView) state.photoInView.textureButtonPressed();
-    });
-    dom.photoViewControlButtons.lighting.addEventListener("click", function () {
-      if (state.photoInView) state.photoInView.lightingButtonPressed();
-    });
-    dom.photoViewControlButtons.background.addEventListener("click", function () {
-      if (state.photoInView) state.photoInView.backgroundButtonPressed();
     });
 
     // url handling
@@ -2371,7 +2448,7 @@ function go() {
     if (photo) {
       (function () {
         state.loadingPhotoView = true;
-        var photoView = new PhotoView({ photo: photo, scene: scene, camera: cameras.perspectiveCamera });
+        var photoView = new PhotoView({ photo: photo, scene: scene, camera: cameras.perspectiveCamera, closeHandler: exitCurrentPhotoView });
         photoView.load(function () {
           state.loadingPhotoView = false;
           setPhotoView(photoView);
@@ -2398,7 +2475,7 @@ function go() {
       cameras.resetPerspectiveCamera();
     }
 
-    [dom.info, dom.photoViewInterface, dom.seriesTitle].forEach(function (el) {
+    [dom.info, dom.seriesTitle].forEach(function (el) {
       if (photoView) el.classList.add("photo-view");else el.classList.remove("photo-view");
     });
 
@@ -2420,7 +2497,7 @@ function go() {
   }
 }
 
-},{"./cameras":2,"./data":6,"./data-util":5,"./home-view":8,"./photo-view":14,"ismobilejs":16,"three":17,"tween.js":18}],12:[function(require,module,exports){
+},{"./cameras":2,"./data":8,"./data-util":7,"./home-view":10,"./photo-view":16,"ismobilejs":18,"three":19,"tween.js":20}],14:[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -2471,7 +2548,7 @@ function load(photo, callback) {
   });
 }
 
-},{"./lib/OBJLoader":9,"three":17}],13:[function(require,module,exports){
+},{"./lib/OBJLoader":11,"three":19}],15:[function(require,module,exports){
 "use strict";
 
 var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
@@ -2550,7 +2627,7 @@ var MouseIntersector = (function () {
 
 module.exports = MouseIntersector;
 
-},{"three":17}],14:[function(require,module,exports){
+},{"three":19}],16:[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -2570,6 +2647,8 @@ var LightRing = _interopRequire(require("./light-ring"));
 
 var Controls = _interopRequire(require("./controls"));
 
+var PhotoViewInterface = _interopRequire(require("./components/photo-view-interface"));
+
 var BACKGROUNDS = ["texture", "black", "grid"];
 var LIGHTINGS = ["white", "red", "blue", "green", "yellow", "primary"];
 var DEFAULT_CAMERA_POSITION = 10;
@@ -2580,6 +2659,7 @@ var PhotoView = (function () {
     var photo = _ref.photo;
     var scene = _ref.scene;
     var camera = _ref.camera;
+    var closeHandler = _ref.closeHandler;
 
     _classCallCheck(this, PhotoView);
 
@@ -2604,6 +2684,14 @@ var PhotoView = (function () {
 
     var ring = this.lightRing = new LightRing({ count: 3, radius: 15, y: 10, yRange: 6, distance: 200, angle: 0.5, revolutionSpeed: 0.004 });
     container.add(ring.obj);
+
+    this["interface"] = new PhotoViewInterface({
+      closeHandler: closeHandler,
+      wireframeHandler: this.wireframeButtonPressed.bind(this),
+      textureHandler: this.textureButtonPressed.bind(this),
+      lightingHandler: this.lightingButtonPressed.bind(this),
+      backgroundHandler: this.backgroundButtonPressed.bind(this)
+    });
 
     this.state = {
       active: false,
@@ -2678,22 +2766,39 @@ var PhotoView = (function () {
     },
     activate: {
       value: function activate() {
+        var _this = this;
+
         this.state.active = true;
         this.setBackground(this.state.background);
         this.scene.add(this.container);
         this.controls.enabled = true;
         this.resetCamera();
+
+        this["interface"].addToParent(document.body);
+        setTimeout(function () {
+          _this["interface"].el.classList.add("active");
+        }, 0);
       }
     },
     deactivate: {
       value: function deactivate() {
+        var _this = this;
+
         var permanent = arguments[0] === undefined ? true : arguments[0];
 
         this.state.active = false;
-        this.scene.background = new THREE.Color(16777215);
+        this.scene.background = new THREE.Color(0);
         this.scene.remove(this.container);
+        this.scene.remove(this.grid);
         this.grid = null;
         this.controls.enabled = false;
+
+        this["interface"].el.classList.remove("active");
+        setTimeout(function () {
+          if (!_this.state.active) {
+            _this["interface"].removeFromParent();
+          }
+        }, 250);
 
         if (permanent) {
           this.container = null;
@@ -2897,7 +3002,7 @@ var PhotoView = (function () {
 
 module.exports = PhotoView;
 
-},{"./controls":4,"./grid":7,"./light-ring":10,"./model-cache":12,"three":17,"tween.js":18}],15:[function(require,module,exports){
+},{"./components/photo-view-interface":5,"./controls":6,"./grid":9,"./light-ring":12,"./model-cache":14,"three":19,"tween.js":20}],17:[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -3113,7 +3218,7 @@ var ThumbnailPile = (function () {
 
 module.exports = ThumbnailPile;
 
-},{"./Thumbnail":1,"./cameras":2,"three":17}],16:[function(require,module,exports){
+},{"./Thumbnail":1,"./cameras":2,"three":19}],18:[function(require,module,exports){
 /**
  * isMobile.js v0.4.0
  *
@@ -3252,7 +3357,7 @@ module.exports = ThumbnailPile;
 
 })(this);
 
-},{}],17:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -45551,7 +45656,7 @@ module.exports = ThumbnailPile;
 
 })));
 
-},{}],18:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 (function (process){
 /**
  * Tween.js - Licensed under the MIT license
@@ -46425,7 +46530,7 @@ TWEEN.Interpolation = {
 })(this);
 
 }).call(this,require('_process'))
-},{"_process":19}],19:[function(require,module,exports){
+},{"_process":21}],21:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -46521,4 +46626,4 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}]},{},[11]);
+},{}]},{},[13]);

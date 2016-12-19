@@ -6,6 +6,7 @@ import loadModel from './model-cache';
 import createGrid from './grid';
 import LightRing from './light-ring';
 import Controls from './controls';
+import PhotoViewInterface from './components/photo-view-interface';
 
 let BACKGROUNDS = ['texture', 'black', 'grid'];
 let LIGHTINGS = ['white', 'red', 'blue', 'green', 'yellow', 'primary'];
@@ -13,7 +14,7 @@ let DEFAULT_CAMERA_POSITION = 10;
 let MODEL_SCALE_FACTOR = 3.5;
 
 export default class PhotoView {
-  constructor ({ photo, scene, camera }) {
+  constructor ({ photo, scene, camera, closeHandler }) {
     this.photo = photo;
     this.scene = scene;
     this.camera = camera;
@@ -35,6 +36,14 @@ export default class PhotoView {
 
     let ring = this.lightRing = new LightRing({ count: 3, radius: 15, y: 10, yRange: 6, distance: 200, angle: 0.5, revolutionSpeed: 0.004 });
     container.add(ring.obj);
+
+    this.interface = new PhotoViewInterface({
+      closeHandler,
+      wireframeHandler: this.wireframeButtonPressed.bind(this),
+      textureHandler: this.textureButtonPressed.bind(this),
+      lightingHandler: this.lightingButtonPressed.bind(this),
+      backgroundHandler: this.backgroundButtonPressed.bind(this)
+    });
 
     this.state = {
       active: false,
@@ -104,14 +113,27 @@ export default class PhotoView {
     this.scene.add(this.container);
     this.controls.enabled = true;
     this.resetCamera();
+
+    this.interface.addToParent(document.body);
+    setTimeout(() => {
+      this.interface.el.classList.add('active');
+    }, 0);
   }
 
   deactivate (permanent = true) {
     this.state.active = false;
-    this.scene.background = new THREE.Color(0xffffff);
+    this.scene.background = new THREE.Color(0x000000);
     this.scene.remove(this.container);
+    this.scene.remove(this.grid);
     this.grid = null;
     this.controls.enabled = false;
+
+    this.interface.el.classList.remove('active');
+    setTimeout(() => {
+      if (!this.state.active) {
+        this.interface.removeFromParent();
+      }
+    }, 250);
 
     if (permanent) {
       this.container = null;

@@ -6,8 +6,8 @@ let isMobile = require('ismobilejs');
 import seriesData from './data';
 import dataUtil from './data-util';
 import cameras from './cameras';
-import PhotoView from './photo-view';
 import HomeView from './home-view';
+import PhotoView from './photo-view';
 
 if (isMobile.any) {
   let mobileWarning = document.createElement('div');
@@ -44,15 +44,7 @@ function go () {
   let dom = {
     info: document.querySelector('.info'),
     title: document.querySelector('.title'),
-    seriesTitle: document.querySelector('.series-title'),
-    photoViewInterface: document.querySelector('.photo-view-interface'),
-    photoViewCloseButton: document.querySelector('.photo-view-close-button'),
-    photoViewControlButtons: {
-      wireframe: document.querySelector('#wireframe-button'),
-      texture: document.querySelector('#texture-button'),
-      lighting: document.querySelector('#lighting-button'),
-      background: document.querySelector('#background-button')
-    }
+    seriesTitle: document.querySelector('.series-title')
   };
 
   let state = {
@@ -89,21 +81,6 @@ function go () {
     });
     document.addEventListener('mousemove', ev => {
       if (state.photoInView) state.photoInView.mousemove(ev);
-    });
-
-    dom.photoViewCloseButton.addEventListener('click', exitCurrentPhotoView);
-
-    dom.photoViewControlButtons.wireframe.addEventListener('click', () => {
-      if (state.photoInView) state.photoInView.wireframeButtonPressed();
-    });
-    dom.photoViewControlButtons.texture.addEventListener('click', () => {
-      if (state.photoInView) state.photoInView.textureButtonPressed();
-    });
-    dom.photoViewControlButtons.lighting.addEventListener('click', () => {
-      if (state.photoInView) state.photoInView.lightingButtonPressed();
-    });
-    dom.photoViewControlButtons.background.addEventListener('click', () => {
-      if (state.photoInView) state.photoInView.backgroundButtonPressed();
     });
 
     // url handling
@@ -169,7 +146,7 @@ function go () {
 
     if (photo) {
       state.loadingPhotoView = true;
-      let photoView = new PhotoView({ photo, scene, camera: cameras.perspectiveCamera });
+      let photoView = new PhotoView({ photo, scene, camera: cameras.perspectiveCamera, closeHandler: exitCurrentPhotoView });
       photoView.load(() => {
         state.loadingPhotoView = false;
         setPhotoView(photoView);
@@ -195,7 +172,7 @@ function go () {
       cameras.resetPerspectiveCamera();
     }
 
-    [dom.info, dom.photoViewInterface, dom.seriesTitle].forEach(el => {
+    [dom.info, dom.seriesTitle].forEach(el => {
       if (photoView) el.classList.add('photo-view');
       else el.classList.remove('photo-view');
     });
