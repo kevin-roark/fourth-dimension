@@ -146,83 +146,6 @@ module.exports = {
 },{"three":19}],3:[function(require,module,exports){
 "use strict";
 
-var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
-
-var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc && desc.writable) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
-
-var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
-
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
-
-var Component = _interopRequire(require("./component"));
-
-var CollectionHud = (function (_Component) {
-  function CollectionHud(_ref) {
-    var arrowHandler = _ref.arrowHandler;
-
-    _classCallCheck(this, CollectionHud);
-
-    _get(Object.getPrototypeOf(CollectionHud.prototype), "constructor", this).call(this);
-
-    var el = this.el = this.div("home-view-collection-hud");
-
-    var label = this.label = this.div("home-view-collection-hud-label", null, "collection");
-    el.appendChild(label);
-
-    var title = this.title = this.div("home-view-collection-hud-title");
-    el.appendChild(title);
-
-    var arrowContainer = this.arrowContainer = this.div("home-view-collection-hud-arrow-container");
-    el.appendChild(arrowContainer);
-
-    var leftArrow = this.leftArrow = this.div("home-view-collection-hud-arrow", null, "PREV");
-    leftArrow.addEventListener("click", function () {
-      if (arrowHandler) arrowHandler(-1);
-    }, false);
-    arrowContainer.appendChild(leftArrow);
-
-    var rightArrow = this.rightArrow = this.div("home-view-collection-hud-arrow", null, "NEXT");
-    rightArrow.addEventListener("click", function () {
-      if (arrowHandler) arrowHandler(1);
-    }, false);
-    arrowContainer.appendChild(rightArrow);
-
-    this.state = {
-      titleCount: 0
-    };
-  }
-
-  _inherits(CollectionHud, _Component);
-
-  _createClass(CollectionHud, {
-    setTitle: {
-      value: function setTitle(title) {
-        var _this = this;
-
-        this.title.textContent = title;
-
-        this.state.titleCount += 1;
-        var count = this.state.titleCount;
-        this.el.classList.add("active");
-        setTimeout(function () {
-          if (count === _this.state.titleCount) {
-            _this.el.classList.remove("active");
-          }
-        }, 500);
-      }
-    }
-  });
-
-  return CollectionHud;
-})(Component);
-
-module.exports = CollectionHud;
-
-},{"./component":4}],4:[function(require,module,exports){
-"use strict";
-
 var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
@@ -264,7 +187,85 @@ var Component = (function () {
 
 module.exports = Component;
 
-},{}],5:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
+"use strict";
+
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc && desc.writable) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
+var Component = _interopRequire(require("./component"));
+
+var HomeViewHud = (function (_Component) {
+  function HomeViewHud(_ref) {
+    var arrowHandler = _ref.arrowHandler;
+    var styleHandler = _ref.styleHandler;
+
+    _classCallCheck(this, HomeViewHud);
+
+    _get(Object.getPrototypeOf(HomeViewHud.prototype), "constructor", this).call(this);
+
+    var el = this.el = this.div("home-view-hud");
+
+    var label = this.label = this.div("home-view-hud-label");
+    label.addEventListener("click", styleHandler, false);
+    el.appendChild(label);
+
+    var arrowContainer = this.arrowContainer = this.div("home-view-collection-arrow-container");
+    el.appendChild(arrowContainer);
+
+    var leftArrow = this.leftArrow = this.div("home-view-hud-arrow", null, "Previous Collection");
+    leftArrow.addEventListener("click", function () {
+      if (arrowHandler) arrowHandler(-1);
+    }, false);
+    arrowContainer.appendChild(leftArrow);
+
+    var rightArrow = this.rightArrow = this.div("home-view-hud-arrow", null, "Next Collection");
+    rightArrow.addEventListener("click", function () {
+      if (arrowHandler) arrowHandler(1);
+    }, false);
+    arrowContainer.appendChild(rightArrow);
+
+    this.state = {
+      titleCount: 0
+    };
+
+    this.setStyle();
+  }
+
+  _inherits(HomeViewHud, _Component);
+
+  _createClass(HomeViewHud, {
+    setStyle: {
+      value: function setStyle() {
+        var style = arguments[0] === undefined ? "collection" : arguments[0];
+
+        var names = { collection: "Collection", crazy: "Explosion", neat: "Splayed" };
+        this.label.textContent = "" + names[style] + " View";
+
+        this.label.className = "home-view-hud-label home-view-label-" + style;
+
+        if (style === "collection") {
+          this.arrowContainer.classList.add("active");
+        } else {
+          this.arrowContainer.classList.remove("active");
+        }
+      }
+    }
+  });
+
+  return HomeViewHud;
+})(Component);
+
+module.exports = HomeViewHud;
+
+},{"./component":3}],5:[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -322,7 +323,7 @@ var PhotoViewInterface = (function (_Component) {
 
 module.exports = PhotoViewInterface;
 
-},{"./component":4}],6:[function(require,module,exports){
+},{"./component":3}],6:[function(require,module,exports){
 "use strict";
 
 module.exports = TrackballKeyboardControls;
@@ -1053,7 +1054,7 @@ var MouseIntersector = _interopRequire(require("./mouse-intersector"));
 
 var cameras = _interopRequire(require("./cameras"));
 
-var CollectionHud = _interopRequire(require("./components/collection-hud"));
+var HomeViewHud = _interopRequire(require("./components/home-view-hud"));
 
 var pileStyles = ["collection", "crazy", "neat"];
 
@@ -1086,16 +1087,19 @@ var HomeView = (function () {
     this.lights = new THREE.Object3D();
     this.container.add(this.lights);
 
-    this.collectionHud = new CollectionHud({ arrowHandler: function (delta) {
-        _this.cycleCollectionPile(delta > 0);
-      } });
-
     this.dom = {
       container: this.createDomContainer(),
       seriesTitle: document.querySelector(".series-title"),
-      collectionHud: this.collectionHud.el,
       neatTitleContainer: this.createNeatTitleContainer()
     };
+
+    this.homeViewHud = new HomeViewHud({
+      arrowHandler: function (delta) {
+        _this.cycleCollectionPile(delta > 0);
+      },
+      styleHandler: this.cyclePileStyle.bind(this)
+    });
+    this.homeViewHud.addToParent(this.dom.container);
 
     this.state = {
       active: false,
@@ -1192,8 +1196,10 @@ var HomeView = (function () {
     setHoverThumnbail: {
       value: function setHoverThumnbail(thumbnail) {
         var title = "";
-        if (thumbnail) {
-          title = this.state.pileStyle === "collection" ? thumbnail.photo.name : "" + thumbnail._pile.series.name + " — " + thumbnail.photo.name;
+        if (this.state.pileStyle === "collection") {
+          title = thumbnail ? "" + thumbnail._pile.series.name + " — " + thumbnail.photo.name : this.state.collectionPile.series.name;
+        } else {
+          title = thumbnail ? "" + thumbnail._pile.series.name + " — " + thumbnail.photo.name : "";
         }
         this.dom.seriesTitle.textContent = title;
 
@@ -1299,6 +1305,7 @@ var HomeView = (function () {
         var pileStyle = arguments[0] === undefined ? this.state.pileStyle : arguments[0];
 
         this.state.pileStyle = pileStyle;
+        this.homeViewHud.setStyle(pileStyle);
         this.arrangePiles();
       }
     },
@@ -1314,8 +1321,6 @@ var HomeView = (function () {
           this.camera.position.y = 0;
         }
 
-        this.collectionHud.removeFromParent();
-
         this.piles.forEach(function (pile, idx) {
           pile.state.viewport = viewport;
           pile.setStyle(style);
@@ -1323,18 +1328,18 @@ var HomeView = (function () {
 
         switch (style) {
           case "collection":
-            this.collectionHud.addToParent(this.dom.container);
-
             var collectionPileIndex = this.piles.indexOf(this.state.collectionPile);
             this.piles.forEach(function (p, idx) {
               return p.mesh.position.set((idx - collectionPileIndex) * viewport.width, 0, -25);
             });
+            this.dom.seriesTitle.textContent = collectionPileIndex >= 0 ? this.state.collectionPile.series.name : "";
             break;
 
           case "crazy":
             this.piles.forEach(function (p) {
               return p.mesh.position.set((Math.random() - 0.5) * viewport.width * 0.25, (Math.random() - 0.5) * viewport.height * 0.25, -50);
             });
+            this.dom.seriesTitle.textContent = "";
             break;
 
           case "neat":
@@ -1354,6 +1359,8 @@ var HomeView = (function () {
                   var duration = overflow / speed * 1000;
                   _this.state.pileOverflowTween = new TWEEN.Tween(_this.camera.position).to(to, duration).delay(3000).repeat(Infinity).yoyo(true).start();
                 }
+
+                _this.dom.seriesTitle.textContent = "";
               })();
             }break;
         }
@@ -1390,7 +1397,6 @@ var HomeView = (function () {
         var _this = this;
 
         this.state.collectionPile = collectionPile;
-        this.collectionHud.setTitle(collectionPile ? collectionPile.series.name : "");
 
         if (this.state.pileStyle === "collection") {
           (function () {
@@ -1405,6 +1411,8 @@ var HomeView = (function () {
               var to = { x: (idx - collectionPileIndex) * viewport.width };
               pile._collectionTween = new TWEEN.Tween(pile.mesh.position).to(to, 500).easing(TWEEN.Easing.Quadratic.InOut).start();
             });
+
+            _this.dom.seriesTitle.textContent = collectionPile.series.name;
           })();
         }
       }
@@ -1455,7 +1463,7 @@ var HomeView = (function () {
 
 module.exports = HomeView;
 
-},{"./cameras":2,"./components/collection-hud":3,"./mouse-intersector":15,"./thumbnail-pile":17,"three":19,"tween.js":20}],11:[function(require,module,exports){
+},{"./cameras":2,"./components/home-view-hud":4,"./mouse-intersector":15,"./thumbnail-pile":17,"three":19,"tween.js":20}],11:[function(require,module,exports){
 
 
 /**

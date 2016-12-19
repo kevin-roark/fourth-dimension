@@ -5,7 +5,7 @@ let TWEEN = require('tween.js');
 import ThumbnailPile from './thumbnail-pile';
 import MouseIntersector from './mouse-intersector';
 import cameras from './cameras';
-import CollectionHud from './components/collection-hud';
+import HomeViewHud from './components/home-view-hud';
 
 let pileStyles = ['collection', 'crazy', 'neat'];
 
@@ -28,16 +28,19 @@ export default class HomeView {
     this.lights = new THREE.Object3D();
     this.container.add(this.lights);
 
-    this.collectionHud = new CollectionHud({ arrowHandler: delta => {
-      this.cycleCollectionPile(delta > 0);
-    } });
-
     this.dom = {
       container: this.createDomContainer(),
       seriesTitle: document.querySelector('.series-title'),
-      collectionHud: this.collectionHud.el,
       neatTitleContainer: this.createNeatTitleContainer()
     };
+
+    this.homeViewHud = new HomeViewHud({
+      arrowHandler: delta => {
+        this.cycleCollectionPile(delta > 0);
+      },
+      styleHandler: this.cyclePileStyle.bind(this)
+    });
+    this.homeViewHud.addToParent(this.dom.container);
 
     this.state = {
       active: false,
@@ -121,8 +124,10 @@ export default class HomeView {
 
   setHoverThumnbail (thumbnail) {
     let title = '';
-    if (thumbnail) {
-      title = this.state.pileStyle === 'collection' ? thumbnail.photo.name : `${thumbnail._pile.series.name} — ${thumbnail.photo.name}`;
+    if (this.state.pileStyle === 'collection') {
+      title = thumbnail ? `${thumbnail._pile.series.name} — ${thumbnail.photo.name}` : this.state.collectionPile.series.name;
+    } else {
+      title = thumbnail ? `${thumbnail._pile.series.name} — ${thumbnail.photo.name}` : '';
     }
     this.dom.seriesTitle.textContent = title;
 
@@ -213,6 +218,7 @@ export default class HomeView {
 
   setPileStyle (pileStyle = this.state.pileStyle) {
     this.state.pileStyle = pileStyle;
+    this.homeViewHud.setStyle(pileStyle);
     this.arrangePiles();
   }
 
@@ -225,8 +231,6 @@ export default class HomeView {
       this.camera.position.y = 0;
     }
 
-    this.collectionHud.removeFromParent();
-
     this.piles.forEach((pile, idx) => {
       pile.state.viewport = viewport;
       pile.setStyle(style);
@@ -234,14 +238,14 @@ export default class HomeView {
 
     switch (style) {
       case 'collection':
-        this.collectionHud.addToParent(this.dom.container);
-
         let collectionPileIndex = this.piles.indexOf(this.state.collectionPile);
         this.piles.forEach((p, idx) => p.mesh.position.set((idx - collectionPileIndex) * viewport.width, 0, -25));
+        this.dom.seriesTitle.textContent = collectionPileIndex >= 0 ? this.state.collectionPile.series.name : '';
         break;
 
       case 'crazy':
         this.piles.forEach(p => p.mesh.position.set((Math.random() - 0.5) * viewport.width * 0.25, (Math.random() - 0.5) * viewport.height * 0.25, -50));
+        this.dom.seriesTitle.textContent = '';
         break;
 
       case 'neat': {
@@ -259,6 +263,8 @@ export default class HomeView {
           let duration = (overflow / speed) * 1000;
           this.state.pileOverflowTween = new TWEEN.Tween(this.camera.position).to(to, duration).delay(3000).repeat(Infinity).yoyo(true).start();
         }
+
+        this.dom.seriesTitle.textContent = '';
       } break;
     }
   }
@@ -285,7 +291,6 @@ export default class HomeView {
 
   setCollectionPile (collectionPile) {
     this.state.collectionPile = collectionPile;
-    this.collectionHud.setTitle(collectionPile ? collectionPile.series.name : '');
 
     if (this.state.pileStyle === 'collection') {
       let collectionPileIndex = this.piles.indexOf(collectionPile);
@@ -299,6 +304,8 @@ export default class HomeView {
         let to = { x: (idx - collectionPileIndex) * viewport.width };
         pile._collectionTween = new TWEEN.Tween(pile.mesh.position).to(to, 500).easing(TWEEN.Easing.Quadratic.InOut).start();
       });
+
+      this.dom.seriesTitle.textContent = collectionPile.series.name;
     }
   }
 

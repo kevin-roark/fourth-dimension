@@ -53,9 +53,10 @@ canvas {
   }
 
 .title {
+  font-family: Times New Roman, serif;
   font-size: 100px;
   letter-spacing: 1px;
-  text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.1);
+  text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.25);
   transition: font-size 1s;
 }
   .title.loaded {
@@ -69,8 +70,9 @@ canvas {
 
 .human {
   display: inline-block;
-  font-size: 11px;
+  font-size: 10px;
   color: inherit;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
   text-decoration: underline;
   transform-origin: 100% 0;
   transition: transform 0.1s;
@@ -82,11 +84,13 @@ canvas {
 .series-title {
   z-index: 10;
   position: fixed;
-  bottom: 40px;
-  right: 40px;
+  bottom: 40px; right: 40px;
   max-width: calc(100% - 80px);
-  font-size: 64px;
   color: #fff;
+  text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.25);
+  font-family: Times New Roman, serif;
+  font-size: 64px;
+  letter-spacing: 1px;
   transition: color 0.25s;
 }
   .series-title.photo-view {
@@ -107,49 +111,66 @@ canvas {
   z-index: 1;
 }
 
-.home-view-collection-hud {
+.home-view-hud {
   position: fixed;
   left: 20px; bottom: 20px;
-  background: #fff;
-  color: #000;
   padding: 5px;
+  width: calc(100% - 30px);
   font-family: Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, serif;
   transition: background 0.5s, color 0.5s;
 }
-  .home-view-collection-hud.active {
-    background: #f00;
-    color: #fff;
+  .home-view-hud.active {
+    background: #fff;
+    color: #000;
   }
 
-.home-view-collection-hud-label {
-  position: absolute;
-  left: 0; width: 100%; text-align: center;
-  top: 5px;
-  color: #444;
-  font-size: 8px;
-}
-
-.home-view-collection-hud-title {
-  text-shadow: 1px 1px rgba(255, 0, 0, 0.1  );
-  font-size: 16px;
-  margin: 15px 5px 5px 5px;
-  max-width: 100px;
-  font-family: Times New Roman, serif;
-}
-
-.home-view-collection-hud-arrow {
+.home-view-hud-label {
   display: inline-block;
   cursor: pointer;
-  color: #ff0;
-  background: #000;
-  padding: 10px;
+  color: #fff;
+  padding: 5px;
   margin: 5px;
   font-size: 12px;
+  transition: background 0.4s, box-shadow 0.1s;
+}
+  .home-view-label-collection {
+    background: #f00;
+  }
+  .home-view-label-crazy {
+    background: #00f;
+  }
+  .home-view-label-neat {
+    background: #7800ff;
+  }
+  .home-view-label:hover, .home-view-label:focus {
+    box-shadow: 2px 2px 0 2px #ff0;
+    font-weight: bold;
+  }
+
+.home-view-collection-arrow-container {
+  display: none;
+}
+  .home-view-collection-arrow-container.active {
+    display: inline-block;
+  }
+
+.home-view-hud-arrow {
+  display: inline-block;
+  cursor: pointer;
+  color: #000;
+  background: #fff;
+  padding: 5px;
+  margin: 5px;
+  font-size: 10px;
+  line-height: 14px;
+  vertical-align: middle;
+  transition: background 0.4s, box-shadow 0.1s;
   user-select: none;
   -webkit-user-select: none;
 }
-  .home-view-collection-hud-arrow:hover, .home-view-collection-hud-arrow:focus {
+  .home-view-hud-arrow:hover, .home-view-hud-arrow:focus {
     font-weight: bold;
+    box-shadow: 2px 2px 0 2px #00f;
   }
 
 .home-view-neat-title-container {
