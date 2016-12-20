@@ -3,6 +3,16 @@ let THREE = require('three');
 import Thumbnail from './Thumbnail';
 import cameras from './cameras';
 
+let pedestalColors = [
+  0xffcccc,
+  0xccffcc,
+  0xccccff,
+  0xccffff,
+  0xffffcc,
+  0xffccff,
+  0xffffff
+];
+
 export default class ThumbnailPile {
   constructor ({ series, style = 'neat', viewport = cameras.getOrthographicViewport() }) {
     this.series = series;
@@ -16,6 +26,7 @@ export default class ThumbnailPile {
       collectionHeightPercentage: 0.8,
       crazyWidthPercentage: 0.66,
       crazyHeightPercentage: 0.7,
+      pedestalColor: pedestalColors[Math.floor(Math.random() * pedestalColors.length)],
       style,
       viewport
     };
@@ -116,9 +127,11 @@ export default class ThumbnailPile {
 
           if (!thumbnail._pedestalMesh) {
             let pedestal = thumbnail._pedestalMesh = new THREE.Mesh(
-              new THREE.BoxBufferGeometry(1, 0.25, 1),
+              new THREE.BoxBufferGeometry(1, 0.25, 5),
               new THREE.MeshStandardMaterial({
-                color: 0xffffff
+                color: this.state.pedestalColor,
+                roughness: 0.16,
+                metalness: 0.35
               })
             );
             pedestal.receiveShadow = true;

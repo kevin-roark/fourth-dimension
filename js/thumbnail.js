@@ -18,15 +18,13 @@ export default class Thumbnail {
 
       let material = new THREE.MeshStandardMaterial({
         color: 0xffffff,
-        roughness: 0.8,
-        metalness: 0.3,
+        roughness: 0.35,
+        metalness: 0.05,
         map: texture
       });
-      material.side = THREE.DoubleSide;
 
       let mesh = this.mesh = new THREE.Mesh(geometry, material);
       mesh.castShadow = true;
-      mesh.receiveShadow = true;
       mesh._thumbnail = this;
       this.setScale();
       if (callback) callback(mesh);

@@ -28,6 +28,15 @@ export default class HomeView {
     this.lights = new THREE.Object3D();
     this.container.add(this.lights);
 
+    let backgroundMesh = this.backgroundMesh = new THREE.Mesh(
+      new THREE.BoxBufferGeometry(1, 1, 1),
+      new THREE.MeshStandardMaterial({
+        color: 0xaaaaaa
+      })
+    );
+    backgroundMesh.position.z = -100;
+    this.container.add(backgroundMesh);
+
     this.dom = {
       container: this.createDomContainer(),
       seriesTitle: document.querySelector('.series-title'),
@@ -132,7 +141,7 @@ export default class HomeView {
     this.dom.seriesTitle.textContent = title;
 
     let cursor = thumbnail ? "url('images/basketball.png'), crosshair" : "url('images/myhand.png'), auto";
-    this.renderer.domElement.style.cursor = cursor;
+    document.body.style.cursor = cursor;
 
     if (this.state.hoverThumbnail) {
       this.state.hoverThumbnail.setScale();
@@ -158,15 +167,15 @@ export default class HomeView {
       let viewport = cameras.getOrthographicViewport();
       new TWEEN.Tween(light.position)
         .to({
-          x: (Math.random() - 0.5) * viewport.width * 2,
-          y: (Math.random() - 0.5) * viewport.height * 2,
-          z: -50 + Math.random() * 450
-        }, 5000)
+          x: (Math.random() - 0.5) * viewport.width * 2.2,
+          y: (Math.random() - 0.5) * viewport.height * 2.2,
+          z: -80 + Math.random() * 250
+        }, 2000 + Math.random() * 10000)
         .start()
         .onComplete(() => setupPositionTween(light));
     };
 
-    let pointlight0 = new THREE.PointLight(0xffffff, 0.4, 5000, 2);
+    let pointlight0 = new THREE.PointLight(0xffffff, 0.3, 5000, 2);
     pointlight0.position.set(100, 100, 300);
     shadowConfig(pointlight0);
     this.lights.add(pointlight0);
@@ -235,6 +244,8 @@ export default class HomeView {
       pile.state.viewport = viewport;
       pile.setStyle(style);
     });
+
+    this.backgroundMesh.scale.set(viewport.width, viewport.height, 1);
 
     switch (style) {
       case 'collection':

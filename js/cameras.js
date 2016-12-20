@@ -20,8 +20,6 @@ function resize (w = window.innerWidth, h = window.innerHeight) {
   orthographicCamera.top = orthographicHeight / 2;
   orthographicCamera.bottom = -orthographicHeight / 2;
   orthographicCamera.updateProjectionMatrix();
-
-  console.log(getCameraViewport(35.5));
 }
 
 function getCameraViewport (zDist) {

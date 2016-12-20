@@ -46,21 +46,27 @@ canvas {
   color: #000;
 }
   .info.loaded {
-    color: #fff;
+    color: #000;
+    text-shadow: 0px 0px 1px rgba(0,0,0,0.25);
   }
   .info.photo-view {
     opacity: 0;
   }
 
 .title {
+  display: inline-block;
   font-family: Times New Roman, serif;
   font-size: 100px;
   letter-spacing: 1px;
-  text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.25);
-  transition: font-size 1s;
+  transform-origin: 100% 20%;
+  transition: font-size 1s, color 0.2s, transform 0.1s;
 }
   .title.loaded {
     font-size: 20px;
+  }
+  .title:hover {
+    color: #fff;
+    transform: scale(5, 25);
   }
 
 .title::after {
@@ -79,6 +85,7 @@ canvas {
 }
   .human:hover {
     transform: scale(20, 20);
+    text-shadow: none;
   }
 
 .series-title {
@@ -87,15 +94,19 @@ canvas {
   bottom: 40px; right: 40px;
   max-width: calc(100% - 80px);
   color: #fff;
-  text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.25);
+  text-shadow: 0px 0px 1px rgba(0,0,0,0.25);
   font-family: Times New Roman, serif;
-  font-size: 64px;
+  font-size: 72px;
   letter-spacing: 1px;
-  transition: color 0.25s;
+  transform-origin: 100% 80%;
+  transition: color 0.25s, transform 0.1s;
 }
   .series-title.photo-view {
     color: #fff;
-    font-size: 24px;
+    font-size: 35px;
+  }
+  .series-title:hover {
+    transform: scale(1.5, 5);
   }
 
 .mobile-warning {
@@ -117,8 +128,12 @@ canvas {
   padding: 5px;
   width: calc(100% - 30px);
   font-family: Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, serif;
-  transition: background 0.5s, color 0.5s;
+  transition: background 0.5s, color 0.5s, opacity 1s;
+  opacity: 0;
 }
+  .home-view-hud.loaded {
+    opacity: 1;
+  }
   .home-view-hud.active {
     background: #fff;
     color: #000;
@@ -142,7 +157,7 @@ canvas {
   .home-view-label-neat {
     background: #7800ff;
   }
-  .home-view-label:hover, .home-view-label:focus {
+  .home-view-hud-label:hover, .home-view-hud-label:focus {
     box-shadow: 2px 2px 0 2px #ff0;
     font-weight: bold;
   }
@@ -199,20 +214,37 @@ canvas {
     opacity: 1;
   }
 
+.photo-view-parameter-flash {
+  display: none;
+  position: fixed;
+  left: 0; width: 100%; text-align: center;
+  top: 0;
+  font-size: 72px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  color: #ff0;
+  text-shadow: 0 0 1px rgba(0,0,0,0.5);
+  text-transform: uppercase;
+  transform: scale(1.4, 3);
+  transform-origin: 50% 10%;
+}
+  .photo-view-parameter-flash.active {
+    display: block;
+  }
+
 .photo-view-close-button {
   position: fixed;
   top: 10px; left: 10px;
   cursor: url('../images/myhand.png'), pointer;
   font-size: 28px;
-  color: #f00;
-  text-shadow: 0px 1px 2px #00f;
+  color: #fff;
+  text-shadow: 0px 0px 2px #f00, 0px 0px 4px rgba(255,0,0,0.9), 0px 0px 6px rgba(255,0,0,0.8), 0px 0px 10px rgba(255,0,0,0.7), 0px 0px 15px rgba(255,0,0,0.5);
   transition: color 0.25s;
 }
   .photo-view-close-button::after {
     content: "✕";
   }
   .photo-view-close-button:hover {
-    color: #ff0;
+    color: #f00;
   }
 
 .photo-view-control-buttons {
@@ -224,15 +256,18 @@ canvas {
 
 .photo-view-control-button {
   display: inline-block;
-  margin: 4px;
-  padding: 4px;
+  margin: 5px;
+  padding: 5px;
   cursor: url('../images/myhand.png'), pointer;
-  background: #000;
-  color: #fff;
-  transition: color 0.25s;
+  background: #fff;
+  color: #000;
+  font-size: 10px;
+  line-height: 14px;
+  transition: color 0.25s, box-shadow 0.1s;
 }
   .photo-view-control-button:hover {
-    color: #ff0;
+    font-weight: bold;
+    box-shadow: 2px 2px 0 2px #00f;
   }
 
 @media (max-width: 600px) {

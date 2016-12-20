@@ -44,7 +44,7 @@ function go () {
   let dom = {
     info: document.querySelector('.info'),
     title: document.querySelector('.title'),
-    seriesTitle: document.querySelector('.series-title')
+    seriesTitle: document.querySelector('.series-title'),
   };
 
   let state = {
@@ -94,7 +94,7 @@ function go () {
     }
 
     setTimeout(() => {
-      [document.body, dom.info, dom.title, renderer.domElement].forEach(el => el.classList.add('loaded'));
+      [document.body, dom.info, dom.title, renderer.domElement, document.querySelector('.home-view-hud')].forEach(el => el.classList.add('loaded'));
     }, 500);
   });
 
