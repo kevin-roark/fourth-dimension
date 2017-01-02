@@ -12,10 +12,7 @@ orthographicCamera.position.copy(HOME_CAMERA_POSITION);
 
 resize();
 
-function resize () {
-  let w = window.innerWidth;
-  let h = window.innerHeight;
-
+function resize (w = window.innerWidth, h = window.innerHeight) {
   let aspect = perspectiveCamera.aspect = w / h;
   perspectiveCamera.updateProjectionMatrix();
 
@@ -23,8 +20,6 @@ function resize () {
   orthographicCamera.top = orthographicHeight / 2;
   orthographicCamera.bottom = -orthographicHeight / 2;
   orthographicCamera.updateProjectionMatrix();
-
-  console.log(getCameraViewport(35.5));
 }
 
 function getCameraViewport (zDist) {
@@ -39,10 +34,22 @@ function getOrthographicViewport () {
   return { width: orthographicViewportWidth, height: orthographicViewportWidth / aspect };
 }
 
+function resetPerspectiveCamera () {
+  perspectiveCamera.position.copy(HOME_CAMERA_POSITION);
+  perspectiveCamera.rotation.set(0, 0, 0, 0);
+}
+
+function worldUnitsInPixels (units = 1) {
+  let pixelsPerUnit = window.innerWidth / orthographicViewportWidth;
+  return pixelsPerUnit * units;
+}
+
 export default {
   perspectiveCamera,
   orthographicCamera,
   getCameraViewport,
   getOrthographicViewport,
+  resetPerspectiveCamera,
+  worldUnitsInPixels,
   resize
 };

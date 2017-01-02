@@ -6,14 +6,16 @@ import loadModel from './model-cache';
 import createGrid from './grid';
 import LightRing from './light-ring';
 import Controls from './controls';
+import PhotoViewInterface from './components/photo-view-interface';
 
-let BACKGROUNDS = ['texture', 'black', 'grid'];
+let BACKGROUNDS = ['texture', 'blank', 'grid'];
 let LIGHTINGS = ['white', 'red', 'blue', 'green', 'yellow', 'primary'];
+let TEXTURES = ['default', 'toon', 'empty'];
 let DEFAULT_CAMERA_POSITION = 10;
 let MODEL_SCALE_FACTOR = 3.5;
 
 export default class PhotoView {
-  constructor ({ photo, scene, camera }) {
+  constructor ({ photo, scene, camera, closeHandler }) {
     this.photo = photo;
     this.scene = scene;
     this.camera = camera;
@@ -36,10 +38,18 @@ export default class PhotoView {
     let ring = this.lightRing = new LightRing({ count: 3, radius: 15, y: 10, yRange: 6, distance: 200, angle: 0.5, revolutionSpeed: 0.004 });
     container.add(ring.obj);
 
+    this.interface = new PhotoViewInterface({
+      closeHandler,
+      wireframeHandler: this.wireframeButtonPressed.bind(this),
+      textureHandler: this.textureButtonPressed.bind(this),
+      lightingHandler: this.lightingButtonPressed.bind(this),
+      backgroundHandler: this.backgroundButtonPressed.bind(this)
+    });
+
     this.state = {
       active: false,
-      showTexture: true,
       wireframe: false,
+      texture: TEXTURES[0],
       background: BACKGROUNDS[0],
       lighting: LIGHTINGS[0],
       rps: 1
@@ -60,7 +70,14 @@ export default class PhotoView {
         metalness: 0.3,
         map: texture
       });
-      material.side = THREE.DoubleSide;
+
+      let toonMaterial = this.toonMaterial = new THREE.MeshToonMaterial({
+        map: this.texture,
+        shininess: 666,
+        specular: 0x888888
+      });
+
+      material.side = toonMaterial.side = THREE.DoubleSide;
 
       let mesh = this.mesh = new THREE.Mesh(geometry, material);
       mesh.position.y = 1;
@@ -79,7 +96,7 @@ export default class PhotoView {
       container.add(mesh);
 
       this.setWireframe(this.state.wireframe);
-      this.setShowTexture(this.state.showTexture);
+      this.setTexture(this.state.texture);
       this.setLighting(this.state.lighting);
 
       let platform = this.platform = new THREE.Mesh(
@@ -104,14 +121,27 @@ export default class PhotoView {
     this.scene.add(this.container);
     this.controls.enabled = true;
     this.resetCamera();
+
+    this.interface.addToParent(document.body);
+    setTimeout(() => {
+      this.interface.el.classList.add('active');
+    }, 0);
   }
 
   deactivate (permanent = true) {
     this.state.active = false;
-    this.scene.background = new THREE.Color(0xffffff);
+    this.scene.background = new THREE.Color(0x000000);
     this.scene.remove(this.container);
+    this.scene.remove(this.grid);
     this.grid = null;
     this.controls.enabled = false;
+
+    this.interface.el.classList.remove('active');
+    setTimeout(() => {
+      if (!this.state.active) {
+        this.interface.removeFromParent();
+      }
+    }, 250);
 
     if (permanent) {
       this.container = null;
@@ -202,7 +232,8 @@ export default class PhotoView {
   }
 
   textureButtonPressed () {
-    this.setShowTexture(!this.state.showTexture);
+    let index = (TEXTURES.indexOf(this.state.texture) + 1) % TEXTURES.length;
+    this.setTexture(TEXTURES[index]);
   }
 
   lightingButtonPressed () {
@@ -221,22 +252,37 @@ export default class PhotoView {
     if (this.material) {
       this.material.wireframe = wireframe;
     }
+
+    this.interface.flashParameter(`wireframe: ${wireframe}`);
   }
 
-  setShowTexture (showTexture) {
-    this.state.showTexture = showTexture;
+  setTexture (texture) {
+    this.state.texture = texture;
 
-    if (this.material) {
-      if (showTexture) {
+    if (!this.material) return;
+
+    switch (texture) {
+      case 'default':
         this.material.map = this.texture;
         this.material.color.set(0xffffff);
-      } else {
+        this.mesh.material = this.material;
+        break;
+
+      case 'empty':
         this.material.map = null;
         this.material.color.set(0x666666);
-      }
+        this.mesh.material = this.material;
+        break;
 
-      this.material.needsUpdate = true;
+      case 'toon':
+        this.mesh.material = this.toonMaterial;
+        break;
     }
+
+    this.mesh.needsUpdate = true;
+    this.material.needsUpdate = true;
+
+    this.interface.flashParameter(texture);
   }
 
   setLighting (lighting) {
@@ -261,6 +307,8 @@ export default class PhotoView {
         lightRing.setIntensity(1.4);
         break;
     }
+
+    this.interface.flashParameter(lighting);
   }
 
   setBackground (background) {
@@ -271,7 +319,7 @@ export default class PhotoView {
         this.scene.background = this.texture;
         break;
 
-      case 'black':
+      case 'blank':
         this.scene.background = new THREE.Color(0x000000);
         break;
 
@@ -285,5 +333,7 @@ export default class PhotoView {
     if (background !== 'grid' && this.grid) {
       this.scene.remove(this.grid);
     }
+
+    this.interface.flashParameter(background);
   }
 }

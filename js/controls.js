@@ -419,8 +419,8 @@ export default function TrackballKeyboardControls( object, domElement ) {
 	function mousedown( event ) {
 		if ( _this.enabled === false ) return;
 
-		event.preventDefault();
-		event.stopPropagation();
+		// event.preventDefault();
+		// event.stopPropagation();
 
 		if ( _state === STATE.NONE ) {
 			_state = event.button;
@@ -469,8 +469,8 @@ export default function TrackballKeyboardControls( object, domElement ) {
 	function mouseup( event ) {
 		if ( _this.enabled === false ) return;
 
-		event.preventDefault();
-		event.stopPropagation();
+		// event.preventDefault();
+		// event.stopPropagation();
 
 		_state = STATE.NONE;
     _mouseDown = false;
