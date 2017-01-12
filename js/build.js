@@ -283,6 +283,7 @@ var PhotoViewInterface = (function (_Component) {
     var textureHandler = _ref.textureHandler;
     var lightingHandler = _ref.lightingHandler;
     var backgroundHandler = _ref.backgroundHandler;
+    var printHandler = _ref.printHandler;
 
     _classCallCheck(this, PhotoViewInterface);
 
@@ -315,6 +316,10 @@ var PhotoViewInterface = (function (_Component) {
     this.backgroundButton = this.div("photo-view-control-button", "background-button", "Background");
     this.backgroundButton.addEventListener("click", backgroundHandler, false);
     buttons.appendChild(this.backgroundButton);
+
+    this.printButton = this.div("photo-view-control-button photo-view-print-button", "print-button", "PRINT");
+    this.printButton.addEventListener("click", printHandler, false);
+    buttons.appendChild(this.printButton);
   }
 
   _inherits(PhotoViewInterface, _Component);
@@ -2725,7 +2730,8 @@ var PhotoView = (function () {
       wireframeHandler: this.wireframeButtonPressed.bind(this),
       textureHandler: this.textureButtonPressed.bind(this),
       lightingHandler: this.lightingButtonPressed.bind(this),
-      backgroundHandler: this.backgroundButtonPressed.bind(this)
+      backgroundHandler: this.backgroundButtonPressed.bind(this),
+      printHandler: this.printButtonPressed.bind(this)
     });
 
     this.state = {
@@ -2956,6 +2962,9 @@ var PhotoView = (function () {
         var backgroundIndex = (BACKGROUNDS.indexOf(this.state.background) + 1) % BACKGROUNDS.length;
         this.setBackground(BACKGROUNDS[backgroundIndex]);
       }
+    },
+    printButtonPressed: {
+      value: function printButtonPressed() {}
     },
     setWireframe: {
       value: function setWireframe(wireframe) {

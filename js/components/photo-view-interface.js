@@ -2,7 +2,7 @@
 import Component from './component';
 
 export default class PhotoViewInterface extends Component {
-  constructor ({ closeHandler, wireframeHandler, textureHandler, lightingHandler, backgroundHandler }) {
+  constructor ({ closeHandler, wireframeHandler, textureHandler, lightingHandler, backgroundHandler, printHandler }) {
     super();
 
     let el = this.el = this.div('photo-view-interface');
@@ -32,6 +32,10 @@ export default class PhotoViewInterface extends Component {
     this.backgroundButton = this.div('photo-view-control-button', 'background-button', 'Background');
     this.backgroundButton.addEventListener('click', backgroundHandler, false);
     buttons.appendChild(this.backgroundButton);
+
+    this.printButton = this.div('photo-view-control-button photo-view-print-button', 'print-button', 'PRINT');
+    this.printButton.addEventListener('click', printHandler, false);
+    buttons.appendChild(this.printButton);
   }
 
   flashParameter (name, duration = 300) {

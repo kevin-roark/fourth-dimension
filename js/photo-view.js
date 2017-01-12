@@ -43,7 +43,8 @@ export default class PhotoView {
       wireframeHandler: this.wireframeButtonPressed.bind(this),
       textureHandler: this.textureButtonPressed.bind(this),
       lightingHandler: this.lightingButtonPressed.bind(this),
-      backgroundHandler: this.backgroundButtonPressed.bind(this)
+      backgroundHandler: this.backgroundButtonPressed.bind(this),
+      printHandler: this.printButtonPressed.bind(this)
     });
 
     this.state = {
@@ -244,6 +245,10 @@ export default class PhotoView {
   backgroundButtonPressed () {
     let backgroundIndex = (BACKGROUNDS.indexOf(this.state.background) + 1) % BACKGROUNDS.length;
     this.setBackground(BACKGROUNDS[backgroundIndex]);
+  }
+
+  printButtonPressed () {
+
   }
 
   setWireframe (wireframe) {
