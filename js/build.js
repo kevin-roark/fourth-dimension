@@ -288,12 +288,14 @@ var PhotoViewInterface = (function (_Component) {
     var lightingHandler = _ref.lightingHandler;
     var backgroundHandler = _ref.backgroundHandler;
     var printModalHandler = _ref.printModalHandler;
+    var printImageProvider = _ref.printImageProvider;
 
     _classCallCheck(this, PhotoViewInterface);
 
     _get(Object.getPrototypeOf(PhotoViewInterface.prototype), "constructor", this).call(this);
 
     this.printModalHandler = printModalHandler;
+    this.printImageProvider = printImageProvider;
 
     var el = this.el = this.div("photo-view-interface");
 
@@ -378,8 +380,15 @@ var PhotoViewInterface = (function (_Component) {
     },
     showPrintModal: {
       value: function showPrintModal(show) {
+        var _this = this;
+
         if (show) {
-          this.el.appendChild(this.printModal.el);
+          this.printModal.setImage(null);
+          this.printImageProvider(function (image) {
+            _this.printModal.setImage(image);
+          });
+
+          this.el.appendChild(this.printModal.el);;
         } else {
           this.el.removeChild(this.printModal.el);
         }
@@ -401,6 +410,8 @@ module.exports = PhotoViewInterface;
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
 
+var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
 var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc && desc.writable) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
 var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
@@ -411,6 +422,8 @@ var Component = _interopRequire(require("./component"));
 
 var PhotoViewPrintModal = (function (_Component) {
   function PhotoViewPrintModal(_ref) {
+    var _this = this;
+
     var closeHandler = _ref.closeHandler;
 
     _classCallCheck(this, PhotoViewPrintModal);
@@ -422,12 +435,45 @@ var PhotoViewPrintModal = (function (_Component) {
     var modal = this.modal = this.div("photo-view-print-modal");
     this.el.appendChild(modal);
 
+    ["top", "right", "bottom", "left"].forEach(function (p) {
+      return _this.makeTextBorder(p);
+    });
+
     this.closeButton = this.div("photo-view-print-modal-close-button");
     this.closeButton.addEventListener("click", closeHandler, false);
     modal.appendChild(this.closeButton);
+
+    var canvas = this.canvas = document.createElement("canvas");
+    canvas.width = 400;canvas.height = 300;
+    canvas.className = "photo-view-print-modal-image-canvas";
+    modal.appendChild(canvas);
   }
 
   _inherits(PhotoViewPrintModal, _Component);
+
+  _createClass(PhotoViewPrintModal, {
+    setImage: {
+      value: function setImage(image) {
+        var context = this.canvas.getContext("2d");
+        context.clearRect(0, 0, 400, 300);
+
+        if (image) {
+          context.drawImage(image, 0, 0, 400, 300);
+        } else {
+          context.fillStyle = "#878787";
+          context.fillRect(0, 0, 400, 300);
+        }
+      }
+    },
+    makeTextBorder: {
+      value: function makeTextBorder() {
+        var position = arguments[0] === undefined ? "top" : arguments[0];
+
+        var border = this.div("photo-view-print-modal-text-border " + position, "", "PRINT MY WORLD PRINT MY WORLD PRINT MY WORLD PRINT MY WORLD PRINT MY WORLD PRINT MY WORLD PRINT MY WORLD PRINT MY WORLD PRINT MY WORLD PRINT MY WORLD PRINT MY WORLD PRINT MY WORLD PRINT MY WORLD PRINT MY WORLD");
+        this.modal.appendChild(border);
+      }
+    }
+  });
 
   return PhotoViewPrintModal;
 })(Component);
@@ -2449,7 +2495,8 @@ function go() {
   });
 
   var renderer = new THREE.WebGLRenderer({
-    antialias: true
+    antialias: true,
+    preserveDrawingBuffer: true
   });
   renderer.setClearColor(0);
   renderer.shadowMap.enabled = true;
@@ -2574,7 +2621,7 @@ function go() {
     if (photo) {
       (function () {
         state.loadingPhotoView = true;
-        var photoView = new PhotoView({ photo: photo, scene: scene, camera: cameras.perspectiveCamera, closeHandler: exitCurrentPhotoView });
+        var photoView = new PhotoView({ photo: photo, scene: scene, renderer: renderer, camera: cameras.perspectiveCamera, closeHandler: exitCurrentPhotoView });
         photoView.load(function () {
           state.loadingPhotoView = false;
           setPhotoView(photoView);
@@ -2783,8 +2830,11 @@ var MODEL_SCALE_FACTOR = 3.5;
 
 var PhotoView = (function () {
   function PhotoView(_ref) {
+    var _this = this;
+
     var photo = _ref.photo;
     var scene = _ref.scene;
+    var renderer = _ref.renderer;
     var camera = _ref.camera;
     var closeHandler = _ref.closeHandler;
 
@@ -2792,6 +2842,7 @@ var PhotoView = (function () {
 
     this.photo = photo;
     this.scene = scene;
+    this.renderer = renderer;
     this.camera = camera;
 
     var controls = this.controls = new Controls(camera);
@@ -2818,7 +2869,16 @@ var PhotoView = (function () {
       textureHandler: this.textureButtonPressed.bind(this),
       lightingHandler: this.lightingButtonPressed.bind(this),
       backgroundHandler: this.backgroundButtonPressed.bind(this),
-      printModalHandler: this.printModalHandler.bind(this)
+      printModalHandler: this.printModalHandler.bind(this),
+      printImageProvider: function (callback) {
+        var imageData = _this.mostRecentPrintImageData = _this.renderer.domElement.toDataURL();
+
+        var image = new window.Image();
+        image.src = imageData;
+        image.onload = function () {
+          return callback(image);
+        };
+      }
     });
 
     this.state = {
@@ -2955,7 +3015,7 @@ var PhotoView = (function () {
     },
     update: {
       value: function update(delta) {
-        if (this.state.active) {
+        if (this.state.active && !this.state.showingPrintModal) {
           var _state = this.state;
           var lighting = _state.lighting;
           var rps = _state.rps;
@@ -3069,6 +3129,7 @@ var PhotoView = (function () {
     printModalHandler: {
       value: function printModalHandler(showing) {
         this.state.showingPrintModal = showing;
+        this.controls.enabled = !showing;
       }
     },
     setWireframe: {
@@ -3175,6 +3236,11 @@ var PhotoView = (function () {
         }
 
         this["interface"].flashParameter(background);
+      }
+    },
+    placePrintOrder: {
+      value: function placePrintOrder(options) {
+        var image = this.renderer.domElement.toDataURL();
       }
     }
   });

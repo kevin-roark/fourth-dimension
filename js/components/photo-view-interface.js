@@ -3,10 +3,11 @@ import Component from './component';
 import PhotoViewPrintModal from './photo-view-print-modal';
 
 export default class PhotoViewInterface extends Component {
-  constructor ({ closeHandler, wireframeHandler, textureHandler, lightingHandler, backgroundHandler, printModalHandler }) {
+  constructor ({ closeHandler, wireframeHandler, textureHandler, lightingHandler, backgroundHandler, printModalHandler, printImageProvider }) {
     super();
 
     this.printModalHandler = printModalHandler;
+    this.printImageProvider = printImageProvider;
 
     let el = this.el = this.div('photo-view-interface');
 
@@ -74,7 +75,12 @@ export default class PhotoViewInterface extends Component {
 
   showPrintModal (show) {
     if (show) {
-      this.el.appendChild(this.printModal.el);
+      this.printModal.setImage(null);
+      this.printImageProvider(image => {
+        this.printModal.setImage(image);
+      })
+
+      this.el.appendChild(this.printModal.el);;
     } else {
       this.el.removeChild(this.printModal.el);
     }

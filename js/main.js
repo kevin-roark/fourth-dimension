@@ -24,7 +24,8 @@ function go () {
   seriesData.sort(() => Math.random() - 0.5);
 
   let renderer = new THREE.WebGLRenderer({
-    antialias: true
+    antialias: true,
+    preserveDrawingBuffer: true
   });
   renderer.setClearColor(0x000000);
   renderer.shadowMap.enabled = true;
@@ -146,7 +147,7 @@ function go () {
 
     if (photo) {
       state.loadingPhotoView = true;
-      let photoView = new PhotoView({ photo, scene, camera: cameras.perspectiveCamera, closeHandler: exitCurrentPhotoView });
+      let photoView = new PhotoView({ photo, scene, renderer, camera: cameras.perspectiveCamera, closeHandler: exitCurrentPhotoView });
       photoView.load(() => {
         state.loadingPhotoView = false;
         setPhotoView(photoView);

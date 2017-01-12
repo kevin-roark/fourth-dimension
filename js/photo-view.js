@@ -15,9 +15,10 @@ let DEFAULT_CAMERA_POSITION = 10;
 let MODEL_SCALE_FACTOR = 3.5;
 
 export default class PhotoView {
-  constructor ({ photo, scene, camera, closeHandler }) {
+  constructor ({ photo, scene, renderer, camera, closeHandler }) {
     this.photo = photo;
     this.scene = scene;
+    this.renderer = renderer;
     this.camera = camera;
 
     let controls = this.controls = new Controls(camera);
@@ -44,7 +45,14 @@ export default class PhotoView {
       textureHandler: this.textureButtonPressed.bind(this),
       lightingHandler: this.lightingButtonPressed.bind(this),
       backgroundHandler: this.backgroundButtonPressed.bind(this),
-      printModalHandler: this.printModalHandler.bind(this)
+      printModalHandler: this.printModalHandler.bind(this),
+      printImageProvider: callback => {
+        let imageData = this.mostRecentPrintImageData = this.renderer.domElement.toDataURL();
+
+        let image = new window.Image();
+        image.src = imageData;
+        image.onload = () => callback(image);
+      }
     });
 
     this.state = {
@@ -162,7 +170,7 @@ export default class PhotoView {
   }
 
   update (delta) {
-    if (this.state.active) {
+    if (this.state.active && !this.state.showingPrintModal) {
       let { lighting, rps } = this.state;
       if (this.mesh) {
         this.mesh.rotation.y += rps * (delta / 1000);
@@ -263,6 +271,7 @@ export default class PhotoView {
 
   printModalHandler (showing) {
     this.state.showingPrintModal = showing;
+    this.controls.enabled = !showing;
   }
 
   setWireframe (wireframe) {
@@ -360,5 +369,9 @@ export default class PhotoView {
     }
 
     this.interface.flashParameter(background);
+  }
+
+  placePrintOrder (options) {
+    let image = this.renderer.domElement.toDataURL();
   }
 }
