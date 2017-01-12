@@ -1,9 +1,12 @@
 
 import Component from './component';
+import PhotoViewPrintModal from './photo-view-print-modal';
 
 export default class PhotoViewInterface extends Component {
-  constructor ({ closeHandler, wireframeHandler, textureHandler, lightingHandler, backgroundHandler, printHandler }) {
+  constructor ({ closeHandler, wireframeHandler, textureHandler, lightingHandler, backgroundHandler, printModalHandler }) {
     super();
+
+    this.printModalHandler = printModalHandler;
 
     let el = this.el = this.div('photo-view-interface');
 
@@ -34,8 +37,14 @@ export default class PhotoViewInterface extends Component {
     buttons.appendChild(this.backgroundButton);
 
     this.printButton = this.div('photo-view-control-button photo-view-print-button', 'print-button', 'PRINT');
-    this.printButton.addEventListener('click', printHandler, false);
+    this.printButton.addEventListener('click', () => this.showPrintModal(true), false);
+    this.printButton.addEventListener('mouseenter', () => this.handlePrintButtonHover(true), false);
+    this.printButton.addEventListener('mouseleave', () => this.handlePrintButtonHover(false), false);
     buttons.appendChild(this.printButton);
+
+    this.printModal = new PhotoViewPrintModal({
+      closeHandler: () => this.showPrintModal(false)
+    });
   }
 
   flashParameter (name, duration = 300) {
@@ -46,5 +55,32 @@ export default class PhotoViewInterface extends Component {
       this.flashEl.textContent = '';
       this.flashEl.classList.remove('active');
     }, duration);
+  }
+
+  handlePrintButtonHover (hovering) {
+    if (hovering) {
+      if (!this.printToolTip) {
+        this.printToolTip = this.div('photo-view-tool-tip photo-view-tool-tip-print', '', 'arrange and modify the worldly scan as you like it then press this button to get a still image :)');
+        this.el.appendChild(this.printToolTip);
+      }
+
+      this.printToolTip.style.display = 'block';
+    } else {
+      if (this.printToolTip) {
+        this.printToolTip.style.display = 'none';
+      }
+    }
+  }
+
+  showPrintModal (show) {
+    if (show) {
+      this.el.appendChild(this.printModal.el);
+    } else {
+      this.el.removeChild(this.printModal.el);
+    }
+
+    if (this.printModalHandler) {
+      this.printModalHandler(show);
+    }
   }
 }

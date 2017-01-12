@@ -157,7 +157,7 @@ function go () {
   }
 
   function exitCurrentPhotoView () {
-    if (state.photoInView) {
+    if (state.photoInView && !state.photoInView.state.showingPrintModal) {
       viewPhoto(null);
     }
   }

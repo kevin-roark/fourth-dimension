@@ -76,7 +76,7 @@ var Thumbnail = (function () {
 
 module.exports = Thumbnail;
 
-},{"three":19}],2:[function(require,module,exports){
+},{"three":20}],2:[function(require,module,exports){
 "use strict";
 
 var THREE = require("three");
@@ -139,7 +139,7 @@ module.exports = {
   resize: resize
 };
 
-},{"three":19}],3:[function(require,module,exports){
+},{"three":20}],3:[function(require,module,exports){
 "use strict";
 
 var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
@@ -276,18 +276,24 @@ var _classCallCheck = function (instance, Constructor) { if (!(instance instance
 
 var Component = _interopRequire(require("./component"));
 
+var PhotoViewPrintModal = _interopRequire(require("./photo-view-print-modal"));
+
 var PhotoViewInterface = (function (_Component) {
   function PhotoViewInterface(_ref) {
+    var _this = this;
+
     var closeHandler = _ref.closeHandler;
     var wireframeHandler = _ref.wireframeHandler;
     var textureHandler = _ref.textureHandler;
     var lightingHandler = _ref.lightingHandler;
     var backgroundHandler = _ref.backgroundHandler;
-    var printHandler = _ref.printHandler;
+    var printModalHandler = _ref.printModalHandler;
 
     _classCallCheck(this, PhotoViewInterface);
 
     _get(Object.getPrototypeOf(PhotoViewInterface.prototype), "constructor", this).call(this);
+
+    this.printModalHandler = printModalHandler;
 
     var el = this.el = this.div("photo-view-interface");
 
@@ -318,8 +324,22 @@ var PhotoViewInterface = (function (_Component) {
     buttons.appendChild(this.backgroundButton);
 
     this.printButton = this.div("photo-view-control-button photo-view-print-button", "print-button", "PRINT");
-    this.printButton.addEventListener("click", printHandler, false);
+    this.printButton.addEventListener("click", function () {
+      return _this.showPrintModal(true);
+    }, false);
+    this.printButton.addEventListener("mouseenter", function () {
+      return _this.handlePrintButtonHover(true);
+    }, false);
+    this.printButton.addEventListener("mouseleave", function () {
+      return _this.handlePrintButtonHover(false);
+    }, false);
     buttons.appendChild(this.printButton);
+
+    this.printModal = new PhotoViewPrintModal({
+      closeHandler: function () {
+        return _this.showPrintModal(false);
+      }
+    });
   }
 
   _inherits(PhotoViewInterface, _Component);
@@ -339,6 +359,35 @@ var PhotoViewInterface = (function (_Component) {
           _this.flashEl.classList.remove("active");
         }, duration);
       }
+    },
+    handlePrintButtonHover: {
+      value: function handlePrintButtonHover(hovering) {
+        if (hovering) {
+          if (!this.printToolTip) {
+            this.printToolTip = this.div("photo-view-tool-tip photo-view-tool-tip-print", "", "arrange and modify the worldly scan as you like it then press this button to get a still image :)");
+            this.el.appendChild(this.printToolTip);
+          }
+
+          this.printToolTip.style.display = "block";
+        } else {
+          if (this.printToolTip) {
+            this.printToolTip.style.display = "none";
+          }
+        }
+      }
+    },
+    showPrintModal: {
+      value: function showPrintModal(show) {
+        if (show) {
+          this.el.appendChild(this.printModal.el);
+        } else {
+          this.el.removeChild(this.printModal.el);
+        }
+
+        if (this.printModalHandler) {
+          this.printModalHandler(show);
+        }
+      }
     }
   });
 
@@ -347,7 +396,45 @@ var PhotoViewInterface = (function (_Component) {
 
 module.exports = PhotoViewInterface;
 
-},{"./component":3}],6:[function(require,module,exports){
+},{"./component":3,"./photo-view-print-modal":6}],6:[function(require,module,exports){
+"use strict";
+
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc && desc.writable) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
+var Component = _interopRequire(require("./component"));
+
+var PhotoViewPrintModal = (function (_Component) {
+  function PhotoViewPrintModal(_ref) {
+    var closeHandler = _ref.closeHandler;
+
+    _classCallCheck(this, PhotoViewPrintModal);
+
+    _get(Object.getPrototypeOf(PhotoViewPrintModal.prototype), "constructor", this).call(this);
+
+    this.el = this.div("window-wrapper");
+
+    var modal = this.modal = this.div("photo-view-print-modal");
+    this.el.appendChild(modal);
+
+    this.closeButton = this.div("photo-view-print-modal-close-button");
+    this.closeButton.addEventListener("click", closeHandler, false);
+    modal.appendChild(this.closeButton);
+  }
+
+  _inherits(PhotoViewPrintModal, _Component);
+
+  return PhotoViewPrintModal;
+})(Component);
+
+module.exports = PhotoViewPrintModal;
+
+},{"./component":3}],7:[function(require,module,exports){
 "use strict";
 
 module.exports = TrackballKeyboardControls;
@@ -951,7 +1038,7 @@ TrackballKeyboardControls.prototype = Object.create(THREE.EventDispatcher.protot
 TrackballKeyboardControls.prototype.constructor = TrackballKeyboardControls;
 // screen.width intentional
 
-},{"three":19}],7:[function(require,module,exports){
+},{"three":20}],8:[function(require,module,exports){
 "use strict";
 
 var _slicedToArray = function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { var _arr = []; for (var _iterator = arr[Symbol.iterator](), _step; !(_step = _iterator.next()).done;) { _arr.push(_step.value); if (i && _arr.length === i) break; } return _arr; } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } };
@@ -1003,9 +1090,9 @@ function toTitleCase(str) {
   });
 }
 
-},{}],8:[function(require,module,exports){
-module.exports=[{"name":"Domestic","path":"domestic","photos":[{"name":"Bedroom","path":"bedroom","seriesPath":"domestic","upsideDown":true,"type":"object"},{"name":"Den","path":"den","seriesPath":"domestic","upsideDown":true,"type":"object"},{"name":"Elegant Living Room","path":"elegant-living-room","seriesPath":"domestic","upsideDown":true,"type":"object"},{"name":"Kitchen","path":"kitchen","seriesPath":"domestic","upsideDown":true,"type":"object"},{"name":"Living Room","path":"living-room","seriesPath":"domestic","upsideDown":true,"type":"object"}]},{"name":"Friends","path":"friends","photos":[{"name":"Desmond","path":"desmond","seriesPath":"friends","upsideDown":true,"type":"object"},{"name":"Dylan On The Couch","path":"dylan-on-the-couch","seriesPath":"friends","upsideDown":true,"type":"object"},{"name":"Half Dylan","path":"half-dylan","seriesPath":"friends","upsideDown":false,"type":"object"},{"name":"Jaq Montauk","path":"jaq-montauk","seriesPath":"friends","upsideDown":true,"type":"object"},{"name":"Nigel","path":"nigel","seriesPath":"friends","upsideDown":true,"type":"object"},{"name":"Riddhi Montauk","path":"riddhi-montauk","seriesPath":"friends","upsideDown":false,"type":"object"},{"name":"Sam","path":"sam","seriesPath":"friends","upsideDown":true,"type":"object"},{"name":"Seb Montauk","path":"seb-montauk","seriesPath":"friends","upsideDown":true,"type":"object"}]},{"name":"Natural History","path":"natural-history","photos":[{"name":"Alien Rocks","path":"alien-rocks","seriesPath":"natural-history","upsideDown":true,"type":"object"},{"name":"Big Fly","path":"big-fly","seriesPath":"natural-history","upsideDown":true,"type":"object"},{"name":"Evolution","path":"evolution","seriesPath":"natural-history","upsideDown":true,"type":"object"},{"name":"Farm Scene","path":"farm-scene","seriesPath":"natural-history","upsideDown":true,"type":"object"},{"name":"Frog Shadow","path":"frog-shadow","seriesPath":"natural-history","upsideDown":true,"type":"object"},{"name":"Lot Of Skulls","path":"lot-of-skulls","seriesPath":"natural-history","upsideDown":true,"type":"object"},{"name":"Three Skulls","path":"three-skulls","seriesPath":"natural-history","upsideDown":true,"type":"object"},{"name":"True Monkey","path":"true-monkey","seriesPath":"natural-history","upsideDown":true,"type":"object"}]},{"name":"Objects 1","path":"objects-1","photos":[{"name":"Angel","path":"angel","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Bad Father","path":"bad-father","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Basketball","path":"basketball","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Ben Franklin Bust","path":"ben-franklin-bust","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Broken Eagle","path":"broken-eagle","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Father","path":"father","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Freedom","path":"freedom","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Gator","path":"gator","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Grotto","path":"grotto","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Laptop","path":"laptop","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Last Supper","path":"last-supper","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Marble Bust","path":"marble-bust","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Mary","path":"mary","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Minion","path":"minion","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Rock","path":"rock","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Rocky","path":"rocky","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Video Camera","path":"video-camera","seriesPath":"objects-1","upsideDown":true,"type":"object"}]},{"name":"Roark","path":"roark","photos":[{"name":"Isabella","path":"isabella","seriesPath":"roark","upsideDown":true,"type":"object"},{"name":"Kevin Sr","path":"kevin-sr","seriesPath":"roark","upsideDown":true,"type":"object"},{"name":"Laurie","path":"laurie","seriesPath":"roark","upsideDown":true,"type":"object"},{"name":"Laurie And Mom","path":"laurie-and-mom","seriesPath":"roark","upsideDown":true,"type":"object"},{"name":"Melanie","path":"melanie","seriesPath":"roark","upsideDown":true,"type":"object"},{"name":"Moses","path":"moses","seriesPath":"roark","upsideDown":true,"type":"object"}]},{"name":"Still Life","path":"still-life","photos":[{"name":"Bella With Dog","path":"bella-with-dog","seriesPath":"still-life","upsideDown":true,"type":"object"},{"name":"Dylan On Github","path":"dylan-on-github","seriesPath":"still-life","upsideDown":true,"type":"object"},{"name":"Laurie In The Mirror","path":"laurie-in-the-mirror","seriesPath":"still-life","upsideDown":true,"type":"object"},{"name":"Meme Nancy Reading","path":"meme-nancy-reading","seriesPath":"still-life","upsideDown":true,"type":"object"},{"name":"Myself In The Mirror","path":"myself-in-the-mirror","seriesPath":"still-life","upsideDown":true,"type":"object"},{"name":"Photo Of Rocks","path":"photo-of-rocks","seriesPath":"still-life","upsideDown":true,"type":"object"}]}]
 },{}],9:[function(require,module,exports){
+module.exports=[{"name":"Domestic","path":"domestic","photos":[{"name":"Bedroom","path":"bedroom","seriesPath":"domestic","upsideDown":true,"type":"object"},{"name":"Den","path":"den","seriesPath":"domestic","upsideDown":true,"type":"object"},{"name":"Elegant Living Room","path":"elegant-living-room","seriesPath":"domestic","upsideDown":true,"type":"object"},{"name":"Kitchen","path":"kitchen","seriesPath":"domestic","upsideDown":true,"type":"object"},{"name":"Living Room","path":"living-room","seriesPath":"domestic","upsideDown":true,"type":"object"}]},{"name":"Friends","path":"friends","photos":[{"name":"Desmond","path":"desmond","seriesPath":"friends","upsideDown":true,"type":"object"},{"name":"Dylan On The Couch","path":"dylan-on-the-couch","seriesPath":"friends","upsideDown":true,"type":"object"},{"name":"Half Dylan","path":"half-dylan","seriesPath":"friends","upsideDown":false,"type":"object"},{"name":"Jaq Montauk","path":"jaq-montauk","seriesPath":"friends","upsideDown":true,"type":"object"},{"name":"Nigel","path":"nigel","seriesPath":"friends","upsideDown":true,"type":"object"},{"name":"Riddhi Montauk","path":"riddhi-montauk","seriesPath":"friends","upsideDown":false,"type":"object"},{"name":"Sam","path":"sam","seriesPath":"friends","upsideDown":true,"type":"object"},{"name":"Seb Montauk","path":"seb-montauk","seriesPath":"friends","upsideDown":true,"type":"object"}]},{"name":"Natural History","path":"natural-history","photos":[{"name":"Alien Rocks","path":"alien-rocks","seriesPath":"natural-history","upsideDown":true,"type":"object"},{"name":"Big Fly","path":"big-fly","seriesPath":"natural-history","upsideDown":true,"type":"object"},{"name":"Evolution","path":"evolution","seriesPath":"natural-history","upsideDown":true,"type":"object"},{"name":"Farm Scene","path":"farm-scene","seriesPath":"natural-history","upsideDown":true,"type":"object"},{"name":"Frog Shadow","path":"frog-shadow","seriesPath":"natural-history","upsideDown":true,"type":"object"},{"name":"Lot Of Skulls","path":"lot-of-skulls","seriesPath":"natural-history","upsideDown":true,"type":"object"},{"name":"Three Skulls","path":"three-skulls","seriesPath":"natural-history","upsideDown":true,"type":"object"},{"name":"True Monkey","path":"true-monkey","seriesPath":"natural-history","upsideDown":true,"type":"object"}]},{"name":"Objects 1","path":"objects-1","photos":[{"name":"Angel","path":"angel","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Bad Father","path":"bad-father","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Basketball","path":"basketball","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Ben Franklin Bust","path":"ben-franklin-bust","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Broken Eagle","path":"broken-eagle","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Father","path":"father","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Freedom","path":"freedom","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Gator","path":"gator","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Grotto","path":"grotto","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Laptop","path":"laptop","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Last Supper","path":"last-supper","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Marble Bust","path":"marble-bust","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Mary","path":"mary","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Minion","path":"minion","seriesPath":"objects-1","upsideDown":true,"type":"object"},{"name":"Rock","path":"rock","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Rocky","path":"rocky","seriesPath":"objects-1","upsideDown":false,"type":"object"},{"name":"Video Camera","path":"video-camera","seriesPath":"objects-1","upsideDown":true,"type":"object"}]},{"name":"Roark","path":"roark","photos":[{"name":"Isabella","path":"isabella","seriesPath":"roark","upsideDown":true,"type":"object"},{"name":"Kevin Sr","path":"kevin-sr","seriesPath":"roark","upsideDown":true,"type":"object"},{"name":"Laurie","path":"laurie","seriesPath":"roark","upsideDown":true,"type":"object"},{"name":"Laurie And Mom","path":"laurie-and-mom","seriesPath":"roark","upsideDown":true,"type":"object"},{"name":"Melanie","path":"melanie","seriesPath":"roark","upsideDown":true,"type":"object"},{"name":"Moses","path":"moses","seriesPath":"roark","upsideDown":true,"type":"object"}]},{"name":"Still Life","path":"still-life","photos":[{"name":"Bella With Dog","path":"bella-with-dog","seriesPath":"still-life","upsideDown":true,"type":"object"},{"name":"Dylan On Github","path":"dylan-on-github","seriesPath":"still-life","upsideDown":true,"type":"object"},{"name":"Laurie In The Mirror","path":"laurie-in-the-mirror","seriesPath":"still-life","upsideDown":true,"type":"object"},{"name":"Meme Nancy Reading","path":"meme-nancy-reading","seriesPath":"still-life","upsideDown":true,"type":"object"},{"name":"Myself In The Mirror","path":"myself-in-the-mirror","seriesPath":"still-life","upsideDown":true,"type":"object"},{"name":"Photo Of Rocks","path":"photo-of-rocks","seriesPath":"still-life","upsideDown":true,"type":"object"}]}]
+},{}],10:[function(require,module,exports){
 "use strict";
 
 module.exports = createGrid;
@@ -1060,7 +1147,7 @@ function createGrid() {
   return container;
 }
 
-},{"three":19}],10:[function(require,module,exports){
+},{"three":20}],11:[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -1495,7 +1582,7 @@ var HomeView = (function () {
 
 module.exports = HomeView;
 
-},{"./cameras":2,"./components/home-view-hud":4,"./mouse-intersector":15,"./thumbnail-pile":17,"three":19,"tween.js":20}],11:[function(require,module,exports){
+},{"./cameras":2,"./components/home-view-hud":4,"./mouse-intersector":16,"./thumbnail-pile":18,"three":20,"tween.js":21}],12:[function(require,module,exports){
 
 
 /**
@@ -2152,7 +2239,7 @@ OBJLoader.prototype = {
 
 };
 
-},{"three":19}],12:[function(require,module,exports){
+},{"three":20}],13:[function(require,module,exports){
 "use strict";
 
 var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
@@ -2326,7 +2413,7 @@ var LightRing = (function () {
 
 module.exports = LightRing;
 
-},{"three":19,"tween.js":20}],13:[function(require,module,exports){
+},{"three":20,"tween.js":21}],14:[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -2499,7 +2586,7 @@ function go() {
   }
 
   function exitCurrentPhotoView() {
-    if (state.photoInView) {
+    if (state.photoInView && !state.photoInView.state.showingPrintModal) {
       viewPhoto(null);
     }
   }
@@ -2536,7 +2623,7 @@ function go() {
   }
 }
 
-},{"./cameras":2,"./data":8,"./data-util":7,"./home-view":10,"./photo-view":16,"ismobilejs":18,"three":19,"tween.js":20}],14:[function(require,module,exports){
+},{"./cameras":2,"./data":9,"./data-util":8,"./home-view":11,"./photo-view":17,"ismobilejs":19,"three":20,"tween.js":21}],15:[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -2587,7 +2674,7 @@ function load(photo, callback) {
   });
 }
 
-},{"./lib/OBJLoader":11,"three":19}],15:[function(require,module,exports){
+},{"./lib/OBJLoader":12,"three":20}],16:[function(require,module,exports){
 "use strict";
 
 var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
@@ -2666,7 +2753,7 @@ var MouseIntersector = (function () {
 
 module.exports = MouseIntersector;
 
-},{"three":19}],16:[function(require,module,exports){
+},{"three":20}],17:[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -2690,7 +2777,7 @@ var PhotoViewInterface = _interopRequire(require("./components/photo-view-interf
 
 var BACKGROUNDS = ["texture", "blank", "grid"];
 var LIGHTINGS = ["white", "red", "blue", "green", "yellow", "primary"];
-var TEXTURES = ["default", "toon", "empty"];
+var TEXTURES = ["default", "toon", "empty", "white", "red", "blue", "green", "yellow"];
 var DEFAULT_CAMERA_POSITION = 10;
 var MODEL_SCALE_FACTOR = 3.5;
 
@@ -2731,7 +2818,7 @@ var PhotoView = (function () {
       textureHandler: this.textureButtonPressed.bind(this),
       lightingHandler: this.lightingButtonPressed.bind(this),
       backgroundHandler: this.backgroundButtonPressed.bind(this),
-      printHandler: this.printButtonPressed.bind(this)
+      printModalHandler: this.printModalHandler.bind(this)
     });
 
     this.state = {
@@ -2740,7 +2827,8 @@ var PhotoView = (function () {
       texture: TEXTURES[0],
       background: BACKGROUNDS[0],
       lighting: LIGHTINGS[0],
-      rps: 1
+      rps: 1,
+      showingPrintModal: false
     };
   }
 
@@ -2886,6 +2974,16 @@ var PhotoView = (function () {
     },
     keydown: {
       value: function keydown(ev) {
+        if (this.state.showingPrintModal) {
+          switch (ev.keyCode) {
+            case 27:
+              // ESC
+              this["interface"].showPrintModal(false);
+              break;
+          }
+          return;
+        }
+
         switch (ev.keyCode) {
           case 32:
             // space
@@ -2910,6 +3008,11 @@ var PhotoView = (function () {
           case 77:
             // M
             this.wireframeButtonPressed();
+            break;
+
+          case 80:
+            // P
+            this["interface"].showPrintModal(true);
             break;
         }
       }
@@ -2963,8 +3066,10 @@ var PhotoView = (function () {
         this.setBackground(BACKGROUNDS[backgroundIndex]);
       }
     },
-    printButtonPressed: {
-      value: function printButtonPressed() {}
+    printModalHandler: {
+      value: function printModalHandler(showing) {
+        this.state.showingPrintModal = showing;
+      }
     },
     setWireframe: {
       value: function setWireframe(wireframe) {
@@ -2990,14 +3095,20 @@ var PhotoView = (function () {
             this.mesh.material = this.material;
             break;
 
-          case "empty":
-            this.material.map = null;
-            this.material.color.set(6710886);
-            this.mesh.material = this.material;
-            break;
-
           case "toon":
             this.mesh.material = this.toonMaterial;
+            break;
+
+          case "empty":
+          case "white":
+          case "red":
+          case "yellow":
+          case "blue":
+          case "green":
+            var colorMap = { empty: 6710886, white: 16777215, red: 16711680, blue: 255, green: 65280, yellow: 16776960 };
+            this.material.map = null;
+            this.material.color.set(colorMap[texture]);
+            this.mesh.material = this.material;
             break;
         }
 
@@ -3073,7 +3184,7 @@ var PhotoView = (function () {
 
 module.exports = PhotoView;
 
-},{"./components/photo-view-interface":5,"./controls":6,"./grid":9,"./light-ring":12,"./model-cache":14,"three":19,"tween.js":20}],17:[function(require,module,exports){
+},{"./components/photo-view-interface":5,"./controls":7,"./grid":10,"./light-ring":13,"./model-cache":15,"three":20,"tween.js":21}],18:[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -3294,7 +3405,7 @@ var ThumbnailPile = (function () {
 
 module.exports = ThumbnailPile;
 
-},{"./Thumbnail":1,"./cameras":2,"three":19}],18:[function(require,module,exports){
+},{"./Thumbnail":1,"./cameras":2,"three":20}],19:[function(require,module,exports){
 /**
  * isMobile.js v0.4.0
  *
@@ -3433,7 +3544,7 @@ module.exports = ThumbnailPile;
 
 })(this);
 
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -46779,7 +46890,7 @@ module.exports = ThumbnailPile;
 
 })));
 
-},{}],20:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 (function (process){
 /**
  * Tween.js - Licensed under the MIT license
@@ -47653,7 +47764,7 @@ TWEEN.Interpolation = {
 })(this);
 
 }).call(this,require('_process'))
-},{"_process":21}],21:[function(require,module,exports){
+},{"_process":22}],22:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -47749,4 +47860,4 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}]},{},[13]);
+},{}]},{},[14]);

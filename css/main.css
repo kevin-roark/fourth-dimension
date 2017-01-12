@@ -231,17 +231,32 @@ canvas {
     display: block;
   }
 
+.photo-view-tool-tip {
+  position: fixed;
+  right: 10px; top: 100px;
+  max-width: 270px;
+  font-size: 28px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  font-style: italic;
+  color: #ff0;
+  text-shadow: 0 0 1px rgba(0,0,0,0.5);
+  line-height: 1.5;
+}
+
 .photo-view-close-button {
   position: fixed;
   top: -2px; left: 8px;
   cursor: url('../images/myhand.png'), pointer;
+  font-family: Courier, Courier New, monospace;
   font-size: 60px;
   color: #fff;
   text-shadow: 0px 0px 2px #f00, 0px 0px 4px rgba(255,0,0,0.9), 0px 0px 6px rgba(255,0,0,0.8), 0px 0px 10px rgba(255,0,0,0.7), 0px 0px 15px rgba(255,0,0,0.5);
   transition: color 0.25s;
+  transform-origin: 0 0;
+  transform: scaleX(2);
 }
   .photo-view-close-button::after {
-    content: "✕";
+    content: "X";
   }
   .photo-view-close-button:hover {
     color: #f00;
@@ -279,6 +294,39 @@ canvas {
 }
   .photo-view-print-button:hover {
     background-color: #ede2c8;
+  }
+
+.window-wrapper {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.photo-view-print-modal {
+  position: fixed;
+  width: 800px; height: 600px;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  background: #f9f3e5;
+  box-shadow: 3px 3px 1px 5px #000;
+}
+
+.photo-view-print-modal-close-button {
+  position: fixed;
+  top: 4px; left: 4px;
+  cursor: url('../images/myhand.png'), pointer;
+  font-family: Courier, Courier New, monospace;
+  font-size: 40px;
+  color: #000;
+  transition: text-shadow 0.25s;
+  transform-origin: 0 50%;
+  transform: scale(1.5, 2);
+}
+  .photo-view-print-modal-close-button::after {
+    content: "X";
+  }
+  .photo-view-print-modal-close-button:hover {
+    text-shadow: 0px 0px 2px #000, 0px 0px 4px rgba(0,0,0,0.9);
   }
 
 @media (max-width: 600px) {

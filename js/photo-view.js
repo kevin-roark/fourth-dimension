@@ -10,7 +10,7 @@ import PhotoViewInterface from './components/photo-view-interface';
 
 let BACKGROUNDS = ['texture', 'blank', 'grid'];
 let LIGHTINGS = ['white', 'red', 'blue', 'green', 'yellow', 'primary'];
-let TEXTURES = ['default', 'toon', 'empty'];
+let TEXTURES = ['default', 'toon', 'empty', 'white', 'red', 'blue', 'green', 'yellow'];
 let DEFAULT_CAMERA_POSITION = 10;
 let MODEL_SCALE_FACTOR = 3.5;
 
@@ -44,7 +44,7 @@ export default class PhotoView {
       textureHandler: this.textureButtonPressed.bind(this),
       lightingHandler: this.lightingButtonPressed.bind(this),
       backgroundHandler: this.backgroundButtonPressed.bind(this),
-      printHandler: this.printButtonPressed.bind(this)
+      printModalHandler: this.printModalHandler.bind(this)
     });
 
     this.state = {
@@ -53,7 +53,8 @@ export default class PhotoView {
       texture: TEXTURES[0],
       background: BACKGROUNDS[0],
       lighting: LIGHTINGS[0],
-      rps: 1
+      rps: 1,
+      showingPrintModal: false
     };
   }
 
@@ -176,6 +177,15 @@ export default class PhotoView {
   }
 
   keydown (ev) {
+    if (this.state.showingPrintModal) {
+      switch (ev.keyCode) {
+        case 27: // ESC
+          this.interface.showPrintModal(false);
+          break;
+      }
+      return;
+    }
+
     switch (ev.keyCode) {
       case 32: // space
         this.resetCamera();
@@ -195,6 +205,10 @@ export default class PhotoView {
 
       case 77: // M
         this.wireframeButtonPressed();
+        break;
+
+      case 80: // P
+        this.interface.showPrintModal(true);
         break;
     }
   }
@@ -247,8 +261,8 @@ export default class PhotoView {
     this.setBackground(BACKGROUNDS[backgroundIndex]);
   }
 
-  printButtonPressed () {
-
+  printModalHandler (showing) {
+    this.state.showingPrintModal = showing;
   }
 
   setWireframe (wireframe) {
@@ -273,14 +287,20 @@ export default class PhotoView {
         this.mesh.material = this.material;
         break;
 
-      case 'empty':
-        this.material.map = null;
-        this.material.color.set(0x666666);
-        this.mesh.material = this.material;
-        break;
-
       case 'toon':
         this.mesh.material = this.toonMaterial;
+        break;
+
+      case 'empty':
+      case 'white':
+      case 'red':
+      case 'yellow':
+      case 'blue':
+      case 'green':
+        let colorMap = { empty: 0x666666, white: 0xffffff, red: 0xff0000, blue: 0x0000ff, green: 0x00ff00, yellow: 0xffff00 };
+        this.material.map = null;
+        this.material.color.set(colorMap[texture]);
+        this.mesh.material = this.material;
         break;
     }
 
