@@ -365,10 +365,43 @@ canvas {
 
 @media (max-width: 600px) {
   .title {
-
+    font-size: 48px;
   }
+    .title.loaded {
+      font-size: 16px;
+    }
+    .title::after {
+      content: "";
+    }
 
   .human {
+    display: block;
+    font-size: 9px;
+    text-align: right;
+  }
 
+  .home-view-hud {
+    bottom: auto; top: 0; left: 0;
+  }
+
+  .home-view-hud-label {
+    font-size: 11px;
+  }
+
+  .home-view-collection-arrow-container.active {
+    display: block;
+  }
+
+  .home-view-hud-arrow {
+    font-size: 9px;
+    line-height: 1;
+    padding: 4px;
+    margin-right: 0;
+  }
+
+  .series-title {
+    bottom: 5px; right: 5px;
+    font-size: 48px;
+    max-width: calc(100% - 10px);
   }
 }
