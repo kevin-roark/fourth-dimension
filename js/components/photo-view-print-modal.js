@@ -17,20 +17,34 @@ export default class PhotoViewPrintModal extends Component {
     modal.appendChild(this.closeButton);
 
     let canvas = this.canvas = document.createElement('canvas');
-    canvas.width = 400; canvas.height = 300;
     canvas.className = 'photo-view-print-modal-image-canvas';
     modal.appendChild(canvas);
+
+    this.resize();
+    window.addEventListener('resize', this.resize.bind(this));
+  }
+
+  resize () {
+    let width = window.innerWidth >= 800 ? 400 : window.innerWidth * 0.48;
+    let height = (window.innerHeight / window.innerWidth) * width;
+
+    this.size = { width, height };
+    this.canvas.width = width;
+    this.canvas.height = height;
+    this.canvas.style.width = width + 'px';
+    this.canvas.style.height = height + 'px';
   }
 
   setImage (image) {
-    let context = this.canvas.getContext('2d');
-    context.clearRect(0, 0, 400, 300);
+    let { canvas, size } = this;
+    let context = canvas.getContext('2d');
+    context.clearRect(0, 0, canvas.width, canvas.height);
 
     if (image) {
-      context.drawImage(image, 0, 0, 400, 300);
+      context.drawImage(image, 0, 0, size.width, size.height);
     } else {
       context.fillStyle = '#878787';
-      context.fillRect(0, 0, 400, 300);
+      context.fillRect(0, 0, canvas.width, canvas.height);
     }
   }
 

@@ -444,24 +444,43 @@ var PhotoViewPrintModal = (function (_Component) {
     modal.appendChild(this.closeButton);
 
     var canvas = this.canvas = document.createElement("canvas");
-    canvas.width = 400;canvas.height = 300;
     canvas.className = "photo-view-print-modal-image-canvas";
     modal.appendChild(canvas);
+
+    this.resize();
+    window.addEventListener("resize", this.resize.bind(this));
   }
 
   _inherits(PhotoViewPrintModal, _Component);
 
   _createClass(PhotoViewPrintModal, {
+    resize: {
+      value: function resize() {
+        var width = window.innerWidth >= 800 ? 400 : window.innerWidth * 0.48;
+        var height = window.innerHeight / window.innerWidth * width;
+
+        this.size = { width: width, height: height };
+        this.canvas.width = width;
+        this.canvas.height = height;
+        this.canvas.style.width = width + "px";
+        this.canvas.style.height = height + "px";
+      }
+    },
     setImage: {
       value: function setImage(image) {
-        var context = this.canvas.getContext("2d");
-        context.clearRect(0, 0, 400, 300);
+        var _ref = this;
+
+        var canvas = _ref.canvas;
+        var size = _ref.size;
+
+        var context = canvas.getContext("2d");
+        context.clearRect(0, 0, canvas.width, canvas.height);
 
         if (image) {
-          context.drawImage(image, 0, 0, 400, 300);
+          context.drawImage(image, 0, 0, size.width, size.height);
         } else {
           context.fillStyle = "#878787";
-          context.fillRect(0, 0, 400, 300);
+          context.fillRect(0, 0, canvas.width, canvas.height);
         }
       }
     },

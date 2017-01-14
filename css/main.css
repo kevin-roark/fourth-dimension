@@ -358,12 +358,11 @@ canvas {
 .photo-view-print-modal-image-canvas {
   position: static;
   opacity: 1;
-  width: 400px; height: 300px;
   border: 3px solid #000;
   margin: 40px 200px;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 800px) {
   .title {
     font-size: 48px;
   }
@@ -378,10 +377,11 @@ canvas {
     display: block;
     font-size: 9px;
     text-align: right;
+    margin-top: 5px;
   }
 
   .home-view-hud {
-    bottom: auto; top: 0; left: 0;
+    bottom: 0; left: 0;
   }
 
   .home-view-hud-label {
@@ -400,8 +400,29 @@ canvas {
   }
 
   .series-title {
-    bottom: 5px; right: 5px;
+    bottom: auto; right: auto; top: 5px; left: 5px;
     font-size: 48px;
-    max-width: calc(100% - 10px);
+    max-width: calc(67%);
+  }
+
+  .photo-view-close-button {
+    left: auto; top: -5px; right: 30px;
+    font-size: 44px;
+  }
+
+  .photo-view-control-buttons {
+    right: 0; top: auto; bottom: 0;
+  }
+
+  .photo-view-print-modal {
+    width: 90vw; height: 90vh;
+  }
+
+  .photo-view-print-modal-close-button {
+    font-size: 28px;
+  }
+
+  .photo-view-print-modal-image-canvas {
+    margin: 20px 22.5vw;
   }
 }
