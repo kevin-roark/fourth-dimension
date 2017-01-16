@@ -16,36 +16,40 @@ export default class PhotoViewPrintModal extends Component {
     this.closeButton.addEventListener('click', closeHandler, false);
     modal.appendChild(this.closeButton);
 
-    let canvas = this.canvas = document.createElement('canvas');
-    canvas.className = 'photo-view-print-modal-image-canvas';
-    modal.appendChild(canvas);
+    let previewImage = this.previewImage = document.createElement('img');
+    previewImage.className = 'photo-view-print-modal-image-preview';
+    previewImage.addEventListener('click', () => {
+      window.open(previewImage.src, '_blank');
+    }, false);
+    modal.appendChild(previewImage);
+
+    this.tip = this.div('photo-view-print-modal-text-tip', '',
+      `You can download the above model-image by clicking it. Please enjoy!!<br><br>
+       You can receive a high-quality physical print of the image and support my work in the process
+       by sending me some money on PayPal — be sure to enter the image ID shown when you click below and your shipping
+       address in the personal note!
+       You are welcome to contact me at kevin.e.roark@gmail.com with any questions or comments!
+       Thank you for entering MY WORLD.`,
+    true);
+    modal.append(this.tip);
+
+    this.eightInchButton = this.link({
+      className: 'photo-view-print-modal-buy-button',
+      text: 'Order 8" Print - $5',
+      url: 'https://paypal.me/Roark/5'
+    });
+    modal.appendChild(this.eightInchButton);
 
     this.resize();
     window.addEventListener('resize', this.resize.bind(this));
   }
 
   resize () {
-    let width = window.innerWidth >= 800 ? 400 : window.innerWidth * 0.48;
-    let height = (window.innerHeight / window.innerWidth) * width;
 
-    this.size = { width, height };
-    this.canvas.width = width;
-    this.canvas.height = height;
-    this.canvas.style.width = width + 'px';
-    this.canvas.style.height = height + 'px';
   }
 
-  setImage (image) {
-    let { canvas, size } = this;
-    let context = canvas.getContext('2d');
-    context.clearRect(0, 0, canvas.width, canvas.height);
-
-    if (image) {
-      context.drawImage(image, 0, 0, size.width, size.height);
-    } else {
-      context.fillStyle = '#878787';
-      context.fillRect(0, 0, canvas.width, canvas.height);
-    }
+  setImageData (imageData) {
+    this.previewImage.src = imageData || '';
   }
 
   makeTextBorder (position = 'top') {

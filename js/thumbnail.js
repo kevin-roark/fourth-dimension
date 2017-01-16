@@ -19,7 +19,7 @@ export default class Thumbnail {
       let material = new THREE.MeshStandardMaterial({
         color: 0xffffff,
         roughness: 0.35,
-        metalness: 0.05,
+        metalness: 0.1,
         map: texture
       });
 

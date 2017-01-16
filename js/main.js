@@ -45,7 +45,7 @@ function go () {
   let dom = {
     info: document.querySelector('.info'),
     title: document.querySelector('.title'),
-    seriesTitle: document.querySelector('.series-title'),
+    seriesTitle: document.querySelector('.series-title')
   };
 
   let state = {
@@ -191,7 +191,7 @@ function go () {
   }
 
   function makeLights () {
-    let ambient = new THREE.AmbientLight(0xffffff, 0.5);
+    let ambient = new THREE.AmbientLight(0xffffff, 0.4);
     scene.add(ambient);
   }
 }

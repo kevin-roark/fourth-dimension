@@ -75,12 +75,12 @@ export default class PhotoViewInterface extends Component {
 
   showPrintModal (show) {
     if (show) {
-      this.printModal.setImage(null);
-      this.printImageProvider(image => {
-        this.printModal.setImage(image);
-      })
+      this.printModal.setImageData(null);
+      this.printImageProvider(imageData => {
+        this.printModal.setImageData(imageData);
+      });
 
-      this.el.appendChild(this.printModal.el);;
+      this.el.appendChild(this.printModal.el);
     } else {
       this.el.removeChild(this.printModal.el);
     }

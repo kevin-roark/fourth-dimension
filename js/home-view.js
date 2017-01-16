@@ -113,11 +113,11 @@ export default class HomeView {
     if (!this.state.active) return;
 
     switch (ev.keyCode) {
-      case 37:
+      case 37: // left
         this.cycleCollectionPile(false);
         break;
 
-      case 39:
+      case 39: // right
         this.cycleCollectionPile(true);
         break;
 

@@ -355,12 +355,44 @@ canvas {
     text-shadow: 0px 0px 2px #000, 0px 0px 4px rgba(0,0,0,0.9);
   }
 
-.photo-view-print-modal-image-canvas {
-  position: static;
-  opacity: 1;
+.photo-view-print-modal-image-preview {
+  display: block;
+  margin: 40px auto;
+  max-width: 400px; max-height: 400px;
+  cursor: pointer;
   border: 3px solid #000;
-  margin: 40px 200px;
+  background-color: #878787;
 }
+  .photo-view-print-modal-image-preview:hover {
+    box-shadow: 0 10px 20px 10px #aaa;
+  }
+
+.photo-view-print-modal-text-tip {
+  color: #006611;
+  font-family: Courier, Courier New, monospace;
+  font-size: 12px;
+  line-height: 1.2;
+  max-width: 80%;
+  margin: 0 auto 30px auto;
+  user-select: auto;
+}
+
+.photo-view-print-modal-buy-button {
+  display: block;
+  max-width: 200px;
+  text-align: center;
+  margin: 0 auto;
+  padding: 15px;
+  cursor: pointer;
+  background: #00f;
+  color: #fff;
+  font-family: Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, serif;
+  font-size: 14px;
+}
+  .photo-view-print-modal-buy-button:hover {
+    font-weight: bold;
+    box-shadow: 0 6px 0 3px #f00;
+  }
 
 @media (max-width: 800px) {
   .title {
@@ -422,7 +454,15 @@ canvas {
     font-size: 28px;
   }
 
-  .photo-view-print-modal-image-canvas {
+  .photo-view-print-modal-image-preview.horizontal {
+    max-width: 45vw;
+    margin: 20px 22.5vw;
+  }
+}
+
+@media (max-height: 600px) {
+  .photo-view-print-modal-image-preview.vertical {
+    max-height: 45vh;
     margin: 20px 22.5vw;
   }
 }

@@ -16,13 +16,13 @@ export default class HomeViewHud extends Component {
 
     let leftArrow = this.leftArrow = this.div('home-view-hud-arrow', null, 'Previous Collection');
     leftArrow.addEventListener('click', () => {
-      if (arrowHandler) arrowHandler(-1);
+      if (arrowHandler) arrowHandler(false);
     }, false);
     arrowContainer.appendChild(leftArrow);
 
     let rightArrow = this.rightArrow = this.div('home-view-hud-arrow', null, 'Next Collection');
     rightArrow.addEventListener('click', () => {
-      if (arrowHandler) arrowHandler(1);
+      if (arrowHandler) arrowHandler(true);
     }, false);
     arrowContainer.appendChild(rightArrow);
 

@@ -10,7 +10,7 @@ import PhotoViewInterface from './components/photo-view-interface';
 
 let BACKGROUNDS = ['texture', 'blank', 'grid'];
 let LIGHTINGS = ['white', 'red', 'blue', 'green', 'yellow', 'primary'];
-let TEXTURES = ['default', 'toon', 'empty', 'white', 'red', 'blue', 'green', 'yellow'];
+let TEXTURES = ['default', 'toon', 'empty', 'white', 'purple', 'cyan', 'yellow'];
 let DEFAULT_CAMERA_POSITION = 10;
 let MODEL_SCALE_FACTOR = 3.5;
 
@@ -36,7 +36,7 @@ export default class PhotoView {
     spotlight.castShadow = true;
     container.add(spotlight);
 
-    let ring = this.lightRing = new LightRing({ count: 3, radius: 15, y: 10, yRange: 6, distance: 200, angle: 0.5, revolutionSpeed: 0.004 });
+    let ring = this.lightRing = new LightRing({ count: 3, radius: 15, y: 10, yRange: 6, distance: 200, angle: 0.5, revolutionSpeed: 0.004, castShadow: false });
     container.add(ring.obj);
 
     this.interface = new PhotoViewInterface({
@@ -48,10 +48,7 @@ export default class PhotoView {
       printModalHandler: this.printModalHandler.bind(this),
       printImageProvider: callback => {
         let imageData = this.mostRecentPrintImageData = this.renderer.domElement.toDataURL();
-
-        let image = new window.Image();
-        image.src = imageData;
-        image.onload = () => callback(image);
+        callback(imageData);
       }
     });
 
@@ -302,11 +299,10 @@ export default class PhotoView {
 
       case 'empty':
       case 'white':
-      case 'red':
+      case 'purple':
       case 'yellow':
-      case 'blue':
-      case 'green':
-        let colorMap = { empty: 0x666666, white: 0xffffff, red: 0xff0000, blue: 0x0000ff, green: 0x00ff00, yellow: 0xffff00 };
+      case 'cyan':
+        let colorMap = { empty: 0x666666, white: 0xffffff, yellow: 0xffff00, purple: 0xff00ff, cyan: 0x00ffff };
         this.material.map = null;
         this.material.color.set(colorMap[texture]);
         this.mesh.material = this.material;

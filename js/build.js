@@ -37,7 +37,7 @@ var Thumbnail = (function () {
           var material = new THREE.MeshStandardMaterial({
             color: 16777215,
             roughness: 0.35,
-            metalness: 0.05,
+            metalness: 0.1,
             map: texture
           });
 
@@ -168,11 +168,31 @@ var Component = (function () {
       value: function div(className) {
         var id = arguments[1] === undefined ? null : arguments[1];
         var textContent = arguments[2] === undefined ? "" : arguments[2];
+        var innerHTML = arguments[3] === undefined ? false : arguments[3];
 
         var el = document.createElement("div");
         el.className = className;
         if (id) el.id = id;
-        el.textContent = textContent;
+        if (innerHTML) el.innerHTML = textContent;else el.textContent = textContent;
+        return el;
+      }
+    },
+    link: {
+      value: function link(_ref) {
+        var url = _ref.url;
+        var className = _ref.className;
+        var id = _ref.id;
+        var _ref$text = _ref.text;
+        var text = _ref$text === undefined ? "" : _ref$text;
+        var _ref$blank = _ref.blank;
+        var blank = _ref$blank === undefined ? false : _ref$blank;
+
+        var el = document.createElement("a");
+        el.className = className;
+        el.textContent = text;
+        el.href = url;
+        if (id) el.id = id;
+        if (blank) el.target = "_blank";
         return el;
       }
     }
@@ -218,13 +238,13 @@ var HomeViewHud = (function (_Component) {
 
     var leftArrow = this.leftArrow = this.div("home-view-hud-arrow", null, "Previous Collection");
     leftArrow.addEventListener("click", function () {
-      if (arrowHandler) arrowHandler(-1);
+      if (arrowHandler) arrowHandler(false);
     }, false);
     arrowContainer.appendChild(leftArrow);
 
     var rightArrow = this.rightArrow = this.div("home-view-hud-arrow", null, "Next Collection");
     rightArrow.addEventListener("click", function () {
-      if (arrowHandler) arrowHandler(1);
+      if (arrowHandler) arrowHandler(true);
     }, false);
     arrowContainer.appendChild(rightArrow);
 
@@ -383,12 +403,12 @@ var PhotoViewInterface = (function (_Component) {
         var _this = this;
 
         if (show) {
-          this.printModal.setImage(null);
-          this.printImageProvider(function (image) {
-            _this.printModal.setImage(image);
+          this.printModal.setImageData(null);
+          this.printImageProvider(function (imageData) {
+            _this.printModal.setImageData(imageData);
           });
 
-          this.el.appendChild(this.printModal.el);;
+          this.el.appendChild(this.printModal.el);
         } else {
           this.el.removeChild(this.printModal.el);
         }
@@ -443,9 +463,22 @@ var PhotoViewPrintModal = (function (_Component) {
     this.closeButton.addEventListener("click", closeHandler, false);
     modal.appendChild(this.closeButton);
 
-    var canvas = this.canvas = document.createElement("canvas");
-    canvas.className = "photo-view-print-modal-image-canvas";
-    modal.appendChild(canvas);
+    var previewImage = this.previewImage = document.createElement("img");
+    previewImage.className = "photo-view-print-modal-image-preview";
+    previewImage.addEventListener("click", function () {
+      window.open(previewImage.src, "_blank");
+    }, false);
+    modal.appendChild(previewImage);
+
+    this.tip = this.div("photo-view-print-modal-text-tip", "", "You can download the above model-image by clicking it. Please enjoy!!<br><br>\n       You can receive a high-quality physical print of the image and support my work in the process\n       by sending me some money on PayPal — be sure to enter the image ID shown when you click below and your shipping\n       address in the personal note!\n       You are welcome to contact me at kevin.e.roark@gmail.com with any questions or comments!\n       Thank you for entering MY WORLD.", true);
+    modal.append(this.tip);
+
+    this.eightInchButton = this.link({
+      className: "photo-view-print-modal-buy-button",
+      text: "Order 8\" Print - $5",
+      url: "https://paypal.me/Roark/5"
+    });
+    modal.appendChild(this.eightInchButton);
 
     this.resize();
     window.addEventListener("resize", this.resize.bind(this));
@@ -455,33 +488,11 @@ var PhotoViewPrintModal = (function (_Component) {
 
   _createClass(PhotoViewPrintModal, {
     resize: {
-      value: function resize() {
-        var width = window.innerWidth >= 800 ? 400 : window.innerWidth * 0.48;
-        var height = window.innerHeight / window.innerWidth * width;
-
-        this.size = { width: width, height: height };
-        this.canvas.width = width;
-        this.canvas.height = height;
-        this.canvas.style.width = width + "px";
-        this.canvas.style.height = height + "px";
-      }
+      value: function resize() {}
     },
-    setImage: {
-      value: function setImage(image) {
-        var _ref = this;
-
-        var canvas = _ref.canvas;
-        var size = _ref.size;
-
-        var context = canvas.getContext("2d");
-        context.clearRect(0, 0, canvas.width, canvas.height);
-
-        if (image) {
-          context.drawImage(image, 0, 0, size.width, size.height);
-        } else {
-          context.fillStyle = "#878787";
-          context.fillRect(0, 0, canvas.width, canvas.height);
-        }
+    setImageData: {
+      value: function setImageData(imageData) {
+        this.previewImage.src = imageData || "";
       }
     },
     makeTextBorder: {
@@ -1357,10 +1368,12 @@ var HomeView = (function () {
           return;
         }switch (ev.keyCode) {
           case 37:
+            // left
             this.cycleCollectionPile(false);
             break;
 
           case 39:
+            // right
             this.cycleCollectionPile(true);
             break;
 
@@ -2344,6 +2357,8 @@ var LightRing = (function () {
     var decay = _options$decay === undefined ? 2 : _options$decay;
     var _options$revolutionSpeed = options.revolutionSpeed;
     var revolutionSpeed = _options$revolutionSpeed === undefined ? 0.002 : _options$revolutionSpeed;
+    var _options$castShadow = options.castShadow;
+    var castShadow = _options$castShadow === undefined ? true : _options$castShadow;
 
     this.count = count;
     this.intensity = intensity;
@@ -2358,7 +2373,7 @@ var LightRing = (function () {
       var color = new THREE.Color().setHSL(hue, saturation, lightness);
 
       var light = new THREE.SpotLight(color, intensity, distance, angle, penumbra, decay);
-      light.castShadow = true;
+      light.castShadow = castShadow;
       light.shadow.mapSize.width = light.shadow.mapSize.height = 2048;
       light.shadow.camera.far = 4000;
       light.shadow.camera.fov = 30;
@@ -2463,7 +2478,6 @@ var LightRing = (function () {
           var x = r * Math.cos(radialAngle);
           var z = r * Math.sin(radialAngle);
           var y = _this.yRange ? _this.y - _this.yRange + i / (_this.count - 1) * _this.yRange * 2 : _this.y;
-          console.log(y);
           light.position.set(x, y, z);
           light._yDirection = i < _this.count / 2 ? "up" : "down";
         });
@@ -2535,7 +2549,8 @@ function go() {
   var dom = {
     info: document.querySelector(".info"),
     title: document.querySelector(".title"),
-    seriesTitle: document.querySelector(".series-title") };
+    seriesTitle: document.querySelector(".series-title")
+  };
 
   var state = {
     loadingPhotoView: false,
@@ -2684,7 +2699,7 @@ function go() {
   }
 
   function makeLights() {
-    var ambient = new THREE.AmbientLight(16777215, 0.5);
+    var ambient = new THREE.AmbientLight(16777215, 0.4);
     scene.add(ambient);
   }
 }
@@ -2843,7 +2858,7 @@ var PhotoViewInterface = _interopRequire(require("./components/photo-view-interf
 
 var BACKGROUNDS = ["texture", "blank", "grid"];
 var LIGHTINGS = ["white", "red", "blue", "green", "yellow", "primary"];
-var TEXTURES = ["default", "toon", "empty", "white", "red", "blue", "green", "yellow"];
+var TEXTURES = ["default", "toon", "empty", "white", "purple", "cyan", "yellow"];
 var DEFAULT_CAMERA_POSITION = 10;
 var MODEL_SCALE_FACTOR = 3.5;
 
@@ -2879,7 +2894,7 @@ var PhotoView = (function () {
     spotlight.castShadow = true;
     container.add(spotlight);
 
-    var ring = this.lightRing = new LightRing({ count: 3, radius: 15, y: 10, yRange: 6, distance: 200, angle: 0.5, revolutionSpeed: 0.004 });
+    var ring = this.lightRing = new LightRing({ count: 3, radius: 15, y: 10, yRange: 6, distance: 200, angle: 0.5, revolutionSpeed: 0.004, castShadow: false });
     container.add(ring.obj);
 
     this["interface"] = new PhotoViewInterface({
@@ -2891,12 +2906,7 @@ var PhotoView = (function () {
       printModalHandler: this.printModalHandler.bind(this),
       printImageProvider: function (callback) {
         var imageData = _this.mostRecentPrintImageData = _this.renderer.domElement.toDataURL();
-
-        var image = new window.Image();
-        image.src = imageData;
-        image.onload = function () {
-          return callback(image);
-        };
+        callback(imageData);
       }
     });
 
@@ -3181,11 +3191,10 @@ var PhotoView = (function () {
 
           case "empty":
           case "white":
-          case "red":
+          case "purple":
           case "yellow":
-          case "blue":
-          case "green":
-            var colorMap = { empty: 6710886, white: 16777215, red: 16711680, blue: 255, green: 65280, yellow: 16776960 };
+          case "cyan":
+            var colorMap = { empty: 6710886, white: 16777215, yellow: 16776960, purple: 16711935, cyan: 65535 };
             this.material.map = null;
             this.material.color.set(colorMap[texture]);
             this.mesh.material = this.material;

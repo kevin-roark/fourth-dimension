@@ -16,7 +16,8 @@ export default class LightRing {
       angle = 0.4,
       penumbra = 0,
       decay = 2,
-      revolutionSpeed = 0.002
+      revolutionSpeed = 0.002,
+      castShadow = true
     } = options;
 
     this.count = count;
@@ -32,7 +33,7 @@ export default class LightRing {
       let color = new THREE.Color().setHSL(hue, saturation, lightness);
 
       let light = new THREE.SpotLight(color, intensity, distance, angle, penumbra, decay);
-      light.castShadow = true;
+      light.castShadow = castShadow;
       light.shadow.mapSize.width = light.shadow.mapSize.height = 2048;
       light.shadow.camera.far = 4000;
       light.shadow.camera.fov = 30;
@@ -111,7 +112,6 @@ export default class LightRing {
       let x = r * Math.cos(radialAngle);
       let z = r * Math.sin(radialAngle);
       let y = this.yRange ? (this.y - this.yRange) + ((i / (this.count - 1)) * this.yRange * 2) : this.y;
-      console.log(y);
       light.position.set(x, y, z);
       light._yDirection = i < this.count / 2 ? 'up' : 'down';
     });
