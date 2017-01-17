@@ -1,5 +1,6 @@
 
 import Component from './component';
+import { uploadImage } from '../print-service';
 
 export default class PhotoViewPrintModal extends Component {
   constructor ({ closeHandler }) {
@@ -33,11 +34,8 @@ export default class PhotoViewPrintModal extends Component {
     true);
     modal.append(this.tip);
 
-    this.eightInchButton = this.link({
-      className: 'photo-view-print-modal-buy-button',
-      text: 'Order 8" Print - $5',
-      url: 'https://paypal.me/Roark/5'
-    });
+    this.eightInchButton = this.div('photo-view-print-modal-buy-button', '', 'Order 8" Print - $5');
+    this.eightInchButton.addEventListener('click', () => this.buyButtonClick('https://paypal.me/Roark/5'));
     modal.appendChild(this.eightInchButton);
 
     this.resize();
@@ -49,11 +47,27 @@ export default class PhotoViewPrintModal extends Component {
   }
 
   setImageData (imageData) {
+    this.imageData = imageData;
     this.previewImage.src = imageData || '';
   }
 
   makeTextBorder (position = 'top') {
     let border = this.div(`photo-view-print-modal-text-border ${position}`, '', 'PRINT MY WORLD PRINT MY WORLD PRINT MY WORLD PRINT MY WORLD PRINT MY WORLD PRINT MY WORLD PRINT MY WORLD PRINT MY WORLD PRINT MY WORLD PRINT MY WORLD PRINT MY WORLD PRINT MY WORLD PRINT MY WORLD PRINT MY WORLD');
     this.modal.appendChild(border);
+  }
+
+  buyButtonClick (successURL) {
+    uploadImage(this.imageData, (err, res) => {
+      if (err) {
+        // TODO: error state
+        console.log(err);
+        return;
+      }
+
+      // TODO: show the ID
+      console.log(res.id, res.url);
+
+      window.open(successURL, '_blank');
+    });
   }
 }
