@@ -41,6 +41,7 @@ export default class PhotoView {
 
     this.interface = new PhotoViewInterface({
       closeHandler,
+      modelName: photo.name,
       wireframeHandler: this.wireframeButtonPressed.bind(this),
       textureHandler: this.textureButtonPressed.bind(this),
       lightingHandler: this.lightingButtonPressed.bind(this),

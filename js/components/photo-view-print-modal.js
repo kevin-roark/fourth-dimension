@@ -1,10 +1,13 @@
 
 import Component from './component';
 import { uploadImage } from '../print-service';
+import { toPath } from '../data-util';
 
 export default class PhotoViewPrintModal extends Component {
-  constructor ({ closeHandler }) {
+  constructor ({ modelName, closeHandler }) {
     super();
+
+    this.modelName = modelName;
 
     this.el = this.div('window-wrapper');
 
@@ -26,7 +29,7 @@ export default class PhotoViewPrintModal extends Component {
 
     this.tip = this.div('photo-view-print-modal-text-tip', '',
       `You can download the above model-image by clicking it. Please enjoy!!<br><br>
-       You can receive a high-quality physical print of the image and support my work in the process
+       Also, you can receive a high-quality physical print of the image and support my work in the process
        by sending me some money on PayPal — be sure to enter the image ID shown when you click below and your shipping
        address in the personal note!
        You are welcome to contact me at kevin.e.roark@gmail.com with any questions or comments!
@@ -57,7 +60,7 @@ export default class PhotoViewPrintModal extends Component {
   }
 
   buyButtonClick (successURL) {
-    uploadImage(this.imageData, (err, res) => {
+    uploadImage(toPath(this.modelName), this.imageData, (err, res) => {
       if (err) {
         // TODO: error state
         console.log(err);
