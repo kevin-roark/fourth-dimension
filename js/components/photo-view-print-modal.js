@@ -8,6 +8,10 @@ export default class PhotoViewPrintModal extends Component {
     super();
 
     this.modelName = modelName;
+    this.state = {
+      uploading: false,
+      uploaded: false
+    };
 
     this.el = this.div('window-wrapper');
 
@@ -30,23 +34,22 @@ export default class PhotoViewPrintModal extends Component {
     this.tip = this.div('photo-view-print-modal-text-tip', '',
       `You can download the above model-image by clicking it. Please enjoy!!<br><br>
        Also, you can receive a high-quality physical print of the image and support my work in the process
-       by sending me some money on PayPal — be sure to enter the image ID shown when you click below and your shipping
-       address in the personal note!
-       You are welcome to contact me at kevin.e.roark@gmail.com with any questions or comments!
-       Thank you for entering MY WORLD.`,
+       just by sending me some money on PayPal — sounds fun!!
+       Thank you thank you thank you for entering... <b>MY WORLD</b>.`,
     true);
     modal.append(this.tip);
 
-    this.eightInchButton = this.div('photo-view-print-modal-buy-button', '', 'Order 8" Print - $5');
-    this.eightInchButton.addEventListener('click', () => this.buyButtonClick('https://paypal.me/Roark/5'));
+    this.uploadZone = this.div('photo-view-print-modal-upload-zone', '', '¡Click here to upload your image for printing!');
+    this.uploadZone.addEventListener('click', this.uploadZoneClick.bind(this));
+    modal.append(this.uploadZone);
+
+    this.eightInchButton = this.link({
+      className: 'photo-view-print-modal-buy-button',
+      url: 'https://paypal.me/Roark/5',
+      text: 'Order 8" Print - $5',
+      blank: true
+    });
     modal.appendChild(this.eightInchButton);
-
-    this.resize();
-    window.addEventListener('resize', this.resize.bind(this));
-  }
-
-  resize () {
-
   }
 
   setImageData (imageData) {
@@ -59,18 +62,28 @@ export default class PhotoViewPrintModal extends Component {
     this.modal.appendChild(border);
   }
 
-  buyButtonClick (successURL) {
+  uploadZoneClick () {
+    if (this.state.uploading || this.state.uploaded) return;
+
+    this.modal.classList.add('image-uploading');
+    this.state.uploading = true;
+
     uploadImage(toPath(this.modelName), this.imageData, (err, res) => {
+      this.modal.classList.remove('image-uploading');
+      this.state.uploading = false;
+
       if (err) {
         // TODO: error state
         console.log(err);
         return;
       }
 
-      // TODO: show the ID
-      console.log(res.id, res.url);
-
-      window.open(successURL, '_blank');
+      this.uploadZone.innerHTML =
+        `Your image ID: ${res.id}.<br/></br>
+        Be <b>sure</b> to include this in your personal PayPal note, as well as your <b>shipping address</b> so I can know what to print!
+        You are welcome and encouraged to contact me at <a href="mailto:kevin.e.roark@gmail.com">kevin.e.roark@gmail.com</a> with any questions or sentences!`;
+      this.state.uploaded = true;
+      this.modal.classList.add('image-uploaded');
     });
   }
 }

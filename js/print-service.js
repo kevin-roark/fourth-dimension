@@ -10,6 +10,13 @@ let s3client = new S3({
 });
 
 export function uploadImage (name, base64Data, callback) {
+  if (s3Credentials.mock) {
+    setTimeout(() => {
+      callback(null, { id: 'lol' });
+    }, 2000);
+    return;
+  }
+
   let data = base64ToByteArray(base64Data.replace(/^data:image\/\w+;base64,/, ''));
   let id = getID(name);
 
