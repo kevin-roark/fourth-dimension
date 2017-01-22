@@ -316,6 +316,14 @@ canvas {
   0%   { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+@-webkit-keyframes REVERSE-SPINNING {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(-360deg); }
+}
+@keyframes REVERSE-SPINNING {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(-360deg); }
+}
 
 .window-wrapper {
   position: fixed;
@@ -325,8 +333,9 @@ canvas {
 
 .photo-view-print-modal {
   position: fixed;
-  width: 800px; height: 600px;
-  left: calc(50% - 400px); top: calc(50% - 300px);
+  width: 800px; max-height: 98%;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
   background: #f9f3e5;
   box-shadow: border 5px solid #000;
   overflow: hidden;
@@ -375,6 +384,11 @@ canvas {
     text-shadow: 0px 0px 2px #000, 0px 0px 4px rgba(0,0,0,0.9);
   }
 
+.photo-view-print-modal-content {
+  overflow: auto;
+  max-height: 98vh;
+}
+
 .photo-view-print-modal-image-preview {
   display: block;
   margin: 40px auto;
@@ -382,23 +396,37 @@ canvas {
   cursor: pointer;
   border: 3px solid #000;
   background-color: #878787;
+  transition: box-shadow 0.2s, transform 0.2s;
 }
   .photo-view-print-modal-image-preview:hover {
     box-shadow: 0 10px 20px 10px #aaa;
+    transform: scaleX(1.5);
   }
   .image-uploading .photo-view-print-modal-image-preview {
     -webkit-animation: SPINNING 0.8s linear infinite;
     animation: SPINNING 0.8s linear infinite;
+    box-shadow: 0 0 20px 10px #f00;
   }
 
 .photo-view-print-modal-text-tip {
   color: #006611;
-  font-family: Courier, Courier New, monospace;
-  font-size: 12px;
-  line-height: 1.2;
-  max-width: 80%;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  font-size: 14px;
+  line-height: 1.4;
+  max-width: 50%;
   margin: 0 auto 30px auto;
   user-select: auto;
+  text-align: justify;
+}
+
+.photo-view-print-modal-error {
+  max-width: 340px;
+  margin: 0 auto 10px auto;
+  color: #e71414;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  font-size: 18px;
+  opacity: 0;
+  transition: opacity 0.25s;
 }
 
 .photo-view-print-modal-upload-zone {
@@ -406,22 +434,70 @@ canvas {
   max-width: 50%;
   margin: 0 auto;
   padding: 8px;
-  border: 3px solid #000;
+  border: 3px solid #555;
   text-align: center;
+  transition: opacity 0.1s, background 0.1s;
+  user-select: auto;
+  color: #555;
+  transition: all 0.1s;
+  font-style: italic;
+  text-shadow: 1px 2px 15px #0f0;
 }
+  .photo-view-print-modal-upload-zone:hover {
+    color: #000;
+    border: 3px solid #000;
+    box-shadow: 0 6px 0 3px rgb(27, 140, 27);
+    text-shadow: 1px 2px 5px #0f0;
+  }
   .image-uploading .photo-view-print-modal-upload-zone {
     cursor: crosshair;
+    opacity: 0.5;
+    background: #ff0;
+    -webkit-animation: REVERSE-SPINNING 2s linear infinite;
+    animation: REVERSE-SPINNING 2s linear infinite;
   }
   .image-uploaded .photo-view-print-modal-upload-zone {
     cursor: auto;
     text-align: left;
+    color: #000;
+    border: 3px solid #000;
+    font-style: normal;
+    text-shadow: none;
+  }
+  .image-uploaded .photo-view-print-modal-upload-zone:hover {
+    box-shadow: 0 6px 0 3px rgba(27, 140, 27, 0.2);
+    text-shadow: none;
+  }
+
+.photo-view-print-modal-upload-zone a {
+  color: inherit;
+  text-decoration: underline;
+}
+  .photo-view-print-modal-upload-zone a:hover, .photo-view-print-modal-upload-zone a:focus {
+    text-decoration: line-through;
+  }
+
+.print-image-id {
+  font-style: italic;
+  letter-spacing: 2px;
+  margin-left: 5px;
+}
+
+.photo-view-print-modal-buy-zone {
+  visibility: none;
+  margin: 40px auto 55px auto;
+  max-width: 600px;
+  text-align: center;
+}
+  .image-uploaded .photo-view-print-modal-buy-zone {
+    visibility: visible;
   }
 
 .photo-view-print-modal-buy-button {
-  display: block;
-  max-width: 200px;
+  display: inline-block;
+  width: 200px;
   text-align: center;
-  margin: 20px auto;
+  margin: 5px 12px;
   padding: 15px;
   cursor: pointer;
   background: #00f;
@@ -429,7 +505,9 @@ canvas {
   font-family: Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, serif;
   font-size: 14px;
   opacity: 0;
-  transition: opacity 0.25s;
+  transition: opacity 0.3s;
+  user-select: auto;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
 }
   .photo-view-print-modal-buy-button:hover {
     font-weight: bold;
@@ -493,22 +571,23 @@ canvas {
 
   .photo-view-print-modal {
     width: 90vw; height: 90vh;
-    left: 5vw; top: 5vh;
   }
 
   .photo-view-print-modal-close-button {
+    top: auto; bottom: 6px;
     font-size: 28px;
   }
 
-  .photo-view-print-modal-image-preview.horizontal {
-    max-width: 45vw;
-    margin: 20px 22.5vw;
+  .photo-view-print-modal-text-tip {
+    max-width: 70%;
   }
-}
 
-@media (max-height: 600px) {
-  .photo-view-print-modal-image-preview.vertical {
-    max-height: 45vh;
-    margin: 20px 22.5vw;
+  .photo-view-print-modal-image-preview.horizontal {
+    max-width: 60vw;
+    margin: 40px auto 20px auto;
+  }
+
+  .photo-view-print-modal-buy-zone {
+    padding-bottom: 60px;
   }
 }

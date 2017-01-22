@@ -6,6 +6,7 @@ export default class PhotoViewInterface extends Component {
   constructor ({ modelName, closeHandler, wireframeHandler, textureHandler, lightingHandler, backgroundHandler, printModalHandler, printImageProvider }) {
     super();
 
+    this.modelName = modelName;
     this.printModalHandler = printModalHandler;
     this.printImageProvider = printImageProvider;
 
@@ -42,11 +43,6 @@ export default class PhotoViewInterface extends Component {
     this.printButton.addEventListener('mouseenter', () => this.handlePrintButtonHover(true), false);
     this.printButton.addEventListener('mouseleave', () => this.handlePrintButtonHover(false), false);
     buttons.appendChild(this.printButton);
-
-    this.printModal = new PhotoViewPrintModal({
-      modelName,
-      closeHandler: () => this.showPrintModal(false)
-    });
   }
 
   flashParameter (name, duration = 300) {
@@ -76,7 +72,11 @@ export default class PhotoViewInterface extends Component {
 
   showPrintModal (show) {
     if (show) {
-      this.printModal.setImageData(null);
+      this.printModal = new PhotoViewPrintModal({
+        modelName: this.modelName,
+        closeHandler: () => this.showPrintModal(false)
+      });
+
       this.printImageProvider(imageData => {
         this.printModal.setImageData(imageData);
       });
@@ -84,6 +84,7 @@ export default class PhotoViewInterface extends Component {
       this.el.appendChild(this.printModal.el);
     } else {
       this.el.removeChild(this.printModal.el);
+      this.printModal = null;
     }
 
     if (this.printModalHandler) {
