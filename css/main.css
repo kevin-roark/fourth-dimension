@@ -15,6 +15,17 @@ body {
     background: #000;
   }
 
+::-moz-selection {
+  background: #00f;
+  color: #fff;
+}
+
+::selection {
+  background: #00f;
+  color: #fff;
+}
+
+
 canvas {
   position: fixed;
   top: 0; left: 0; width: 100%; height: 100%;
@@ -30,15 +41,19 @@ canvas {
   cursor: url('../images/basketball.png'), crosshair;
 }
 
-::-moz-selection {
-  background: #00f;
-  color: #fff;
+.big-cursor {
+  position: fixed;
+  width: 64px; height: 64px;
+  opacity: 1;
+  transition: opacity 0.15s;
+  background-size: cover;
 }
-
-::selection {
-  background: #00f;
-  color: #fff;
-}
+  .big-cursor.hand {
+    background-image: url('../images/myhand.png');
+  }
+  .big-cursor.basketball {
+    background-image: url('../images/basketball.png');
+  }
 
 .info {
   z-index: 2;
@@ -136,6 +151,7 @@ canvas {
   font-family: Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, serif;
   transition: background 0.5s, color 0.5s, opacity 1s;
   opacity: 0;
+  z-index: 5;
 }
   .home-view-hud.loaded {
     opacity: 1;
@@ -329,6 +345,7 @@ canvas {
   position: fixed;
   top: 0; left: 0; width: 100%; height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
+  z-index: 20;
 }
 
 .photo-view-print-modal {

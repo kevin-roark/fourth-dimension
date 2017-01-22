@@ -6,6 +6,7 @@ import ThumbnailPile from './thumbnail-pile';
 import MouseIntersector from './mouse-intersector';
 import cameras from './cameras';
 import HomeViewHud from './components/home-view-hud';
+import BigCursor from './components/big-cursor';
 
 let pileStyles = ['collection', 'crazy', 'neat'];
 
@@ -50,6 +51,10 @@ export default class HomeView {
       styleHandler: this.cyclePileStyle.bind(this)
     });
     this.homeViewHud.addToParent(this.dom.container);
+
+    let bigCursor = this.bigCursor = new BigCursor();
+    bigCursor.makeHand();
+    bigCursor.addToParent(this.dom.container);
 
     this.state = {
       active: false,
@@ -149,6 +154,9 @@ export default class HomeView {
 
     if (thumbnail) {
       thumbnail.multiplyScale(this.hoverScaleForPileStyle());
+      this.bigCursor.makeBasketball();
+    } else {
+      this.bigCursor.makeHand();
     }
 
     this.state.hoverThumbnail = thumbnail;
