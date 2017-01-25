@@ -8,9 +8,9 @@ import LightRing from './light-ring';
 import Controls from './controls';
 import PhotoViewInterface from './components/photo-view-interface';
 
-let BACKGROUNDS = ['texture', 'blank', 'grid'];
-let LIGHTINGS = ['white', 'red', 'blue', 'green', 'yellow', 'primary'];
-let TEXTURES = ['default', 'toon', 'empty', 'white', 'purple', 'cyan', 'yellow'];
+let BACKGROUNDS = ['texture', 'blank', 'mosaic', 'grid', 'dark grid'];
+let LIGHTINGS = ['white', 'white front', 'white back', 'primary', 'cops', 'red', 'blue', 'green', 'yellow'];
+let TEXTURES = ['default', 'toon', 'empty', 'purple', 'cyan', 'yellow'];
 let DEFAULT_CAMERA_POSITION = 10;
 let MODEL_SCALE_FACTOR = 3.5;
 
@@ -39,9 +39,13 @@ export default class PhotoView {
     let ring = this.lightRing = new LightRing({ count: 3, radius: 15, y: 10, yRange: 6, distance: 200, angle: 0.5, revolutionSpeed: 0.004, castShadow: false });
     container.add(ring.obj);
 
+    this.copsLightRing = new LightRing({ hues: [0, 0.67], radius: 10, y: 7.5, yRange: 7.5, distance: 200, angle: 0.22, revolutionSpeed: 0.003, castShadow: true });
+    container.add(this.copsLightRing.obj);
+
     this.interface = new PhotoViewInterface({
       closeHandler,
       modelName: photo.name,
+      resetCameraHandler: this.resetCamera.bind(this),
       wireframeHandler: this.wireframeButtonPressed.bind(this),
       textureHandler: this.textureButtonPressed.bind(this),
       lightingHandler: this.lightingButtonPressed.bind(this),
@@ -70,6 +74,11 @@ export default class PhotoView {
     loadModel(photo, ({ geometry, texture }) => {
       this.geometry = geometry;
       this.texture = texture;
+
+      let mosaicTexture = this.mosaicTexture = texture.clone();
+      mosaicTexture.wrapS = mosaicTexture.wrapT = THREE.RepeatWrapping;
+      mosaicTexture.repeat.set(8, 8);
+      mosaicTexture.needsUpdate = true;
 
       geometry.center();
       geometry.computeBoundingBox();
@@ -117,10 +126,30 @@ export default class PhotoView {
       platform.position.set(0, -(size.y / 2) - 2, -size.z * 0.75);
       container.add(platform);
 
-      spotlight.position.set(0, size.y + 8, size.z + 2);
+      this.setSpotlightPosition();
 
       if (callback) callback();
     });
+  }
+
+  setSpotlightPosition (style = 'top') {
+    let { spotlight, geometry } = this;
+
+    let size = geometry.boundingBox.getSize();
+    switch (style) {
+      case 'front':
+        spotlight.position.set(0, size.y + 1, size.z + 10);
+        break;
+
+      case 'back':
+        spotlight.position.set(0, size.y + 3, -size.z - 25);
+        break;
+
+      case 'top':
+      default:
+        spotlight.position.set(0, size.y + 8, size.z + 2);
+        break;
+    }
   }
 
   activate () {
@@ -142,6 +171,8 @@ export default class PhotoView {
     this.scene.remove(this.container);
     this.scene.remove(this.grid);
     this.grid = null;
+    this.scene.remove(this.darkGrid);
+    this.darkGrid = null;
     this.controls.enabled = false;
 
     this.interface.el.classList.remove('active');
@@ -176,6 +207,8 @@ export default class PhotoView {
 
       if (lighting === 'primary') {
         this.lightRing.update(delta);
+      } else if (lighting === 'cops') {
+        this.copsLightRing.update(delta);
       }
 
       this.controls.update(delta);
@@ -299,7 +332,6 @@ export default class PhotoView {
         break;
 
       case 'empty':
-      case 'white':
       case 'purple':
       case 'yellow':
       case 'cyan':
@@ -317,7 +349,7 @@ export default class PhotoView {
   }
 
   setLighting (lighting) {
-    let { spotlight, lightRing, state } = this;
+    let { spotlight, lightRing, copsLightRing, state } = this;
     state.lighting = lighting;
 
     switch (lighting) {
@@ -327,17 +359,31 @@ export default class PhotoView {
       case 'blue':
       case 'yellow':
         spotlight.intensity = lighting === 'white' ? 2 : 5;
-        lightRing.setIntensity(0);
+        this.setSpotlightPosition('top');
 
         let colorMap = { white: 0xffffff, red: 0xff0000, green: 0x00ff00, blue: 0x0000ff, yellow: 0xffff00 };
         spotlight.color.set(colorMap[lighting]);
         break;
 
+      case 'white front':
+      case 'white back':
+        spotlight.intensity = 3;
+        spotlight.color.set(0xffffff);
+        this.setSpotlightPosition(lighting === 'white front' ? 'front' : 'back');
+        break;
+
       case 'primary':
-        spotlight.intensity = 0;
         lightRing.setIntensity(1.4);
         break;
+
+      case 'cops':
+        copsLightRing.setIntensity(1.6);
+        break;
     }
+
+    if (lighting !== 'primary') lightRing.setIntensity(0);
+    if (lighting !== 'cops') copsLightRing.setIntensity(0);
+    if (lighting === 'primary' || lighting === 'cops') spotlight.intensity = 0;
 
     this.interface.flashParameter(lighting);
   }
@@ -350,6 +396,10 @@ export default class PhotoView {
         this.scene.background = this.texture;
         break;
 
+      case 'mosaic':
+        this.scene.background = this.mosaicTexture;
+        break;
+
       case 'blank':
         this.scene.background = new THREE.Color(0x000000);
         break;
@@ -359,16 +409,20 @@ export default class PhotoView {
         if (!this.grid) this.grid = createGrid({ length: 60, gridLength: 20 });
         this.scene.add(this.grid);
         break;
+
+      case 'dark grid':
+        this.scene.background = new THREE.Color(0x000000);
+        if (!this.darkGrid) this.darkGrid = createGrid({ length: 60, gridLength: 10, color: 0x00ff00 });
+        this.scene.add(this.darkGrid);
     }
 
     if (background !== 'grid' && this.grid) {
       this.scene.remove(this.grid);
     }
+    if (background !== 'dark grid' && this.darkGrid) {
+      this.scene.remove(this.darkGrid);
+    }
 
     this.interface.flashParameter(background);
-  }
-
-  placePrintOrder (options) {
-    let image = this.renderer.domElement.toDataURL();
   }
 }

@@ -11,6 +11,3 @@ prod:
 
 serve:
 	serve -p 4004 ./
-
-beef:
-	beefy js/main.js 4005 -t babelify -o js/build.js --live

@@ -3,7 +3,7 @@ import Component from './component';
 import PhotoViewPrintModal from './photo-view-print-modal';
 
 export default class PhotoViewInterface extends Component {
-  constructor ({ modelName, closeHandler, wireframeHandler, textureHandler, lightingHandler, backgroundHandler, printModalHandler, printImageProvider }) {
+  constructor ({ modelName, closeHandler, resetCameraHandler, wireframeHandler, textureHandler, lightingHandler, backgroundHandler, printModalHandler, printImageProvider }) {
     super();
 
     this.modelName = modelName;
@@ -21,6 +21,10 @@ export default class PhotoViewInterface extends Component {
 
     let buttons = this.controlButtons = this.div('photo-view-control-buttons');
     el.appendChild(buttons);
+
+    this.resetCameraButton = this.div('photo-view-control-button', 'reset-position-button', 'Reset Camera');
+    this.resetCameraButton.addEventListener('click', resetCameraHandler, false);
+    buttons.appendChild(this.resetCameraButton);
 
     this.wireframeButton = this.div('photo-view-control-button', 'wireframe-button', 'Wireframe');
     this.wireframeButton.addEventListener('click', wireframeHandler, false);
