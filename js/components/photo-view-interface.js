@@ -1,6 +1,7 @@
 
 import Component from './component';
 import PhotoViewPrintModal from './photo-view-print-modal';
+import playSound from '../audio';
 
 export default class PhotoViewInterface extends Component {
   constructor ({ modelName, closeHandler, resetCameraHandler, wireframeHandler, textureHandler, lightingHandler, backgroundHandler, printModalHandler, printImageProvider }) {
@@ -16,37 +17,51 @@ export default class PhotoViewInterface extends Component {
     el.appendChild(flashEl);
 
     this.closeButton = this.div('photo-view-close-button');
-    this.closeButton.addEventListener('click', closeHandler, false);
+    this.closeButton.addEventListener('click', () => {
+      playSound('buzzer');
+      if (closeHandler) {
+        closeHandler();
+      }
+    }, false);
     el.appendChild(this.closeButton);
 
     let buttons = this.controlButtons = this.div('photo-view-control-buttons');
     el.appendChild(buttons);
 
     this.resetCameraButton = this.div('photo-view-control-button', 'reset-position-button', 'Reset Camera');
-    this.resetCameraButton.addEventListener('click', resetCameraHandler, false);
+    this.setupClick(this.resetCameraButton, resetCameraHandler);
     buttons.appendChild(this.resetCameraButton);
 
     this.wireframeButton = this.div('photo-view-control-button', 'wireframe-button', 'Wireframe');
-    this.wireframeButton.addEventListener('click', wireframeHandler, false);
+    this.setupClick(this.wireframeButton, wireframeHandler);
     buttons.appendChild(this.wireframeButton);
 
     this.textureButton = this.div('photo-view-control-button', 'texture-button', 'Texture');
-    this.textureButton.addEventListener('click', textureHandler, false);
+    this.setupClick(this.textureButton, textureHandler);
     buttons.appendChild(this.textureButton);
 
     this.lightingButton = this.div('photo-view-control-button', 'lighting-button', 'Lighting');
-    this.lightingButton.addEventListener('click', lightingHandler, false);
+    this.setupClick(this.lightingButton, lightingHandler);
     buttons.appendChild(this.lightingButton);
 
     this.backgroundButton = this.div('photo-view-control-button', 'background-button', 'Background');
-    this.backgroundButton.addEventListener('click', backgroundHandler, false);
+    this.setupClick(this.backgroundButton, backgroundHandler);
     buttons.appendChild(this.backgroundButton);
 
     this.printButton = this.div('photo-view-control-button photo-view-print-button', 'print-button', 'PRINT');
-    this.printButton.addEventListener('click', () => this.showPrintModal(true), false);
+    this.setupClick(this.printButton, () => this.showPrintModal(true));
     this.printButton.addEventListener('mouseenter', () => this.handlePrintButtonHover(true), false);
     this.printButton.addEventListener('mouseleave', () => this.handlePrintButtonHover(false), false);
     buttons.appendChild(this.printButton);
+  }
+
+  setupClick (button, handler) {
+    button.addEventListener('click', () => {
+      playSound();
+      if (handler) {
+        handler();
+      }
+    }, false);
   }
 
   flashParameter (name, duration = 300) {

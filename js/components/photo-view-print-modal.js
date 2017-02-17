@@ -2,6 +2,7 @@
 import Component from './component';
 import { uploadImage } from '../print-service';
 import { toPath } from '../data-util';
+import playSound from '../audio';
 
 export default class PhotoViewPrintModal extends Component {
   constructor ({ modelName, closeHandler }) {
@@ -13,10 +14,15 @@ export default class PhotoViewPrintModal extends Component {
       uploaded: false
     };
 
+    let close = () => {
+      playSound('buzzer');
+      if (closeHandler) closeHandler();
+    };
+
     this.el = this.div('window-wrapper');
     this.el.addEventListener('click', ev => {
       if (ev.target === this.el) {
-        if (closeHandler) closeHandler();
+        close();
       }
     }, false);
 
@@ -26,7 +32,7 @@ export default class PhotoViewPrintModal extends Component {
     ['top', 'right', 'bottom', 'left'].forEach(p => this.makeTextBorder(p));
 
     this.closeButton = this.div('photo-view-print-modal-close-button');
-    this.closeButton.addEventListener('click', closeHandler, false);
+    this.closeButton.addEventListener('click', close, false);
     modal.appendChild(this.closeButton);
 
     let content = this.content = this.div('photo-view-print-modal-content');

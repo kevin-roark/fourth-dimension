@@ -7,6 +7,7 @@ import MouseIntersector from './mouse-intersector';
 import cameras from './cameras';
 import HomeViewHud from './components/home-view-hud';
 import BigCursor from './components/big-cursor';
+import playSound from './audio';
 
 let pileStyles = ['collection', 'crazy', 'neat'];
 
@@ -92,6 +93,7 @@ export default class HomeView {
       });
       thumbnailIntersector.addClickListener(mesh => {
         if (this.state.active) {
+          playSound();
           if (this.photoClickHandler) {
             this.photoClickHandler(mesh ? mesh._thumbnail.photo : null);
           }
@@ -306,6 +308,10 @@ export default class HomeView {
     if (collectionPileIndex < 0) collectionPileIndex = this.piles.length - 1;
     if (collectionPileIndex > this.piles.length - 1) collectionPileIndex = 0;
     this.setCollectionPile(this.piles[collectionPileIndex]);
+
+    if (this.state.pileStyle === 'collection') {
+      playSound();
+    }
   }
 
   setCollectionPile (collectionPile) {

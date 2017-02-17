@@ -169,8 +169,11 @@ function go () {
       photoView.activate();
     } else {
       state.photoInView.deactivate();
-      homeView.activate(scene);
       cameras.resetPerspectiveCamera();
+
+      setTimeout(() => {
+        homeView.activate(scene);
+      }, 0);
     }
 
     [dom.info, dom.seriesTitle].forEach(el => {
