@@ -153,7 +153,7 @@ export default class HomeView {
     }
     this.dom.seriesTitle.textContent = title;
 
-    let cursor = thumbnail ? "url('images/basketball.png'), crosshair" : "url('images/myhand.png'), auto";
+    let cursor = thumbnail ? "url('images/globe.png'), crosshair" : "url('images/myhand.png'), auto";
     document.body.style.cursor = cursor;
 
     if (this.state.hoverThumbnail) {

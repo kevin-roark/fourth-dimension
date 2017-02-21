@@ -37,8 +37,8 @@ canvas {
     opacity: 1;
   }
 
-.basketball-cursor {
-  cursor: url('../images/basketball.png'), crosshair;
+.globe-cursor {
+  cursor: url('../images/globe.png'), crosshair;
 }
 
 .big-cursor {
@@ -51,8 +51,8 @@ canvas {
   .big-cursor.hand {
     background-image: url('../images/myhand.png');
   }
-  .big-cursor.basketball {
-    background-image: url('../images/basketball.png');
+  .big-cursor.globe {
+    background-image: url('../images/globe.png');
   }
 
 .info {
@@ -230,11 +230,11 @@ canvas {
 
 .home-view-list-title {
   margin-bottom: 3px;
-  font-size: 15px;
+  font-size: 18px;
 }
 
 .home-view-list-container ul {
-  list-style: none;
+  list-style: decimal;
   margin: 0;
   padding: 0;
   font-size: 14px;
@@ -243,7 +243,13 @@ canvas {
 .home-view-list-container ul li {
   cursor: pointer;
   margin-bottom: 2px;
+  transform-origin: 0 0;
+  transition: transform 0.2s;
 }
+  .home-view-list-container ul li:hover {
+    z-index: 10;
+    transform: scale(4, 2);
+  }
 
 /**
  * PHOTO VIEW INTERFACE
@@ -284,7 +290,7 @@ canvas {
   position: fixed;
   right: 10px; top: 100px;
   max-width: 270px;
-  font-size: 28px;
+  font-size: 16px;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
   font-style: italic;
   color: #ff0;
@@ -311,6 +317,17 @@ canvas {
     color: #f00;
   }
 
+.photo-view-movement-tip {
+  position: fixed;
+  left: 50%;
+  top: 8px;
+  transform: translateX(-50%);
+  font-family: Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, serif;
+  font-size: 12px;
+  color: #fff;
+  text-shadow: -1px 0.5px #00f, -2px 1px #f00;
+}
+
 .photo-view-control-buttons {
   position: fixed;
   top: 5px; right: 5px;
@@ -327,6 +344,7 @@ canvas {
   color: #000;
   font-size: 10px;
   line-height: 14px;
+  text-align: center;
   transition: color 0.25s, box-shadow 0.1s, background-color 0.1s;
 }
   .photo-view-control-button:hover {
@@ -437,7 +455,6 @@ canvas {
   cursor: pointer;
   border: 3px solid #000;
   background-color: #878787;
-  transition: box-shadow 0.2s, transform 0.2s;
 }
   .photo-view-print-modal-image-preview:hover {
     box-shadow: 0 10px 20px 10px #aaa;
@@ -616,6 +633,10 @@ canvas {
 
   .photo-view-control-buttons {
     right: 0; top: auto; bottom: 0;
+  }
+
+  .photo-view-print-button {
+    display: inline-block;
   }
 
   .photo-view-print-modal {

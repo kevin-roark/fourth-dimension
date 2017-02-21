@@ -13,13 +13,13 @@ export default class BigCursor extends Component {
   }
 
   makeBasketball () {
-    this.el.classList.add('basketball');
+    this.el.classList.add('globe');
     this.el.classList.remove('hand');
   }
 
   makeHand () {
     this.el.classList.add('hand');
-    this.el.classList.remove('basketball');
+    this.el.classList.remove('globe');
   }
 
   handleMouseEvent (ev) {

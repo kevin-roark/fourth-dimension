@@ -201,7 +201,7 @@ export default class PhotoView {
   update (delta) {
     if (this.state.active && !this.state.showingPrintModal) {
       let { lighting, rps } = this.state;
-      if (this.mesh) {
+      if (this.mesh && rps > 0) {
         this.mesh.rotation.y += rps * (delta / 1000);
       }
 
@@ -269,16 +269,9 @@ export default class PhotoView {
   }
 
   controlActivityMonitor (isActive) {
-    let to = { rps: isActive ? 0 : 1 };
-    let easing = isActive ? TWEEN.Easing.Quadratic.Out : TWEEN.Easing.Quadratic.In;
-    let duration = 2500 * Math.abs(this.state.rps - to.rps);
-
-    if (this.activityTween) {
-      this.activityTween.stop();
-      this.activityTween = null;
+    if (isActive) {
+      this.state.rps = 0;
     }
-
-    this.activityTween = new TWEEN.Tween(this.state).to(to, duration).easing(easing).start();
   }
 
   wireframeButtonPressed () {
