@@ -8,8 +8,9 @@ import cameras from './cameras';
 import HomeViewHud from './components/home-view-hud';
 import BigCursor from './components/big-cursor';
 import playSound from './audio';
+import createGrid from './grid';
 
-let pileStyles = ['collection', 'crazy', 'neat'];
+let pileStyles = ['collection', 'crazy', 'neat', 'list'];
 
 // Modes
 // Pile per collection that you arrow through
@@ -33,16 +34,21 @@ export default class HomeView {
     let backgroundMesh = this.backgroundMesh = new THREE.Mesh(
       new THREE.BoxBufferGeometry(1, 1, 1),
       new THREE.MeshStandardMaterial({
-        color: 0xaaaaaa
+        color: 0xaaaaaa,
+        roughness: 0.4
       })
     );
     backgroundMesh.position.z = -100;
     this.container.add(backgroundMesh);
 
+    let grid = this.grid = createGrid({ length: 100, gridLength: 16, color: 0x000000 });
+    grid.position.z = -150;
+    this.container.add(grid);
+
     this.dom = {
       container: this.createDomContainer(),
       seriesTitle: document.querySelector('.series-title'),
-      neatTitleContainer: this.createNeatTitleContainer()
+      listContainer: this.createListContainer(seriesData)
     };
 
     this.homeViewHud = new HomeViewHud({
@@ -87,12 +93,12 @@ export default class HomeView {
     this.makePiles(() => {
       let thumbnailIntersector = this.thumbnailIntersector = new MouseIntersector({ camera, renderer, meshes: this.thumbnailMeshes });
       thumbnailIntersector.addHoverListener(mesh => {
-        if (this.state.active) {
+        if (this.state.active && this.state.pileStyle !== 'list') {
           this.setHoverThumnbail(mesh ? mesh._thumbnail : null);
         }
       });
       thumbnailIntersector.addClickListener(mesh => {
-        if (this.state.active) {
+        if (this.state.active && this.state.pileStyle !== 'list') {
           playSound();
           if (this.photoClickHandler) {
             this.photoClickHandler(mesh ? mesh._thumbnail.photo : null);
@@ -186,27 +192,21 @@ export default class HomeView {
     };
 
     let pointlight0 = new THREE.PointLight(0xffffff, 0.3, 5000, 2);
-    pointlight0.position.set(100, 100, 300);
+    pointlight0.position.set(0, 0, 300);
     shadowConfig(pointlight0);
     this.lights.add(pointlight0);
 
-    let pointlight1 = new THREE.PointLight(0x0000ff, 0.3, 5000, 2);
-    pointlight1.position.set(-100, -25, 300);
+    let pointlight1 = new THREE.PointLight(0x0000ff, 0.6, 2000, 2);
+    pointlight1.position.set(-100, -25, 40);
     shadowConfig(pointlight1);
     setupPositionTween(pointlight1);
     this.lights.add(pointlight1);
 
-    let pointlight2 = new THREE.PointLight(0xff0000, 0.3, 5000, 2);
-    pointlight2.position.set(100, 25, 300);
+    let pointlight2 = new THREE.PointLight(0xff0000, 0.6, 2000, 2);
+    pointlight2.position.set(100, 25, 40);
     shadowConfig(pointlight2);
     setupPositionTween(pointlight2);
     this.lights.add(pointlight2);
-
-    let pointlight3 = new THREE.PointLight(0xffff00, 0.3, 5000, 2);
-    pointlight3.position.set(0, 0, 300);
-    shadowConfig(pointlight3);
-    setupPositionTween(pointlight3);
-    this.lights.add(pointlight3);
   }
 
   makePiles (callback) {
@@ -257,6 +257,10 @@ export default class HomeView {
 
     this.backgroundMesh.scale.set(viewport.width, viewport.height, 1);
 
+    if (this.dom.listContainer.parentNode) {
+      this.dom.listContainer.parentNode.removeChild(this.dom.listContainer);
+    }
+
     switch (style) {
       case 'collection':
         let collectionPileIndex = this.piles.indexOf(this.state.collectionPile);
@@ -287,6 +291,10 @@ export default class HomeView {
 
         this.dom.seriesTitle.textContent = '';
       } break;
+
+      case 'list':
+        this.dom.container.appendChild(this.dom.listContainer);
+        this.dom.seriesTitle.textContent = '';
     }
   }
 
@@ -340,30 +348,38 @@ export default class HomeView {
     return el;
   }
 
-  createNeatTitleContainer () {
+  createListContainer (seriesData) {
     let el = document.createElement('div');
-    el.className = 'home-view-neat-title-container';
-    return el;
-  }
+    el.className = 'home-view-list-container';
 
-  activateNeatTitles () {
-    let viewport = cameras.getOrthographicViewport();
+    seriesData.forEach(series => {
+      let div = document.createElement('div');
+      div.className = 'home-view-list';
 
-    this.piles.forEach(pile => {
-      let el = document.createElement('div');
-      el.className = 'home-view-neat-title';
-      el.textContent = pile.series.name;
-      el.style.bottom = cameras.worldUnitsInPixels(pile.mesh.position.y + viewport.height / 2) + 'px';
-      this.dom.neatTitleContainer.appendChild(el);
+      let title = document.createElement('div');
+      title.className = 'home-view-list-title';
+      title.textContent = series.name;
+
+      let ul = document.createElement('ul');
+      series.photos.forEach(photo => {
+        let li = document.createElement('li');
+        li.textContent = photo.name;
+        li.addEventListener('click', () => {
+          playSound();
+          if (this.photoClickHandler) {
+            this.photoClickHandler(photo);
+          }
+        });
+
+        ul.appendChild(li);
+      });
+
+      div.appendChild(title);
+      div.appendChild(ul);
+
+      el.appendChild(div);
     });
 
-    this.dom.container.appendChild(this.dom.neatTitleContainer);
-  }
-
-  deactivateNeatTitles () {
-    this.dom.neatTitleContainer.innerHTML = '';
-    if (this.dom.neatTitleContainer.parentNode) {
-      this.dom.neatTitleContainer.parentNode.removeChild(this.dom.neatTitleContainer);
-    }
+    return el;
   }
 }

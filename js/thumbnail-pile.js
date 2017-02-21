@@ -94,6 +94,8 @@ export default class ThumbnailPile {
       }
     });
 
+    this.mesh.visible = true;
+
     switch (style) {
       case 'collection':
         thumbnails.forEach(thumbnail => {
@@ -140,6 +142,10 @@ export default class ThumbnailPile {
             this.mesh.add(pedestal);
           }
         });
+        break;
+
+      case 'list':
+        this.mesh.visible = false;
         break;
     }
   }

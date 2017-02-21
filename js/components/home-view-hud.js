@@ -34,7 +34,7 @@ export default class HomeViewHud extends Component {
   }
 
   setStyle (style = 'collection') {
-    let names = { collection: 'Collection', crazy: 'Explosion', neat: 'Splayed' };
+    let names = { collection: 'Collection', crazy: 'Explosion', neat: 'Splayed', list: 'List' };
     this.label.textContent = `${names[style]} View`;
 
     this.label.className = `home-view-hud-label home-view-label-${style}`;
