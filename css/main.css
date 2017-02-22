@@ -255,6 +255,9 @@ canvas {
 
 .home-view-list {
   margin: 60px 0 0 60px;
+  background: #000;
+  padding: 6px;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
 }
 
 .home-view-list-title {
@@ -263,7 +266,7 @@ canvas {
 }
 
 .home-view-list-container ul {
-  list-style: decimal;
+  list-style: none;
   margin: 0;
   padding: 0;
   font-size: 14px;
