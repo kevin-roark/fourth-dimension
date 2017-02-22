@@ -1,10 +1,10 @@
 
 let THREE = require('three');
-let TWEEN = require('tween.js');
 
 import loadModel from './model-cache';
 import createGrid from './grid';
 import LightRing from './light-ring';
+import LightCloud from './light-cloud';
 import Controls from './controls';
 import PhotoViewInterface from './components/photo-view-interface';
 
@@ -42,6 +42,12 @@ export default class PhotoView {
     this.copsLightRing = new LightRing({ hues: [0, 0.67], radius: 10, y: 7.5, yRange: 7.5, distance: 200, angle: 0.22, revolutionSpeed: 0.003, castShadow: true });
     container.add(this.copsLightRing.obj);
 
+    this.redLightCloud = new LightCloud({ color: 0xff0000 });
+    container.add(this.redLightCloud.container);
+
+    this.blueLightCloud = new LightCloud({ color: 0x0000ff });
+    container.add(this.blueLightCloud.container);
+
     this.interface = new PhotoViewInterface({
       closeHandler,
       modelName: photo.name,
@@ -69,7 +75,7 @@ export default class PhotoView {
   }
 
   load (callback) {
-    let { photo, container, spotlight, controls } = this;
+    let { photo, container, controls } = this;
 
     loadModel(photo, ({ geometry, texture }) => {
       this.geometry = geometry;
@@ -342,7 +348,7 @@ export default class PhotoView {
   }
 
   setLighting (lighting) {
-    let { spotlight, lightRing, copsLightRing, state } = this;
+    let { spotlight, lightRing, copsLightRing, redLightCloud, blueLightCloud, state } = this;
     state.lighting = lighting;
 
     switch (lighting) {
@@ -372,11 +378,29 @@ export default class PhotoView {
       case 'cops':
         copsLightRing.setIntensity(1.6);
         break;
+
+      case 'redCloud':
+        redLightCloud.setIntensity(1);
+        redLightCloud.setActive(true);
+        break;
+
+      case 'blueCloud':
+        blueLightCloud.setIntensity(1);
+        blueLightCloud.setActive(true);
+        break;
     }
 
     if (lighting !== 'primary') lightRing.setIntensity(0);
     if (lighting !== 'cops') copsLightRing.setIntensity(0);
-    if (lighting === 'primary' || lighting === 'cops') spotlight.intensity = 0;
+    if (lighting !== 'redCloud') {
+      redLightCloud.setIntensity(0);
+      redLightCloud.setActive(false);
+    }
+    if (lighting !== 'blueCloud') {
+      blueLightCloud.setIntensity(0);
+      blueLightCloud.setActive(false);
+    }
+    if (lighting === 'primary' || lighting === 'cops' || lighting.indexOf('Cloud') >= 0) spotlight.intensity = 0;
 
     this.interface.flashParameter(lighting);
   }
