@@ -25,7 +25,7 @@ export default function load (photo, callback) {
     callback(model);
   };
 
-  let texturePath = `models/${photo.seriesPath}/${photo.path}/Thumbnail.jpg`;
+  let texturePath = `models/${photo.seriesPath}/${photo.path}/Model.jpg`;
   textureLoader.load(texturePath, texture => {
     model.texture = texture;
     loaded();

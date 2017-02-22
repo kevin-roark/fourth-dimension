@@ -9,7 +9,7 @@ import Controls from './controls';
 import PhotoViewInterface from './components/photo-view-interface';
 
 let BACKGROUNDS = ['texture', 'blank', 'mosaic', 'grid', 'dark grid'];
-let LIGHTINGS = ['white', 'white front', 'white back', 'primary', 'cops', 'red', 'blue', 'green', 'yellow'];
+let LIGHTINGS = ['white', 'white front', 'white back', 'primary', 'cops', 'redCloud', 'blueCloud', 'red', 'blue', 'green', 'yellow'];
 let TEXTURES = ['default', 'toon', 'empty', 'purple', 'cyan', 'yellow'];
 let DEFAULT_CAMERA_POSITION = 10;
 let MODEL_SCALE_FACTOR = 3.5;
@@ -42,11 +42,8 @@ export default class PhotoView {
     this.copsLightRing = new LightRing({ hues: [0, 0.67], radius: 10, y: 7.5, yRange: 7.5, distance: 200, angle: 0.22, revolutionSpeed: 0.003, castShadow: true });
     container.add(this.copsLightRing.obj);
 
-    this.redLightCloud = new LightCloud({ color: 0xff0000 });
-    container.add(this.redLightCloud.container);
-
-    this.blueLightCloud = new LightCloud({ color: 0x0000ff });
-    container.add(this.blueLightCloud.container);
+    this.lightCloud = new LightCloud({ color: 0xff0000 });
+    container.add(this.lightCloud.container);
 
     this.interface = new PhotoViewInterface({
       closeHandler,
@@ -131,6 +128,8 @@ export default class PhotoView {
       platform.receiveShadow = true;
       platform.position.set(0, -(size.y / 2) - 2, -size.z * 0.75);
       container.add(platform);
+
+      this.lightCloud.container.position.set(0, size.y * 1.1, 0);
 
       this.setSpotlightPosition();
 
@@ -348,7 +347,7 @@ export default class PhotoView {
   }
 
   setLighting (lighting) {
-    let { spotlight, lightRing, copsLightRing, redLightCloud, blueLightCloud, state } = this;
+    let { spotlight, lightRing, copsLightRing, lightCloud, state } = this;
     state.lighting = lighting;
 
     switch (lighting) {
@@ -380,25 +379,23 @@ export default class PhotoView {
         break;
 
       case 'redCloud':
-        redLightCloud.setIntensity(1);
-        redLightCloud.setActive(true);
+        lightCloud.setIntensity(1.5);
+        lightCloud.setActive(true);
+        lightCloud.setColor(0xff0000);
         break;
 
       case 'blueCloud':
-        blueLightCloud.setIntensity(1);
-        blueLightCloud.setActive(true);
+        lightCloud.setIntensity(1.5);
+        lightCloud.setActive(true);
+        lightCloud.setColor(0x0000ff);
         break;
     }
 
     if (lighting !== 'primary') lightRing.setIntensity(0);
     if (lighting !== 'cops') copsLightRing.setIntensity(0);
-    if (lighting !== 'redCloud') {
-      redLightCloud.setIntensity(0);
-      redLightCloud.setActive(false);
-    }
-    if (lighting !== 'blueCloud') {
-      blueLightCloud.setIntensity(0);
-      blueLightCloud.setActive(false);
+    if (lighting !== 'redCloud' && lighting !== 'blueCloud') {
+      lightCloud.setIntensity(0);
+      lightCloud.setActive(false);
     }
     if (lighting === 'primary' || lighting === 'cops' || lighting.indexOf('Cloud') >= 0) spotlight.intensity = 0;
 

@@ -4,7 +4,7 @@ let TWEEN = require('tween.js');
 
 export default class LightCloud {
   constructor (options = {}) {
-    let { count = 5, spread = 5, color = 0xffffff, intensity = 1, distance = 5, decay = 2 } = options;
+    let { count = 3, spread = 8, color = 0xffffff, intensity = 1, distance = 10, decay = 2 } = options;
     this.count = count;
     this.spread = spread;
 
@@ -14,7 +14,8 @@ export default class LightCloud {
     this.lights = [];
     for (let i = 0; i < count; i++) {
       let light = new THREE.PointLight(color, intensity, distance, decay);
-      light.position.copy(this.pos());
+      let pos = this.pos();
+      light.position.set(pos.x, pos.y, pos.z);
       this.lights.push(light);
       this.container.add(light);
     }
@@ -29,7 +30,7 @@ export default class LightCloud {
     if (active) {
       let setupPositionTween = light => {
         new TWEEN.Tween(light.position)
-          .to(this.pos(), 5000 + Math.random() * 10000)
+          .to(this.pos(), 1000 + Math.random() * 6000)
           .start()
           .onComplete(() => setupPositionTween(light));
       };
@@ -47,6 +48,10 @@ export default class LightCloud {
 
   setIntensity (intensity) {
     this.lights.forEach(l => (l.intensity = intensity));
+  }
+
+  setColor (color) {
+    this.lights.forEach(l => (l.color.set(color)));
   }
 
   pos () {

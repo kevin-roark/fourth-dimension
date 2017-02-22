@@ -95,7 +95,7 @@ function go () {
     }
 
     setTimeout(() => {
-      [document.body, dom.info, dom.title, renderer.domElement, document.querySelector('.home-view-hud')].forEach(el => el.classList.add('loaded'));
+      [document.body, dom.info, dom.title, renderer.domElement, document.querySelector('.home-view-hud')].forEach(el => el ? el.classList.add('loaded') : '');
     }, 500);
   });
 
