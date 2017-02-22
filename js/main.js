@@ -8,6 +8,7 @@ import dataUtil from './data-util';
 import cameras from './cameras';
 import HomeView from './home-view';
 import PhotoView from './photo-view';
+import setLoading from './loading';
 
 if (isMobile) {
   let mobileWarning = document.createElement('div');
@@ -28,6 +29,8 @@ if (isMobile) {
 
 function go () {
   window.THREE = THREE;
+
+  setLoading(true);
 
   seriesData.sort(() => Math.random() - 0.5);
 
@@ -131,7 +134,7 @@ function go () {
 
     if (state.photoInView) {
       state.photoInView.update(delta);
-    } else {
+    } else if (!state.loadingPhotoView) {
       homeView.update(delta);
     }
 
@@ -154,10 +157,12 @@ function go () {
     window.history.replaceState('', document.title, `${window.location.pathname}${hash}`);
 
     if (photo) {
+      setLoading(true);
       state.loadingPhotoView = true;
       let photoView = new PhotoView({ photo, scene, renderer, camera: cameras.perspectiveCamera, closeHandler: exitCurrentPhotoView });
       photoView.load(() => {
         state.loadingPhotoView = false;
+        setLoading(false);
         setPhotoView(photoView);
       });
     } else {
@@ -197,6 +202,7 @@ function go () {
   function createScene (callback) {
     makeLights();
     homeView.load(() => {
+      setLoading(false);
       callback();
     });
   }
