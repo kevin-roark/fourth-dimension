@@ -379,10 +379,6 @@ export default function TrackballKeyboardControls( object, domElement ) {
 
 		_state = _prevState;
 
-    if (handleMovementKey(event.keyCode, false) !== undefined) {
-      markActivity();
-    }
-
 		// window.addEventListener( 'keydown', keydown, false );
 	}
 
@@ -443,8 +439,6 @@ export default function TrackballKeyboardControls( object, domElement ) {
 		document.addEventListener( 'mouseup', mouseup, false );
 
 		_this.dispatchEvent( startEvent );
-
-    markActivity();
 	}
 
 	function mousemove( event ) {

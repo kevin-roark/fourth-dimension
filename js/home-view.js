@@ -1,6 +1,7 @@
 
 let THREE = require('three');
 let TWEEN = require('tween.js');
+let isMobile = require('ismobilejs').any;
 
 import ThumbnailPile from './thumbnail-pile';
 import MouseIntersector from './mouse-intersector';
@@ -31,6 +32,22 @@ export default class HomeView {
     this.lights = new THREE.Object3D();
     this.container.add(this.lights);
 
+    this.dom = {
+      container: this.createDomContainer(),
+      seriesTitle: document.querySelector('.series-title'),
+      listContainer: this.createListContainer(seriesData)
+    };
+
+    this.homeViewHud = new HomeViewHud({
+      arrowHandler: delta => {
+        this.cycleCollectionPile(delta > 0);
+      },
+      styleHandler: this.cyclePileStyle.bind(this)
+    });
+    if (!isMobile) {
+      this.homeViewHud.addToParent(this.dom.container);
+    }
+
     let backgroundMesh = this.backgroundMesh = new THREE.Mesh(
       new THREE.BoxBufferGeometry(1, 1, 1),
       new THREE.MeshStandardMaterial({
@@ -45,27 +62,13 @@ export default class HomeView {
     grid.position.z = -150;
     this.container.add(grid);
 
-    this.dom = {
-      container: this.createDomContainer(),
-      seriesTitle: document.querySelector('.series-title'),
-      listContainer: this.createListContainer(seriesData)
-    };
-
-    this.homeViewHud = new HomeViewHud({
-      arrowHandler: delta => {
-        this.cycleCollectionPile(delta > 0);
-      },
-      styleHandler: this.cyclePileStyle.bind(this)
-    });
-    this.homeViewHud.addToParent(this.dom.container);
-
-    let bigCursor = this.bigCursor = new BigCursor();
+    let bigCursor = this.bigCursor = new BigCursor({ size: isMobile ? 32 : 64 });
     bigCursor.makeHand();
     bigCursor.addToParent(this.dom.container);
 
     this.state = {
       active: false,
-      pileStyle: 'collection',
+      pileStyle: isMobile ? 'list' : 'collection',
       collectionPile: null,
       pileOverflowTween: null,
       hoverThumbnail: null
@@ -88,6 +91,11 @@ export default class HomeView {
 
   load (callback) {
     let { renderer, camera } = this;
+
+    if (isMobile) {
+      if (callback) callback();
+      return;
+    }
 
     this.makeLights();
     this.makePiles(() => {
@@ -172,6 +180,8 @@ export default class HomeView {
 
   makeLights () {
     let shadowConfig = light => {
+      if (isMobile) return;
+
       light.castShadow = true;
       light.shadow.mapSize.width = light.shadow.mapSize.height = 1024;
       light.shadow.camera.near = 1;
@@ -180,6 +190,8 @@ export default class HomeView {
     };
 
     let setupPositionTween = light => {
+      if (isMobile) return;
+
       let viewport = cameras.getOrthographicViewport();
       new TWEEN.Tween(light.position)
         .to({
@@ -370,6 +382,11 @@ export default class HomeView {
             this.photoClickHandler(photo);
           }
         });
+
+        if (!isMobile) {
+          li.addEventListener('mouseenter', () => li.classList.add('hovering'));
+          li.addEventListener('mouseleave', () => li.classList.remove('hovering'));
+        }
 
         ul.appendChild(li);
       });

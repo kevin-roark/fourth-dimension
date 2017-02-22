@@ -1,7 +1,7 @@
 
 let THREE = require('three');
 let TWEEN = require('tween.js');
-let isMobile = require('ismobilejs');
+let isMobile = require('ismobilejs').any;
 
 import seriesData from './data';
 import dataUtil from './data-util';
@@ -9,10 +9,18 @@ import cameras from './cameras';
 import HomeView from './home-view';
 import PhotoView from './photo-view';
 
-if (isMobile.any) {
+if (isMobile) {
   let mobileWarning = document.createElement('div');
   mobileWarning.className = 'mobile-warning';
+  mobileWarning.textContent = 'Check this out on your laptop some time... it is good.';
   document.body.appendChild(mobileWarning);
+  setTimeout(() => {
+    mobileWarning.style.opacity = 0;
+    setTimeout(() => {
+      mobileWarning.parentNode.removeChild(mobileWarning);
+    }, 1200);
+  }, 7300);
+
   setTimeout(go, 1000);
 } else {
   go();
@@ -194,7 +202,7 @@ function go () {
   }
 
   function makeLights () {
-    let ambient = new THREE.AmbientLight(0xffffff, 0.4);
+    let ambient = new THREE.AmbientLight(0xffffff, isMobile ? 1 : 0.4);
     scene.add(ambient);
   }
 }

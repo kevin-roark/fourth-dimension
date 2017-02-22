@@ -1,4 +1,6 @@
 
+let isMobile = require('ismobilejs').any;
+
 import Component from './component';
 import PhotoViewPrintModal from './photo-view-print-modal';
 import playSound from '../audio';
@@ -62,7 +64,7 @@ export default class PhotoViewInterface extends Component {
   }
 
   setupButton (button, handler, shortcut) {
-    if (shortcut) {
+    if (shortcut && !isMobile) {
       button.addEventListener('mouseenter', () => {
         this.toolTip.textContent = `Shortcut: ${shortcut}`;
       });

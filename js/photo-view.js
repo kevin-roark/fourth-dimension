@@ -1,5 +1,6 @@
 
 let THREE = require('three');
+let isMobile = require('ismobilejs').any;
 
 import loadModel from './model-cache';
 import createGrid from './grid';
@@ -9,7 +10,7 @@ import Controls from './controls';
 import PhotoViewInterface from './components/photo-view-interface';
 
 let BACKGROUNDS = ['texture', 'blank', 'mosaic', 'grid', 'dark grid'];
-let LIGHTINGS = ['white', 'white front', 'white back', 'primary', 'cops', 'redCloud', 'blueCloud', 'red', 'blue', 'green', 'yellow'];
+let LIGHTINGS = isMobile ? ['white', 'white front', 'white back', 'red', 'blue', 'green', 'yellow'] : ['white', 'white front', 'white back', 'primary', 'cops', 'redCloud', 'blueCloud', 'red', 'blue', 'green', 'yellow'];
 let TEXTURES = ['default', 'toon', 'empty', 'purple', 'cyan', 'yellow'];
 let DEFAULT_CAMERA_POSITION = 10;
 let MODEL_SCALE_FACTOR = 3.5;
@@ -36,14 +37,13 @@ export default class PhotoView {
     spotlight.castShadow = true;
     container.add(spotlight);
 
-    let ring = this.lightRing = new LightRing({ count: 3, radius: 15, y: 10, yRange: 6, distance: 200, angle: 0.5, revolutionSpeed: 0.004, castShadow: false });
-    container.add(ring.obj);
+    if (!isMobile) {
+      let ring = this.lightRing = new LightRing({ count: 3, radius: 15, y: 10, yRange: 6, distance: 200, angle: 0.5, revolutionSpeed: 0.004, castShadow: false });
+      container.add(ring.obj);
 
-    this.copsLightRing = new LightRing({ hues: [0, 0.67], radius: 10, y: 7.5, yRange: 7.5, distance: 200, angle: 0.22, revolutionSpeed: 0.003, castShadow: true });
-    container.add(this.copsLightRing.obj);
-
-    this.lightCloud = new LightCloud({ color: 0xff0000 });
-    container.add(this.lightCloud.container);
+      this.lightCloud = new LightCloud({ color: 0xff0000 });
+      container.add(this.lightCloud.container);
+    }
 
     this.interface = new PhotoViewInterface({
       closeHandler,
@@ -129,7 +129,7 @@ export default class PhotoView {
       platform.position.set(0, -(size.y / 2) - 2, -size.z * 0.75);
       container.add(platform);
 
-      this.lightCloud.container.position.set(0, size.y * 1.1, 0);
+      if (this.lightCloud) this.lightCloud.container.position.set(0, size.y * 1.2, 0);
 
       this.setSpotlightPosition();
 
@@ -212,8 +212,6 @@ export default class PhotoView {
 
       if (lighting === 'primary') {
         this.lightRing.update(delta);
-      } else if (lighting === 'cops') {
-        this.copsLightRing.update(delta);
       }
 
       this.controls.update(delta);
@@ -347,7 +345,7 @@ export default class PhotoView {
   }
 
   setLighting (lighting) {
-    let { spotlight, lightRing, copsLightRing, lightCloud, state } = this;
+    let { spotlight, lightRing, lightCloud, state } = this;
     state.lighting = lighting;
 
     switch (lighting) {
@@ -375,7 +373,9 @@ export default class PhotoView {
         break;
 
       case 'cops':
-        copsLightRing.setIntensity(1.6);
+        lightCloud.setIntensity(1.5);
+        lightCloud.setActive(true);
+        lightCloud.setColor([0xff0000, 0x0000ff]);
         break;
 
       case 'redCloud':
@@ -391,9 +391,8 @@ export default class PhotoView {
         break;
     }
 
-    if (lighting !== 'primary') lightRing.setIntensity(0);
-    if (lighting !== 'cops') copsLightRing.setIntensity(0);
-    if (lighting !== 'redCloud' && lighting !== 'blueCloud') {
+    if (lighting !== 'primary' && lightRing) lightRing.setIntensity(0);
+    if (lightCloud && lighting !== 'cops' && lighting !== 'redCloud' && lighting !== 'blueCloud') {
       lightCloud.setIntensity(0);
       lightCloud.setActive(false);
     }

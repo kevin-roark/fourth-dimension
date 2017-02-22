@@ -147,10 +147,11 @@ canvas {
   }
 
 .mobile-warning {
-  position: fixed; top: 0; left: 0; width: 100%;
+  position: fixed; bottom: 0; left: 0; width: 100%;
   padding: 20px;
   background: #fff; color: #000; opacity: 0.75;
   line-height: 1.5;
+  transition: opacity 1s;
 }
 
 /**
@@ -282,7 +283,7 @@ canvas {
   transition: transform 0.2s;
   transition: transform 0.2s, -webkit-transform 0.2s;
 }
-  .home-view-list-container ul li:hover {
+  .home-view-list-container ul li.hovering {
     z-index: 10;
     -webkit-transform: scale(4, 2);
             transform: scale(4, 2);
@@ -378,6 +379,7 @@ canvas {
   top: 5px; right: 5px;
   font-family: Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, serif;
   font-size: 12px;
+  text-align: center;
 }
 
 .photo-view-control-button {
@@ -695,6 +697,11 @@ canvas {
     max-width: calc(67%);
   }
 
+  .big-cursor {
+    width: 32px;
+    height: 32px;
+  }
+
   .photo-view-close-button {
     left: auto; top: -5px; right: 30px;
     font-size: 44px;
@@ -706,6 +713,7 @@ canvas {
 
   .photo-view-print-button {
     display: inline-block;
+    padding: 5px 20px 5px 20px;
   }
 
   .photo-view-print-modal {
