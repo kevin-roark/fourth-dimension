@@ -4,7 +4,7 @@ let TWEEN = require('tween.js');
 
 export default class LightCloud {
   constructor (options = {}) {
-    let { count = 3, spread = 8, color = 0xffffff, intensity = 1, distance = 10, decay = 2 } = options;
+    let { count = 3, spread = 6, color = 0xffffff, intensity = 1, distance = 10, decay = 2 } = options;
     this.count = count;
     this.spread = spread;
 
@@ -12,8 +12,9 @@ export default class LightCloud {
     this.container = new THREE.Object3D();
 
     this.lights = [];
+    let colors = color.length ? color : [color];
     for (let i = 0; i < count; i++) {
-      let light = new THREE.PointLight(color, intensity, distance, decay);
+      let light = new THREE.PointLight(colors[i % colors.length], intensity, distance, decay);
       let pos = this.pos();
       light.position.set(pos.x, pos.y, pos.z);
       this.lights.push(light);
@@ -51,7 +52,10 @@ export default class LightCloud {
   }
 
   setColor (color) {
-    this.lights.forEach(l => (l.color.set(color)));
+    let colors = color.length ? color : [color];
+    for (let i = 0; i < this.lights.length; i++) {
+      this.lights[i].color.set(colors[i % colors.length]);
+    }
   }
 
   pos () {

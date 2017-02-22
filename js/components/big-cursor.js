@@ -10,6 +10,8 @@ export default class BigCursor extends Component {
 
     window.addEventListener('mousedown', this.handleMouseEvent.bind(this));
     window.addEventListener('mousemove', this.handleMouseEvent.bind(this));
+    window.addEventListener('touchdown', ev => this.handleMouseEvent(ev.touches[0]));
+    window.addEventListener('touchmove', ev => this.handleMouseEvent(ev.touches[0]));
   }
 
   makeBasketball () {
