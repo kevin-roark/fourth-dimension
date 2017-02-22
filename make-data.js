@@ -5,9 +5,9 @@ let dataUtil = require('./js/data-util');
 
 const typeMap = {
   friends: 'body',
-  domestic: 'room',
+  domestic: 'room'
 };
-const makeThumbnails = false;
+const makeThumbnails = true;
 
 let seriesPaths = fs.readdirSync('models').filter(dirFilter);
 let data = seriesPaths.map(seriesPath => {
@@ -43,7 +43,7 @@ fs.writeFileSync('js/data.json', json);
 
 function makeThumbnail (modelPath) {
   let texturePath = `${modelPath}/Model.jpg`;
-  let command = `convert ${texturePath} -resize 512x512 ${modelPath}/Thumbnail.jpg`;
+  let command = `convert ${texturePath} -resize 256x256 ${modelPath}/Thumbnail.jpg`;
   execSync(command);
 }
 
