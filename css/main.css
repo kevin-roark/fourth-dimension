@@ -39,6 +39,34 @@ canvas {
     opacity: 1;
   }
 
+@-webkit-keyframes LOADING {
+  0%   { text-shadow: 0 0 2px #f00, 0 0 5px #f00, 0 0 10px #f00; }
+  100% { text-shadow: 0 0 2px #00f, 0 0 5px #00f, 0 0 10px #00f; }
+}
+
+@keyframes LOADING {
+  0%   { text-shadow: 0 0 2px #f00, 0 0 5px #f00, 0 0 10px #f00; }
+  100% { text-shadow: 0 0 2px #00f, 0 0 5px #00f, 0 0 10px #00f; }
+}
+.loading-notification {
+  position: fixed;
+  z-index: 1000;
+  width: 300px;
+  left: 50%;
+  top: 40%;
+  -webkit-transform: translate(-50%, -50%);
+          transform: translate(-50%, -50%);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  font-size: 64px;
+  color: #fff;
+  text-align: center;
+  -webkit-animation: LOADING 0.3s ease alternate infinite;
+          animation: LOADING 0.3s ease alternate infinite;
+  -webkit-transition: opacity 0.2s;
+  transition: opacity 0.2s;
+  opacity: 0;
+}
+
 .globe-cursor {
   cursor: url('../images/globe.png'), crosshair;
 }
@@ -151,6 +179,7 @@ canvas {
   padding: 20px;
   background: #fff; color: #000; opacity: 0.75;
   line-height: 1.5;
+  -webkit-transition: opacity 1s;
   transition: opacity 1s;
 }
 
