@@ -24,7 +24,8 @@ function go () {
   seriesData.sort(() => Math.random() - 0.5);
 
   let renderer = new THREE.WebGLRenderer({
-    antialias: true
+    antialias: true,
+    preserveDrawingBuffer: true
   });
   renderer.setClearColor(0x000000);
   renderer.shadowMap.enabled = true;
@@ -44,7 +45,7 @@ function go () {
   let dom = {
     info: document.querySelector('.info'),
     title: document.querySelector('.title'),
-    seriesTitle: document.querySelector('.series-title'),
+    seriesTitle: document.querySelector('.series-title')
   };
 
   let state = {
@@ -94,7 +95,7 @@ function go () {
     }
 
     setTimeout(() => {
-      [document.body, dom.info, dom.title, renderer.domElement, document.querySelector('.home-view-hud')].forEach(el => el.classList.add('loaded'));
+      [document.body, dom.info, dom.title, renderer.domElement, document.querySelector('.home-view-hud')].forEach(el => el ? el.classList.add('loaded') : '');
     }, 500);
   });
 
@@ -146,7 +147,7 @@ function go () {
 
     if (photo) {
       state.loadingPhotoView = true;
-      let photoView = new PhotoView({ photo, scene, camera: cameras.perspectiveCamera, closeHandler: exitCurrentPhotoView });
+      let photoView = new PhotoView({ photo, scene, renderer, camera: cameras.perspectiveCamera, closeHandler: exitCurrentPhotoView });
       photoView.load(() => {
         state.loadingPhotoView = false;
         setPhotoView(photoView);
@@ -157,7 +158,7 @@ function go () {
   }
 
   function exitCurrentPhotoView () {
-    if (state.photoInView) {
+    if (state.photoInView && !state.photoInView.state.showingPrintModal) {
       viewPhoto(null);
     }
   }
@@ -168,8 +169,11 @@ function go () {
       photoView.activate();
     } else {
       state.photoInView.deactivate();
-      homeView.activate(scene);
       cameras.resetPerspectiveCamera();
+
+      setTimeout(() => {
+        homeView.activate(scene);
+      }, 0);
     }
 
     [dom.info, dom.seriesTitle].forEach(el => {
@@ -190,7 +194,7 @@ function go () {
   }
 
   function makeLights () {
-    let ambient = new THREE.AmbientLight(0xffffff, 0.5);
+    let ambient = new THREE.AmbientLight(0xffffff, 0.4);
     scene.add(ambient);
   }
 }

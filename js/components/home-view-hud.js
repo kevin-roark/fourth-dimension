@@ -16,13 +16,13 @@ export default class HomeViewHud extends Component {
 
     let leftArrow = this.leftArrow = this.div('home-view-hud-arrow', null, 'Previous Collection');
     leftArrow.addEventListener('click', () => {
-      if (arrowHandler) arrowHandler(-1);
+      if (arrowHandler) arrowHandler(false);
     }, false);
     arrowContainer.appendChild(leftArrow);
 
     let rightArrow = this.rightArrow = this.div('home-view-hud-arrow', null, 'Next Collection');
     rightArrow.addEventListener('click', () => {
-      if (arrowHandler) arrowHandler(1);
+      if (arrowHandler) arrowHandler(true);
     }, false);
     arrowContainer.appendChild(rightArrow);
 
@@ -34,7 +34,7 @@ export default class HomeViewHud extends Component {
   }
 
   setStyle (style = 'collection') {
-    let names = { collection: 'Collection', crazy: 'Explosion', neat: 'Splayed' };
+    let names = { collection: 'Collection', crazy: 'Explosion', neat: 'Splayed', list: 'List' };
     this.label.textContent = `${names[style]} View`;
 
     this.label.className = `home-view-hud-label home-view-label-${style}`;

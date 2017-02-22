@@ -1,23 +1,24 @@
 
 let THREE = require('three');
-let TWEEN = require('tween.js');
 
 import loadModel from './model-cache';
 import createGrid from './grid';
 import LightRing from './light-ring';
+import LightCloud from './light-cloud';
 import Controls from './controls';
 import PhotoViewInterface from './components/photo-view-interface';
 
-let BACKGROUNDS = ['texture', 'blank', 'grid'];
-let LIGHTINGS = ['white', 'red', 'blue', 'green', 'yellow', 'primary'];
-let TEXTURES = ['default', 'toon', 'empty'];
+let BACKGROUNDS = ['texture', 'blank', 'mosaic', 'grid', 'dark grid'];
+let LIGHTINGS = ['white', 'white front', 'white back', 'primary', 'cops', 'redCloud', 'blueCloud', 'red', 'blue', 'green', 'yellow'];
+let TEXTURES = ['default', 'toon', 'empty', 'purple', 'cyan', 'yellow'];
 let DEFAULT_CAMERA_POSITION = 10;
 let MODEL_SCALE_FACTOR = 3.5;
 
 export default class PhotoView {
-  constructor ({ photo, scene, camera, closeHandler }) {
+  constructor ({ photo, scene, renderer, camera, closeHandler }) {
     this.photo = photo;
     this.scene = scene;
+    this.renderer = renderer;
     this.camera = camera;
 
     let controls = this.controls = new Controls(camera);
@@ -35,15 +36,28 @@ export default class PhotoView {
     spotlight.castShadow = true;
     container.add(spotlight);
 
-    let ring = this.lightRing = new LightRing({ count: 3, radius: 15, y: 10, yRange: 6, distance: 200, angle: 0.5, revolutionSpeed: 0.004 });
+    let ring = this.lightRing = new LightRing({ count: 3, radius: 15, y: 10, yRange: 6, distance: 200, angle: 0.5, revolutionSpeed: 0.004, castShadow: false });
     container.add(ring.obj);
+
+    this.copsLightRing = new LightRing({ hues: [0, 0.67], radius: 10, y: 7.5, yRange: 7.5, distance: 200, angle: 0.22, revolutionSpeed: 0.003, castShadow: true });
+    container.add(this.copsLightRing.obj);
+
+    this.lightCloud = new LightCloud({ color: 0xff0000 });
+    container.add(this.lightCloud.container);
 
     this.interface = new PhotoViewInterface({
       closeHandler,
+      modelName: photo.name,
+      resetCameraHandler: this.resetCamera.bind(this),
       wireframeHandler: this.wireframeButtonPressed.bind(this),
       textureHandler: this.textureButtonPressed.bind(this),
       lightingHandler: this.lightingButtonPressed.bind(this),
-      backgroundHandler: this.backgroundButtonPressed.bind(this)
+      backgroundHandler: this.backgroundButtonPressed.bind(this),
+      printModalHandler: this.printModalHandler.bind(this),
+      printImageProvider: callback => {
+        let imageData = this.mostRecentPrintImageData = this.renderer.domElement.toDataURL();
+        callback(imageData);
+      }
     });
 
     this.state = {
@@ -52,16 +66,22 @@ export default class PhotoView {
       texture: TEXTURES[0],
       background: BACKGROUNDS[0],
       lighting: LIGHTINGS[0],
-      rps: 1
+      rps: 1,
+      showingPrintModal: false
     };
   }
 
   load (callback) {
-    let { photo, container, spotlight, controls } = this;
+    let { photo, container, controls } = this;
 
     loadModel(photo, ({ geometry, texture }) => {
       this.geometry = geometry;
       this.texture = texture;
+
+      let mosaicTexture = this.mosaicTexture = texture.clone();
+      mosaicTexture.wrapS = mosaicTexture.wrapT = THREE.RepeatWrapping;
+      mosaicTexture.repeat.set(8, 8);
+      mosaicTexture.needsUpdate = true;
 
       geometry.center();
       geometry.computeBoundingBox();
@@ -109,10 +129,32 @@ export default class PhotoView {
       platform.position.set(0, -(size.y / 2) - 2, -size.z * 0.75);
       container.add(platform);
 
-      spotlight.position.set(0, size.y + 8, size.z + 2);
+      this.lightCloud.container.position.set(0, size.y * 1.1, 0);
+
+      this.setSpotlightPosition();
 
       if (callback) callback();
     });
+  }
+
+  setSpotlightPosition (style = 'top') {
+    let { spotlight, geometry } = this;
+
+    let size = geometry.boundingBox.getSize();
+    switch (style) {
+      case 'front':
+        spotlight.position.set(0, size.y + 1, size.z + 10);
+        break;
+
+      case 'back':
+        spotlight.position.set(0, size.y + 3, -size.z - 25);
+        break;
+
+      case 'top':
+      default:
+        spotlight.position.set(0, size.y + 8, size.z + 2);
+        break;
+    }
   }
 
   activate () {
@@ -134,6 +176,8 @@ export default class PhotoView {
     this.scene.remove(this.container);
     this.scene.remove(this.grid);
     this.grid = null;
+    this.scene.remove(this.darkGrid);
+    this.darkGrid = null;
     this.controls.enabled = false;
 
     this.interface.el.classList.remove('active');
@@ -160,14 +204,16 @@ export default class PhotoView {
   }
 
   update (delta) {
-    if (this.state.active) {
+    if (this.state.active && !this.state.showingPrintModal) {
       let { lighting, rps } = this.state;
-      if (this.mesh) {
+      if (this.mesh && rps > 0) {
         this.mesh.rotation.y += rps * (delta / 1000);
       }
 
       if (lighting === 'primary') {
         this.lightRing.update(delta);
+      } else if (lighting === 'cops') {
+        this.copsLightRing.update(delta);
       }
 
       this.controls.update(delta);
@@ -175,6 +221,15 @@ export default class PhotoView {
   }
 
   keydown (ev) {
+    if (this.state.showingPrintModal) {
+      switch (ev.keyCode) {
+        case 27: // ESC
+          this.interface.showPrintModal(false);
+          break;
+      }
+      return;
+    }
+
     switch (ev.keyCode) {
       case 32: // space
         this.resetCamera();
@@ -194,6 +249,10 @@ export default class PhotoView {
 
       case 77: // M
         this.wireframeButtonPressed();
+        break;
+
+      case 80: // P
+        this.interface.showPrintModal(true);
         break;
     }
   }
@@ -215,16 +274,9 @@ export default class PhotoView {
   }
 
   controlActivityMonitor (isActive) {
-    let to = { rps: isActive ? 0 : 1 };
-    let easing = isActive ? TWEEN.Easing.Quadratic.Out : TWEEN.Easing.Quadratic.In;
-    let duration = 2500 * Math.abs(this.state.rps - to.rps);
-
-    if (this.activityTween) {
-      this.activityTween.stop();
-      this.activityTween = null;
+    if (isActive) {
+      this.state.rps = 0;
     }
-
-    this.activityTween = new TWEEN.Tween(this.state).to(to, duration).easing(easing).start();
   }
 
   wireframeButtonPressed () {
@@ -244,6 +296,11 @@ export default class PhotoView {
   backgroundButtonPressed () {
     let backgroundIndex = (BACKGROUNDS.indexOf(this.state.background) + 1) % BACKGROUNDS.length;
     this.setBackground(BACKGROUNDS[backgroundIndex]);
+  }
+
+  printModalHandler (showing) {
+    this.state.showingPrintModal = showing;
+    this.controls.enabled = !showing;
   }
 
   setWireframe (wireframe) {
@@ -268,14 +325,18 @@ export default class PhotoView {
         this.mesh.material = this.material;
         break;
 
-      case 'empty':
-        this.material.map = null;
-        this.material.color.set(0x666666);
-        this.mesh.material = this.material;
-        break;
-
       case 'toon':
         this.mesh.material = this.toonMaterial;
+        break;
+
+      case 'empty':
+      case 'purple':
+      case 'yellow':
+      case 'cyan':
+        let colorMap = { empty: 0x666666, white: 0xffffff, yellow: 0xffff00, purple: 0xff00ff, cyan: 0x00ffff };
+        this.material.map = null;
+        this.material.color.set(colorMap[texture]);
+        this.mesh.material = this.material;
         break;
     }
 
@@ -286,7 +347,7 @@ export default class PhotoView {
   }
 
   setLighting (lighting) {
-    let { spotlight, lightRing, state } = this;
+    let { spotlight, lightRing, copsLightRing, lightCloud, state } = this;
     state.lighting = lighting;
 
     switch (lighting) {
@@ -296,17 +357,47 @@ export default class PhotoView {
       case 'blue':
       case 'yellow':
         spotlight.intensity = lighting === 'white' ? 2 : 5;
-        lightRing.setIntensity(0);
+        this.setSpotlightPosition('top');
 
         let colorMap = { white: 0xffffff, red: 0xff0000, green: 0x00ff00, blue: 0x0000ff, yellow: 0xffff00 };
         spotlight.color.set(colorMap[lighting]);
         break;
 
+      case 'white front':
+      case 'white back':
+        spotlight.intensity = 3;
+        spotlight.color.set(0xffffff);
+        this.setSpotlightPosition(lighting === 'white front' ? 'front' : 'back');
+        break;
+
       case 'primary':
-        spotlight.intensity = 0;
         lightRing.setIntensity(1.4);
         break;
+
+      case 'cops':
+        copsLightRing.setIntensity(1.6);
+        break;
+
+      case 'redCloud':
+        lightCloud.setIntensity(1.5);
+        lightCloud.setActive(true);
+        lightCloud.setColor(0xff0000);
+        break;
+
+      case 'blueCloud':
+        lightCloud.setIntensity(1.5);
+        lightCloud.setActive(true);
+        lightCloud.setColor(0x0000ff);
+        break;
     }
+
+    if (lighting !== 'primary') lightRing.setIntensity(0);
+    if (lighting !== 'cops') copsLightRing.setIntensity(0);
+    if (lighting !== 'redCloud' && lighting !== 'blueCloud') {
+      lightCloud.setIntensity(0);
+      lightCloud.setActive(false);
+    }
+    if (lighting === 'primary' || lighting === 'cops' || lighting.indexOf('Cloud') >= 0) spotlight.intensity = 0;
 
     this.interface.flashParameter(lighting);
   }
@@ -319,6 +410,10 @@ export default class PhotoView {
         this.scene.background = this.texture;
         break;
 
+      case 'mosaic':
+        this.scene.background = this.mosaicTexture;
+        break;
+
       case 'blank':
         this.scene.background = new THREE.Color(0x000000);
         break;
@@ -328,10 +423,18 @@ export default class PhotoView {
         if (!this.grid) this.grid = createGrid({ length: 60, gridLength: 20 });
         this.scene.add(this.grid);
         break;
+
+      case 'dark grid':
+        this.scene.background = new THREE.Color(0x000000);
+        if (!this.darkGrid) this.darkGrid = createGrid({ length: 60, gridLength: 10, color: 0x00ff00 });
+        this.scene.add(this.darkGrid);
     }
 
     if (background !== 'grid' && this.grid) {
       this.scene.remove(this.grid);
+    }
+    if (background !== 'dark grid' && this.darkGrid) {
+      this.scene.remove(this.darkGrid);
     }
 
     this.interface.flashParameter(background);

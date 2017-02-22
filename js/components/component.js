@@ -11,11 +11,22 @@ export default class Component {
     }
   }
 
-  div (className, id = null, textContent = '') {
+  div (className, id = null, textContent = '', innerHTML = false) {
     let el = document.createElement('div');
     el.className = className;
     if (id) el.id = id;
-    el.textContent = textContent;
+    if (innerHTML) el.innerHTML = textContent;
+    else el.textContent = textContent;
+    return el;
+  }
+
+  link ({ url, className, id, text = '', blank = false }) {
+    let el = document.createElement('a');
+    el.className = className;
+    el.textContent = text;
+    el.href = url;
+    if (id) el.id = id;
+    if (blank) el.target = '_blank';
     return el;
   }
 }
